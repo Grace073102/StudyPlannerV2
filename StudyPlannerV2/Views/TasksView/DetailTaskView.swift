@@ -36,7 +36,7 @@ struct DetailTaskView: View {
                             ZStack {
                                 if selectedFilter == filter {
                                     RoundedRectangle(cornerRadius: 8)
-                                        .fill(Color.blue.opacity(0.15))
+                                        .fill(Color.accentColor.opacity(0.15))
                                         .matchedGeometryEffect(
                                             id: "filter",
                                             in: animation
@@ -52,7 +52,7 @@ struct DetailTaskView: View {
                                     )
                                     .foregroundStyle(
                                         selectedFilter == filter
-                                        ? .blue
+                                        ? Color.accentColor
                                         : .secondary
                                     )
                                     .frame(maxWidth: .infinity)
@@ -65,7 +65,7 @@ struct DetailTaskView: View {
                 .padding(4)
                 .background(
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(Color(.systemBackground))
+                        .fill(Color(Theme.card))
                 )
 
                 prioritySection(
@@ -120,7 +120,7 @@ struct DetailTaskView: View {
                     }
                     .background(
                         RoundedRectangle(cornerRadius: 16)
-                            .fill(Color(.systemBackground))
+                            .fill(Theme.card)
                     )
                 }
             }

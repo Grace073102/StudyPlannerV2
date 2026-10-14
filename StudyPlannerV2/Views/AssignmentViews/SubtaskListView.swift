@@ -242,7 +242,7 @@ struct SubtaskListView: View {
                     }
                     .font(.subheadline)
                     .fontWeight(.semibold)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Theme.onAccent)
                     .frame(maxWidth: .infinity)
                     .frame(height: 46)
                     .background(
@@ -338,7 +338,7 @@ struct SubtaskListView: View {
                     } label: {
                         Text("Save Changes")
                             .fontWeight(.semibold)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(Theme.onAccent)
                             .frame(maxWidth: .infinity)
                             .frame(height: 46)
                             .background(
