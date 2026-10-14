@@ -70,66 +70,53 @@ struct AssignmentView: View {
                         assignments: assignmentViewModel.assignments
                     )
 
-                    VStack(alignment: .leading, spacing: 16) {
-                        HStack(alignment: .top) {
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text("Upcoming Tasks")
+                    VStack(alignment: .leading, spacing: 12){
+                        HStack(alignment: .firstTextBaseline){
+                            VStack(alignment: .leading, spacing: 3){
+                                Text("To-do list")
                                     .font(.headline)
-                                    .fontWeight(.semibold)
-
-                                Text("Tasks due within the next 7 days")
+                                    .fontWeight(.bold)
+                                
+                                Text(todoSubtitle)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
-
+                            
                             Spacer()
-
+                            
                             NavigationLink {
                                 DetailTaskView()
                                     .environmentObject(assignmentViewModel)
                                     .environmentObject(taskViewModel)
                             } label: {
-                                HStack(spacing: 3) {
-                                    Text("View All")
-                                    Image(systemName: "chevron.right")
-                                }
-                                .font(.caption)
-                                .fontWeight(.semibold)
+                                Text("See all")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
                             }
                         }
-
-                        if taskViewModel.upcomingTasks.isEmpty {
-                            Text("No tasks due within the next 7 days")
+                        
+                        if taskViewModel.todayTasks.isEmpty {
+                            Text("Plan a subtask for today from any assignment to see it here.")
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
-                        } else {
-                            ForEach(taskViewModel.upcomingTasks) { task in
-                                TaskView(
-                                    task: task,
-                                    course: courseName(for: task)
+                        }
+                        else {
+                            ForEach(taskViewModel.todayTasks) { task in
+                                TaskView(task: task,
+                                         course: courseName(for: task)
                                 ) {
-                                    taskViewModel.toggleTask(
-                                        taskID: task.id
-                                    )
+                                    taskViewModel.toggleTask(taskID: task.id)
+                                }
+                                
+                                if task.id != taskViewModel.todayTasks.last?.id {
+                                    Divider()
                                 }
                             }
                         }
                     }
-                    .padding(16)
-                    .frame(
-                        maxWidth: .infinity,
-                        alignment: .leading
-                    )
-                    .background(
-                        RoundedRectangle(cornerRadius: 20)
-                            .fill(Color(.secondarySystemGroupedBackground))
-                            .shadow(
-                                color: .black.opacity(0.06),
-                                radius: 5,
-                                x: 0,
-                                y: 2
-                            )
-                    )
+                    .padding(Theme.padding)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Theme.card, in: .rect(cornerRadius: Theme.corner))
 
                     Spacer(minLength: 20)
                 }
@@ -156,6 +143,15 @@ struct AssignmentView: View {
                 $0.id == task.id
             }
         }?.course
+    }
+    
+    private var todoSubtitle: String {
+        if taskViewModel.todayTasks.isEmpty {
+            return "Nothing planned for today"
+        }
+
+        let minutes = taskViewModel.todayStudyMinutes
+        return minutes > 0 ? "\(formattedDuration(minutes)) left" : "All done for today"
     }
 
     private func formattedDuration(
