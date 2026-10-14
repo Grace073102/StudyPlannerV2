@@ -39,26 +39,33 @@ struct AssignmentView: View {
                         .buttonStyle(.plain)
                     }
                     
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Today's study plan")
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
+                    HStack(spacing: 12) {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Today's study plan")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                            
+                            let count = taskViewModel.todayIncompleteTasks.count
+                            Text("\(count) \(count == 1 ? "task" : "tasks")")
+                                .font(.title)
+                                .fontWeight(.bold)
+                            
+                            let minutes = taskViewModel.todayStudyMinutes
+                            Text(minutes > 0 ? "\(formattedDuration(minutes)) planned" : "Nothing planned")
+                                .font(.subheadline)
+                        }
+                        .foregroundStyle(Theme.onAccent)
+                        .padding(Theme.padding)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                        .background(Color.accentColor, in: .rect(cornerRadius: Theme.corner))
                         
-                        let count = taskViewModel.todayIncompleteTasks.count
-                        Text("\(count) \(count == 1 ? "task" : "tasks")")
-                            .font(.title)
-                            .fontWeight(.bold)
-                        
-                        let minutes = taskViewModel.todayStudyMinutes
-                        Text(minutes > 0 ? "\(formattedDuration(minutes)) planned" : "Nothing planned")
-                            .font(.subheadline)
+                        ProgressOverviewView(
+                            progress: assignmentViewModel.overallProgress,
+                            completedCount: assignmentViewModel.completedTaskCount,
+                            totalCount: assignmentViewModel.totalTaskCount
+                        )
                     }
-                    .foregroundStyle(Theme.onAccent)
-                    .padding(Theme.padding)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.accentColor, in: .rect(cornerRadius: Theme.corner))
-                    
-
+                    .fixedSize(horizontal: false, vertical: true)
                     UpcomingDeadlinesView(
                         assignments: assignmentViewModel.assignments
                     )
@@ -89,42 +96,6 @@ struct AssignmentView: View {
                                 .font(.caption)
                                 .fontWeight(.semibold)
                             }
-                        }
-
-                        if !taskViewModel.todayIncompleteTasks.isEmpty {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Today's Study Plan")
-                                        .font(.subheadline)
-                                        .fontWeight(.semibold)
-
-                                    Text(
-                                        "\(taskViewModel.todayIncompleteTasks.count) tasks"
-                                    )
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                }
-
-                                Spacer()
-
-                                HStack(spacing: 4) {
-                                    Image(systemName: "clock")
-                                    Text(
-                                        formattedDuration(
-                                            taskViewModel.todayStudyMinutes
-                                        )
-                                    )
-                                }
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            }
-                            .padding(12)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(
-                                        Color.blue.opacity(0.08)
-                                    )
-                            )
                         }
 
                         if taskViewModel.upcomingTasks.isEmpty {
@@ -158,10 +129,6 @@ struct AssignmentView: View {
                                 x: 0,
                                 y: 2
                             )
-                    )
-
-                    ProgressOverviewView(
-                        progress: assignmentViewModel.overallProgress
                     )
 
                     Spacer(minLength: 20)
