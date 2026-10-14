@@ -14,51 +14,43 @@ struct TaskView: View {
     var onChange: () -> Void = {}
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 4) {
             Button {
                 withAnimation {
                     onChange()
                 }
             } label: {
-                Image(systemName: task.isCompleted ? "checkmark.square.fill" : "square")
-                    .font(.title3)
-                    .foregroundStyle(task.isCompleted ? .blue : .secondary)
+                Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
+                    .font(.title2)
+                    .foregroundStyle(task.isCompleted ? Color.accentColor : .secondary)
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-
+            
             VStack(alignment: .leading, spacing: 4) {
                 Text(task.title)
                     .font(.subheadline)
                     .strikethrough(task.isCompleted)
                     .foregroundStyle(task.isCompleted ? .secondary : .primary)
 
-                if let course = course {
-                    Text(course)
-                        .font(.caption)
-                        .fontWeight(.medium)
-                        .foregroundStyle(.blue)
-                }
-
-                HStack(spacing: 10) {
-                    if let plannedDate = task.plannedDate {
-                        HStack(spacing: 3) {
-                            Image(systemName: "calendar")
-                            Text(plannedDate, format: .dateTime.day().month(.abbreviated))
-                        }
+                HStack(spacing: 8) {
+                    if let course {
+                        Text(course)
                     }
 
-                    if let estimatedMinutes = task.estimatedMinutes {
-                        HStack(spacing: 3) {
-                            Image(systemName: "clock")
-                            Text(formattedDuration(estimatedMinutes))
-                        }
-                    }
                 }
-                .font(.caption2)
+                .font(.caption)
                 .foregroundStyle(.secondary)
             }
 
             Spacer()
+
+            if let minutes = task.estimatedMinutes {
+                Text(formattedDuration(minutes))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 
