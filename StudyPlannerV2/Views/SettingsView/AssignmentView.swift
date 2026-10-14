@@ -38,6 +38,26 @@ struct AssignmentView: View {
                         }
                         .buttonStyle(.plain)
                     }
+                    
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Today's study plan")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                        
+                        let count = taskViewModel.todayIncompleteTasks.count
+                        Text("\(count) \(count == 1 ? "task" : "tasks")")
+                            .font(.title)
+                            .fontWeight(.bold)
+                        
+                        let minutes = taskViewModel.todayStudyMinutes
+                        Text(minutes > 0 ? "\(formattedDuration(minutes)) planned" : "Nothing planned")
+                            .font(.subheadline)
+                    }
+                    .foregroundStyle(Theme.onAccent)
+                    .padding(Theme.padding)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.accentColor, in: .rect(cornerRadius: Theme.corner))
+                    
 
                     UpcomingDeadlinesView(
                         assignments: assignmentViewModel.assignments
@@ -187,4 +207,16 @@ struct AssignmentView: View {
 
         return "\(hours) hr \(remainingMinutes) min"
     }
+}
+
+#Preview {
+    let assignmentViewModel = AssignmentViewModel(
+        repository: LocalAssignmentRepository()
+    )
+
+    AssignmentView()
+        .environmentObject(assignmentViewModel)
+        .environmentObject(
+            TaskViewModel(assignmentViewModel: assignmentViewModel)
+        )
 }
