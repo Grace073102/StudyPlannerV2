@@ -28,12 +28,9 @@ struct UpcomingDeadlinesView: View {
                 NavigationLink {
                     AssignmentListView()
                 } label: {
-                    HStack(spacing: 3) {
-                        Text("View All")
-                        Image(systemName: "chevron.right")
-                    }
-                    .font(.caption)
-                    .fontWeight(.semibold)
+                    Text("See All")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
                 }
             }
 

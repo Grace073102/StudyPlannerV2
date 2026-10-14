@@ -89,7 +89,7 @@ struct AssignmentView: View {
                                     .environmentObject(assignmentViewModel)
                                     .environmentObject(taskViewModel)
                             } label: {
-                                Text("See all")
+                                Text("See All")
                                     .font(.subheadline)
                                     .fontWeight(.semibold)
                             }
