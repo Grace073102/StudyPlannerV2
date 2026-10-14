@@ -87,8 +87,7 @@ struct AssignmentListView: View {
                                 .background(
                                     RoundedRectangle(cornerRadius: 12)
                                         .fill(
-                                            assignment.priority.color
-                                                .opacity(0.10)
+                                            Color(.tertiarySystemGroupedBackground)
                                         )
                                 )
 
@@ -127,13 +126,13 @@ struct AssignmentListView: View {
                                     .font(.caption2)
                                     .fontWeight(.semibold)
                                     .foregroundStyle(
-                                        assignment.priority.color
+                                        .primary
                                     )
                                     .padding(.horizontal, 8)
                                     .padding(.vertical, 4)
                                     .background(
                                         assignment.priority.color
-                                            .opacity(0.12)
+                                            .opacity(0.25)
                                     )
                                     .clipShape(Capsule())
 
@@ -145,13 +144,7 @@ struct AssignmentListView: View {
                             .padding(14)
                             .background(
                                 RoundedRectangle(cornerRadius: 16)
-                                    .fill(Color(.systemBackground))
-                                    .shadow(
-                                        color: .black.opacity(0.05),
-                                        radius: 5,
-                                        x: 0,
-                                        y: 2
-                                    )
+                                    .fill(Color(Theme.card))
                             )
                         }
                         .buttonStyle(.plain)
