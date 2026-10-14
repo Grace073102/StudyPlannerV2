@@ -66,9 +66,11 @@ struct SubtaskListView: View {
                                         taskViewModel.toggleTask(taskID: task.id)
                                     }
                                 } label: {
-                                    Image(systemName: task.isCompleted ? "checkmark.square.fill" : "square")
-                                        .font(.title3)
-                                        .foregroundStyle(task.isCompleted ? .blue : .secondary)
+                                    Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
+                                        .font(.title2)
+                                        .frame(width: 44, height: 44)
+                                        .foregroundStyle(task.isCompleted ? Color.accentColor : .secondary)
+                                        .contentShape(Rectangle())
                                 }
                                 .buttonStyle(.plain)
 
@@ -108,9 +110,10 @@ struct SubtaskListView: View {
                                 } label: {
                                     Image(systemName: "pencil")
                                         .font(.subheadline)
-                                        .foregroundStyle(.blue)
-                                        .frame(width: 30, height: 30)
-                                        .background(Circle().fill(Color.blue.opacity(0.10)))
+                                        .foregroundStyle(Color.accentColor)
+                                        .frame(width: 44, height: 44)
+                                        .background(Circle().fill(Color.accentColor.opacity(0.10)))
+                                        .contentShape(Rectangle())
                                 }
                                 .buttonStyle(.plain)
 
@@ -121,8 +124,9 @@ struct SubtaskListView: View {
                                     Image(systemName: "trash")
                                         .font(.subheadline)
                                         .foregroundStyle(.red)
-                                        .frame(width: 30, height: 30)
+                                        .frame(width: 44, height: 44)
                                         .background(Circle().fill(Color.red.opacity(0.10)))
+                                        .contentShape(Rectangle())
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -137,7 +141,7 @@ struct SubtaskListView: View {
                     }
                     .background(
                         RoundedRectangle(cornerRadius: 14)
-                            .fill(Color(.systemBackground))
+                            .fill(Theme.card)
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
@@ -146,7 +150,7 @@ struct SubtaskListView: View {
             VStack(alignment: .leading, spacing: 14) {
                 HStack(spacing: 8) {
                     Image(systemName: "plus.circle.fill")
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(Color.accentColor)
 
                     Text("Add New Subtask")
                         .font(.headline)
@@ -168,7 +172,7 @@ struct SubtaskListView: View {
                     .frame(height: 46)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(.secondarySystemBackground))
+                            .fill(Color(.tertiarySystemGroupedBackground))
                     )
                 }
 
@@ -190,7 +194,7 @@ struct SubtaskListView: View {
                     .frame(height: 46)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(.secondarySystemBackground))
+                            .fill(Color(.tertiarySystemGroupedBackground))
                     )
                 }
 
@@ -224,7 +228,7 @@ struct SubtaskListView: View {
                         .frame(height: 46)
                         .background(
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(Color(.secondarySystemBackground))
+                                .fill(Color(.tertiarySystemGroupedBackground))
                         )
                     }
                 }
@@ -243,7 +247,7 @@ struct SubtaskListView: View {
                     .frame(height: 46)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.blue)
+                            .fill(Color.accentColor)
                     )
                 }
                 .disabled(cleanedTitle.isEmpty)
@@ -252,8 +256,7 @@ struct SubtaskListView: View {
             .padding(16)
             .background(
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Color(.systemBackground))
-                    .shadow(color: .black.opacity(0.04), radius: 4, x: 0, y: 2)
+                    .fill(Theme.card)
             )
         }
         .sheet(isPresented: $showEditTask) {
@@ -340,7 +343,7 @@ struct SubtaskListView: View {
                             .frame(height: 46)
                             .background(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.blue)
+                                    .fill(Color.accentColor)
                             )
                     }
                     .disabled(cleanedEditingTitle.isEmpty)
