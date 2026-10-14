@@ -49,59 +49,53 @@ struct UpcomingDeadlinesView: View {
                         .sorted { $0.dueDate < $1.dueDate }
                         .prefix(5)
                 ) { assignment in
-                    HStack(spacing: 0) {
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(assignment.priority.color)
-                            .frame(width: 4, height: 52)
-
-                        HStack {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(assignment.title)
-                                    .font(.subheadline)
-                                    .fontWeight(.semibold)
-                                    .lineLimit(1)
-
-                                Text(assignment.course)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
-                            }
-
-                            Spacer()
-
-                            Text(
-                                assignment.dueDate,
-                                format: .dateTime
-                                    .day()
-                                    .month(.abbreviated)
+                    HStack(spacing: 12) {
+                        Image(systemName: "doc.text")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(Color.accentColor)
+                            .frame(width: 36, height: 36)
+                            .background(
+                                Color.accentColor.opacity(0.15),
+                                in: .rect(cornerRadius: 10)
                             )
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .accessibilityLabel("Assignment")
 
-                            Text(assignment.priority.rawValue)
-                                .font(.caption2)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(assignment.title)
+                                .font(.subheadline)
                                 .fontWeight(.semibold)
-                                .foregroundStyle(
-                                    assignment.priority.color
-                                )
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(
-                                    assignment.priority.color
-                                        .opacity(0.12)
-                                )
-                                .clipShape(Capsule())
+                                .lineLimit(1)
+
+                            Text(assignment.course)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
                         }
-                        .padding(.horizontal, 10)
+
+                        Spacer()
+
+                        Text(
+                            assignment.dueDate,
+                            format: .dateTime.day().month(.abbreviated)
+                        )
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                        Text(assignment.priority.rawValue)
+                            .font(.caption2)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(assignment.priority.color)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(assignment.priority.color.opacity(0.12))
+                            .clipShape(Capsule())
                     }
-                    .frame(height: 52)
+                    .padding(10)
+                    .frame(minHeight: 56)
                     .background(
                         RoundedRectangle(cornerRadius: 10)
-                            .fill(
-                                Color(
-                                    .secondarySystemBackground
-                                )
-                            )
+                            .fill(Color(.tertiarySystemGroupedBackground))
                     )
                 }
             }
