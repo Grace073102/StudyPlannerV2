@@ -17,9 +17,9 @@ struct AssignmentView: View {
             ScrollView {
                 VStack(spacing: 20) {
                     HStack {
-                        Text("Hi, Sarah!")
-                            .font(.title2)
-                            .fontWeight(.semibold)
+                        Text("Dashboard")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
 
                         Spacer()
 
@@ -29,11 +29,11 @@ struct AssignmentView: View {
                             Image(systemName: "plus")
                                 .font(.title3)
                                 .fontWeight(.semibold)
-                                .foregroundStyle(.white)
-                                .frame(width: 36, height: 36)
+                                .foregroundStyle(Theme.onAccent)
+                                .frame(width: 44, height: 44)
                                 .background(
                                     Circle()
-                                        .fill(Color.blue)
+                                        .fill(Color.accentColor)
                                 )
                         }
                         .buttonStyle(.plain)
