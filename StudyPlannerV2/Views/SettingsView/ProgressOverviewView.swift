@@ -84,7 +84,7 @@ struct ProgressOverviewView: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color(.systemBackground))
+                .fill(Color(.secondarySystemGroupedBackground))
                 .shadow(
                     color: .black.opacity(0.06),
                     radius: 5,
