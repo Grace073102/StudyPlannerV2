@@ -17,12 +17,6 @@ struct AssignmentProgressView: View {
                     Text("Overall Progress")
                         .font(.headline)
                         .fontWeight(.semibold)
-
-                    Text(
-                        "\(Int(progress * 100))% completed"
-                    )
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
                 }
 
                 Spacer()
@@ -30,11 +24,11 @@ struct AssignmentProgressView: View {
                 Text("\(Int(progress * 100))%")
                     .font(.title2)
                     .fontWeight(.bold)
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(Color.accentColor)
             }
 
             ProgressView(value: progress)
-                .tint(.blue)
+                .tint(Color.accentColor)
                 .scaleEffect(x: 1, y: 1.5)
 
             HStack {
@@ -73,7 +67,7 @@ struct AssignmentProgressView: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.systemBackground))
+                .fill(Color(Theme.card))
                 .shadow(
                     color: .black.opacity(0.05),
                     radius: 5,
