@@ -14,6 +14,8 @@ struct RequirementDetailView: View {
     @State private var showingDeleteConfirmation = false
     
     @State private var showingEditRequirement = false
+    @State private var showingDeleteError = false
+    @State private var deleteErrorMessage = ""
 
     let requirementID: UUID
 
@@ -196,11 +198,24 @@ struct RequirementDetailView: View {
             Button("Cancel", role: .cancel) { }
 
             Button("Delete", role: .destructive) {
-                viewModel.deleteRequirement(id: requirementID)
-                dismiss()
+                do {
+                    try viewModel.deleteRequirement(id: requirementID)
+                    dismiss()
+                } catch {
+                    deleteErrorMessage = error.localizedDescription
+                    showingDeleteError = true
+                }
             }
         } message: {
             Text("Are you sure you want to delete this requirement? This action cannot be undone.")
+        }
+        .alert(
+            "Unable to Delete",
+            isPresented: $showingDeleteError
+        ) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(deleteErrorMessage)
         }
     }
 }

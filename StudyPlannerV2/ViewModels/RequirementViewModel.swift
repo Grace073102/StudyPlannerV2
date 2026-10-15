@@ -74,14 +74,15 @@ final class RequirementViewModel: ObservableObject {
         loadRequirements()
     }
     
-    func deleteRequirement(id: UUID) {
-        guard let requirement = requirements.first(where: { $0.id == id }) else {
-            return
-        }
-        
-        repository.delete(requirement)
+    func deleteRequirement(id: UUID) throws {
+        let useCase = DeleteRequirementUseCase(
+            repository: repository
+        )
+
+        try useCase.execute(id: id)
         loadRequirements()
     }
+
     
     func completedCount(for placementID: UUID) -> Int {
         requirements(for: placementID).filter {
