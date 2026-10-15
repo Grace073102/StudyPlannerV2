@@ -22,9 +22,26 @@ struct RootView: View {
     }
 
     var body: some View {
-        AssignmentView()
-            .environmentObject(assignmentViewModel)
-            .environmentObject(taskViewModel)
+        TabView {
+            Tab("Dashboard", systemImage: "house") {
+                AssignmentView()
+            }
+            Tab("Assignments", systemImage: "doc.text") {
+                NavigationStack {
+                    AssignmentListView()
+                }
+            }
+
+            Tab("Placements", systemImage: "briefcase") {
+                PlaceholderView(title: "Placements", systemImage: "briefcase")
+            }
+
+            Tab("Settings", systemImage: "gearshape") {
+                PlaceholderView(title: "Settings", systemImage: "gearshape")
+            }
+        }
+        .environmentObject(assignmentViewModel)
+        .environmentObject(taskViewModel)
     }
 }
 
