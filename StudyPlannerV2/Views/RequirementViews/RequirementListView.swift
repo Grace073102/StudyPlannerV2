@@ -125,6 +125,9 @@ struct RequirementListView: View {
                 }
             }
         }
+        .sheet(isPresented: $showingAddRequirement) {
+            AddRequirementView(viewModel: viewModel, placementID: placementID)
+        }
     }
 }
 
