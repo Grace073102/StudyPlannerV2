@@ -10,6 +10,8 @@ import SwiftUI
 struct RequirementDetailView: View {
 
     @ObservedObject var viewModel: RequirementViewModel
+    
+    @State private var showingEditRequirement = false
 
     let requirementID: UUID
 
@@ -156,6 +158,23 @@ struct RequirementDetailView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Requirement Details")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                if viewModel.requirements.contains(where: { $0.id == requirementID }) {
+                    Button("Edit") {
+                        showingEditRequirement = true
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $showingEditRequirement) {
+            if let requirement = viewModel.requirements.first(where: { $0.id == requirementID }) {
+                EditRequirementView(
+                    viewModel: viewModel,
+                    requirement: requirement
+                )
+            }
+        }
     }
 }
 

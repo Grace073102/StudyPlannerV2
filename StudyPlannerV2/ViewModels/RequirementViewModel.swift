@@ -40,7 +40,7 @@ final class RequirementViewModel: ObservableObject {
         dueDate: Date?,
         expiryDate: Date?
     ) throws {
-        try addRequirementUseCase.execute(
+        _ = try addRequirementUseCase.execute(
             placementID: placementID,
             name: name,
             category: category,
@@ -48,6 +48,36 @@ final class RequirementViewModel: ObservableObject {
             expiryDate: expiryDate
         )
 
+        loadRequirements()
+    }
+    
+    
+    func updateRequirement(
+        id: UUID,
+        name: String,
+        category: PlacementRequirement.Category,
+        dueDate: Date?,
+        expiryDate: Date?
+    ) throws {
+
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !trimmedName.isEmpty else {
+            throw RequirementValidationError.emptyName
+        }
+
+        guard let existingRequirement = requirements.first(where: { $0.id == id }) else {
+            throw RequirementValidationError.notFound
+        }
+
+        var updatedRequirement = existingRequirement
+
+        updatedRequirement.name = trimmedName
+        updatedRequirement.category = category
+        updatedRequirement.dueDate = dueDate
+        updatedRequirement.expiryDate = expiryDate
+
+        repository.update(updatedRequirement)
         loadRequirements()
     }
 
@@ -80,4 +110,18 @@ final class RequirementViewModel: ObservableObject {
         loadRequirements()
     }
 
+    
+    enum RequirementValidationError: LocalizedError {
+        case emptyName
+        case notFound
+
+        var errorDescription: String? {
+            switch self {
+            case .emptyName:
+                return "Please enter a requirement name."
+            case .notFound:
+                return "This requirement could not be found."
+            }
+        }
+    }
 }
