@@ -58,17 +58,19 @@ final class AssignmentViewModel: ObservableObject {
         repositoryErrorMessage = repository.errorMessage
     }
 
-    var overallProgress: Double {
-        let allTasks = assignments.flatMap { $0.tasks }
+    var totalTaskCount: Int {
+        assignments.flatMap { $0.tasks }.count
+    }
 
-        guard !allTasks.isEmpty else {
+    var completedTaskCount: Int {
+        assignments.flatMap { $0.tasks }.filter { $0.isCompleted }.count
+    }
+
+    var overallProgress: Double {
+        guard totalTaskCount > 0 else {
             return 0
         }
 
-        let completedTasks = allTasks.filter {
-            $0.isCompleted
-        }.count
-
-        return Double(completedTasks) / Double(allTasks.count)
+        return Double(completedTaskCount) / Double(totalTaskCount)
     }
 }
