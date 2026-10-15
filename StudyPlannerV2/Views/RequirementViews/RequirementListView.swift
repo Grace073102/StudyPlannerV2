@@ -138,16 +138,26 @@ struct RequirementListView: View {
 
                             HStack(spacing: 12) {
 
-                                // Completion Icon
-                                Image(
-                                    systemName: requirement.isCompleted
-                                        ? "checkmark.circle.fill"
-                                        : "circle"
-                                )
-                                .font(.title2)
-                                .foregroundStyle(
+                                // Completion Button
+                                Button {
+                                    viewModel.toggleCompletion(for: requirement)
+                                } label: {
+                                    Image(
+                                        systemName: requirement.isCompleted
+                                            ? "checkmark.circle.fill"
+                                            : "circle"
+                                    )
+                                    .font(.title2)
+                                    .foregroundStyle(
+                                        requirement.isCompleted
+                                            ? Color.green : Color.secondary
+                                    )
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(
                                     requirement.isCompleted
-                                        ? Color.green : Color.secondary
+                                        ? "Mark as incomplete"
+                                        : "Mark as completed"
                                 )
 
                                 // Requirement Information

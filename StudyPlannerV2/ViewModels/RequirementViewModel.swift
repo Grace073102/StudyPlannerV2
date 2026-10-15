@@ -70,4 +70,14 @@ final class RequirementViewModel: ObservableObject {
 
         return Double(completed) / Double(placementRequirements.count)
     }
+    
+    
+    func toggleCompletion(for requirement: PlacementRequirement) {
+        var updatedRequirement = requirement
+
+        updatedRequirement.isCompleted.toggle()
+        repository.update(updatedRequirement)
+        loadRequirements()
+    }
+
 }
