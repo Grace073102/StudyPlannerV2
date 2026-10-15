@@ -5,6 +5,7 @@
 //  Created by Djy on 15/10/2026.
 //
 
+
 import SwiftUI
 
 struct RequirementListView: View {
@@ -67,6 +68,7 @@ struct RequirementListView: View {
                 .background(Color(.secondarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 18))
 
+
                 // Checklist Header
                 HStack {
                     Text("Your checklist")
@@ -78,6 +80,7 @@ struct RequirementListView: View {
 
                 // Filter
                 HStack(spacing: 12) {
+
                     ForEach(["All", "To do", "Completed"], id: \.self) { filter in
 
                         Button {
@@ -87,22 +90,20 @@ struct RequirementListView: View {
                                 .font(.subheadline)
                                 .fontWeight(
                                     selectedFilter == filter
-                                    ? .semibold : .regular
+                                        ? .semibold : .regular
                                 )
                                 .foregroundStyle(
                                     selectedFilter == filter
-                                    ? Color.primary : Color.secondary
+                                        ? Color.primary : Color.secondary
                                 )
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 10)
                                 .background(
                                     selectedFilter == filter
-                                    ? Color(.secondarySystemGroupedBackground)
-                                    : Color.clear
+                                        ? Color(.secondarySystemGroupedBackground)
+                                        : Color.clear
                                 )
-                                .clipShape(
-                                    RoundedRectangle(cornerRadius: 12)
-                                )
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
                         .buttonStyle(.plain)
                     }
@@ -113,6 +114,7 @@ struct RequirementListView: View {
                 if filteredRequirements.isEmpty {
 
                     VStack(spacing: 12) {
+
                         Image(systemName: "checklist")
                             .font(.largeTitle)
                             .foregroundStyle(.secondary)
@@ -152,6 +154,8 @@ struct RequirementListView: View {
                                         requirement.isCompleted
                                             ? Color.green : Color.secondary
                                     )
+                                    .frame(width: 30, height: 44)
+                                    .contentShape(Rectangle())
                                 }
                                 .buttonStyle(.plain)
                                 .accessibilityLabel(
@@ -160,72 +164,85 @@ struct RequirementListView: View {
                                         : "Mark as completed"
                                 )
 
-                                // Requirement Information
-                                VStack(alignment: .leading, spacing: 5) {
+                                // Detail Navigation
+                                NavigationLink {
+                                    RequirementDetailView(
+                                        viewModel: viewModel,
+                                        requirementID: requirement.id
+                                    )
+                                } label: {
+                                    
+                                    HStack(spacing: 12) {
 
-                                    Text(requirement.name)
-                                        .font(.headline)
-                                        .strikethrough(requirement.isCompleted)
-                                        .foregroundStyle(
-                                            requirement.isCompleted
-                                                ? Color.secondary : Color.primary
-                                        )
+                                        // Requirement Information
+                                        VStack(alignment: .leading, spacing: 5) {
 
-                                    Text(requirement.category.rawValue)
+                                            Text(requirement.name)
+                                                .font(.headline)
+                                                .strikethrough(requirement.isCompleted)
+                                                .foregroundStyle(
+                                                    requirement.isCompleted
+                                                        ? Color.secondary : Color.primary
+                                                )
+
+                                            Text(requirement.category.rawValue)
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+
+                                            if let dueDate = requirement.dueDate {
+                                                Text("Due: \(dueDate.formatted(date: .abbreviated, time: .omitted))")
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                            }
+
+                                            if let expiryDate = requirement.expiryDate {
+                                                Text("Expires: \(expiryDate.formatted(date: .abbreviated, time: .omitted))")
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                            }
+                                        }
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+
+
+                                        // Status
+                                        VStack(alignment: .trailing) {
+
+                                            if requirement.isCompleted {
+
+                                                Text("Completed")
+                                                    .foregroundStyle(.green)
+
+                                            } else if let expiryDate = requirement.expiryDate,
+                                                      Calendar.current.startOfDay(for: expiryDate) <
+                                                      Calendar.current.startOfDay(for: Date()) {
+
+                                                Text("Expired")
+                                                    .foregroundStyle(.red)
+
+                                            } else if let dueDate = requirement.dueDate,
+                                                      Calendar.current.startOfDay(for: dueDate) <
+                                                      Calendar.current.startOfDay(for: Date()) {
+
+                                                Text("Overdue")
+                                                    .foregroundStyle(.red)
+
+                                            } else {
+
+                                                Text("Upcoming")
+                                                    .foregroundStyle(.secondary)
+                                            }
+                                        }
                                         .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .fontWeight(.medium)
 
-                                    if let dueDate = requirement.dueDate {
-                                        Text(
-                                            "Due: \(dueDate.formatted(date: .abbreviated, time: .omitted))"
-                                        )
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        // Chevron
+                                        Image(systemName: "chevron.right")
+                                            .font(.caption)
+                                            .foregroundStyle(.tertiary)
                                     }
-
-                                    if let expiryDate = requirement.expiryDate {
-                                        Text(
-                                            "Expires: \(expiryDate.formatted(date: .abbreviated, time: .omitted))"
-                                        )
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                    }
+                                    .contentShape(Rectangle())
                                 }
-
-                                Spacer(minLength: 4)
-
-                                // Status
-                                VStack(alignment: .trailing) {
-
-                                    if requirement.isCompleted {
-                                        Text("Completed")
-                                            .foregroundStyle(.green)
-
-                                    } else if let expiryDate = requirement.expiryDate,
-                                              Calendar.current.startOfDay(for: expiryDate) <
-                                              Calendar.current.startOfDay(for: Date()) {
-
-                                        Text("Expired")
-                                            .foregroundStyle(.red)
-
-                                    } else if let dueDate = requirement.dueDate,
-                                              Calendar.current.startOfDay(for: dueDate) <
-                                              Calendar.current.startOfDay(for: Date()) {
-
-                                        Text("Overdue")
-                                            .foregroundStyle(.red)
-
-                                    } else {
-                                        Text("Upcoming")
-                                            .foregroundStyle(.secondary)
-                                    }
-                                }
-                                .font(.caption)
-                                .fontWeight(.medium)
-
-                                Image(systemName: "chevron.right")
-                                    .font(.caption)
-                                    .foregroundStyle(.tertiary)
+                                .buttonStyle(.plain)
                             }
                             .padding(16)
 
@@ -263,11 +280,12 @@ struct RequirementListView: View {
 }
 
 
-
 #Preview {
+
     let placementID = UUID()
 
     let sampleRequirements = [
+
         PlacementRequirement(
             placementID: placementID,
             name: "Police Check",
@@ -308,4 +326,3 @@ struct RequirementListView: View {
         )
     }
 }
-
