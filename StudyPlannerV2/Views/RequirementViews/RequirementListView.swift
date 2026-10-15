@@ -204,20 +204,21 @@ struct RequirementListView: View {
                                         .frame(maxWidth: .infinity, alignment: .leading)
 
 
+                                        
                                         // Status
                                         VStack(alignment: .trailing) {
 
-                                            if requirement.isCompleted {
-
-                                                Text("Completed")
-                                                    .foregroundStyle(.green)
-
-                                            } else if let expiryDate = requirement.expiryDate,
-                                                      Calendar.current.startOfDay(for: expiryDate) <
-                                                      Calendar.current.startOfDay(for: Date()) {
+                                            if let expiryDate = requirement.expiryDate,
+                                               Calendar.current.startOfDay(for: expiryDate) <
+                                               Calendar.current.startOfDay(for: Date()) {
 
                                                 Text("Expired")
                                                     .foregroundStyle(.red)
+
+                                            } else if requirement.isCompleted {
+
+                                                Text("Completed")
+                                                    .foregroundStyle(.green)
 
                                             } else if let dueDate = requirement.dueDate,
                                                       Calendar.current.startOfDay(for: dueDate) <
@@ -225,6 +226,17 @@ struct RequirementListView: View {
 
                                                 Text("Overdue")
                                                     .foregroundStyle(.red)
+
+                                            } else if let dueDate = requirement.dueDate,
+                                                      let daysRemaining = Calendar.current.dateComponents(
+                                                          [.day],
+                                                          from: Calendar.current.startOfDay(for: Date()),
+                                                          to: Calendar.current.startOfDay(for: dueDate)
+                                                      ).day,
+                                                      daysRemaining <= 7 {
+
+                                                Text("Due Soon")
+                                                    .foregroundStyle(.orange)
 
                                             } else {
 
@@ -291,6 +303,7 @@ struct RequirementListView: View {
             name: "Police Check",
             category: .checksAndClearances,
             dueDate: Calendar.current.date(byAdding: .day, value: 7, to: Date()),
+            expiryDate: Calendar.current.date(byAdding: .day, value: -1, to: Date()),
             isCompleted: true
         ),
 
@@ -311,18 +324,11 @@ struct RequirementListView: View {
         )
     ]
 
-    let repository = LocalRequirementRepository(
-        requirements: sampleRequirements
-    )
+    let repository = LocalRequirementRepository(requirements: sampleRequirements)
 
-    let viewModel = RequirementViewModel(
-        repository: repository
-    )
+    let viewModel = RequirementViewModel(repository: repository)
 
     return NavigationStack {
-        RequirementListView(
-            viewModel: viewModel,
-            placementID: placementID
-        )
+        RequirementListView(viewModel: viewModel, placementID: placementID)
     }
 }
