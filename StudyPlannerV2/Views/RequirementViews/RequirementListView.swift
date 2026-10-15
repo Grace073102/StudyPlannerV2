@@ -127,3 +127,50 @@ struct RequirementListView: View {
         }
     }
 }
+
+
+#Preview {
+    let placementID = UUID()
+
+    let sampleRequirements = [
+        PlacementRequirement(
+            placementID: placementID,
+            name: "Police Check",
+            category: .checksAndClearances,
+            dueDate: Calendar.current.date(byAdding: .day, value: 7, to: Date()),
+            isCompleted: true
+        ),
+
+        PlacementRequirement(
+            placementID: placementID,
+            name: "First Aid Certificate",
+            category: .trainingAndCertificates,
+            dueDate: Calendar.current.date(byAdding: .day, value: 14, to: Date()),
+            isCompleted: false
+        ),
+
+        PlacementRequirement(
+            placementID: placementID,
+            name: "Placement Orientation",
+            category: .placementPreparation,
+            dueDate: Calendar.current.date(byAdding: .day, value: 21, to: Date()),
+            isCompleted: false
+        )
+    ]
+
+    let repository = LocalRequirementRepository(
+        requirements: sampleRequirements
+    )
+
+    let viewModel = RequirementViewModel(
+        repository: repository
+    )
+
+    return NavigationStack {
+        RequirementListView(
+            viewModel: viewModel,
+            placementID: placementID
+        )
+    }
+}
+
