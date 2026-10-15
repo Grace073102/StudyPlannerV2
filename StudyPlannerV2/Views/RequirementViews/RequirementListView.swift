@@ -203,49 +203,55 @@ struct RequirementListView: View {
                                         }
                                         .frame(maxWidth: .infinity, alignment: .leading)
 
-
-                                        
                                         // Status
-                                        VStack(alignment: .trailing) {
+                                        VStack(alignment: .trailing, spacing: 4) {
 
-                                            if let expiryDate = requirement.expiryDate,
-                                               Calendar.current.startOfDay(for: expiryDate) <
-                                               Calendar.current.startOfDay(for: Date()) {
+                                            // Completion status
+                                            Text(requirement.isCompleted ? "Completed" : "To do")
+                                                .foregroundStyle(
+                                                    requirement.isCompleted ? Color.green : Color.secondary
+                                                )
 
-                                                Text("Expired")
-                                                    .foregroundStyle(.red)
+                                            // Due date status
+                                            if !requirement.isCompleted,
+                                               let dueDate = requirement.dueDate {
 
-                                            } else if requirement.isCompleted {
+                                                let daysRemaining = Calendar.current.dateComponents(
+                                                    [.day],
+                                                    from: Calendar.current.startOfDay(for: Date()),
+                                                    to: Calendar.current.startOfDay(for: dueDate)
+                                                ).day ?? 0
 
-                                                Text("Completed")
-                                                    .foregroundStyle(.green)
+                                                if daysRemaining < 0 {
+                                                    Text("Overdue")
+                                                        .foregroundStyle(.red)
+                                                } else if daysRemaining <= 7 {
+                                                    Text("Due Soon")
+                                                        .foregroundStyle(.orange)
+                                                }
+                                            }
 
-                                            } else if let dueDate = requirement.dueDate,
-                                                      Calendar.current.startOfDay(for: dueDate) <
-                                                      Calendar.current.startOfDay(for: Date()) {
+                                            // Expiry date status
+                                            if let expiryDate = requirement.expiryDate {
 
-                                                Text("Overdue")
-                                                    .foregroundStyle(.red)
+                                                let daysRemaining = Calendar.current.dateComponents(
+                                                    [.day],
+                                                    from: Calendar.current.startOfDay(for: Date()),
+                                                    to: Calendar.current.startOfDay(for: expiryDate)
+                                                ).day ?? 0
 
-                                            } else if let dueDate = requirement.dueDate,
-                                                      let daysRemaining = Calendar.current.dateComponents(
-                                                          [.day],
-                                                          from: Calendar.current.startOfDay(for: Date()),
-                                                          to: Calendar.current.startOfDay(for: dueDate)
-                                                      ).day,
-                                                      daysRemaining <= 7 {
-
-                                                Text("Due Soon")
-                                                    .foregroundStyle(.orange)
-
-                                            } else {
-
-                                                Text("Upcoming")
-                                                    .foregroundStyle(.secondary)
+                                                if daysRemaining < 0 {
+                                                    Text("Expired")
+                                                        .foregroundStyle(.red)
+                                                } else if daysRemaining <= 7 {
+                                                    Text("Expiring Soon")
+                                                        .foregroundStyle(.orange)
+                                                }
                                             }
                                         }
                                         .font(.caption)
                                         .fontWeight(.medium)
+
 
                                         // Chevron
                                         Image(systemName: "chevron.right")
