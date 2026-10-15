@@ -9,30 +9,30 @@ import Foundation
 import Combine
 
 final class RequirementViewModel: ObservableObject {
-
+    
     @Published private(set) var requirements: [PlacementRequirement] = []
-
+    
     private let repository: RequirementRepository
     private let addRequirementUseCase: AddRequirementUseCase
-
+    
     init(repository: RequirementRepository) {
         
         self.repository = repository
         self.addRequirementUseCase = AddRequirementUseCase(repository: repository)
-
+        
         loadRequirements()
     }
-
+    
     func loadRequirements() {
         requirements = repository.load()
     }
-
+    
     func requirements(for placementID: UUID) -> [PlacementRequirement] {
         requirements.filter {
             $0.placementID == placementID
         }
     }
-
+    
     func add(
         placementID: UUID,
         name: String,
@@ -47,10 +47,9 @@ final class RequirementViewModel: ObservableObject {
             dueDate: dueDate,
             expiryDate: expiryDate
         )
-
+        
         loadRequirements()
     }
-    
     
     func updateRequirement(
         id: UUID,
@@ -59,25 +58,19 @@ final class RequirementViewModel: ObservableObject {
         dueDate: Date?,
         expiryDate: Date?
     ) throws {
-
-        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-
-        guard !trimmedName.isEmpty else {
-            throw RequirementValidationError.emptyName
-        }
-
-        guard let existingRequirement = requirements.first(where: { $0.id == id }) else {
-            throw RequirementValidationError.notFound
-        }
-
-        var updatedRequirement = existingRequirement
-
-        updatedRequirement.name = trimmedName
-        updatedRequirement.category = category
-        updatedRequirement.dueDate = dueDate
-        updatedRequirement.expiryDate = expiryDate
-
-        repository.update(updatedRequirement)
+        
+        let useCase = UpdateRequirementUseCase(
+            repository: repository
+        )
+        
+        try useCase.execute(
+            id: id,
+            name: name,
+            category: category,
+            dueDate: dueDate,
+            expiryDate: expiryDate
+        )
+        
         loadRequirements()
     }
     
@@ -85,52 +78,57 @@ final class RequirementViewModel: ObservableObject {
         guard let requirement = requirements.first(where: { $0.id == id }) else {
             return
         }
-
+        
         repository.delete(requirement)
         loadRequirements()
     }
-
+    
     func completedCount(for placementID: UUID) -> Int {
         requirements(for: placementID).filter {
             $0.isCompleted
         }.count
     }
-
+    
     func progress(for placementID: UUID) -> Double {
         let placementRequirements = requirements(for: placementID)
-
+        
         guard !placementRequirements.isEmpty else {
             return 0
         }
-
+        
         let completed = placementRequirements.filter {
             $0.isCompleted
         }.count
-
+        
         return Double(completed) / Double(placementRequirements.count)
     }
     
     
     func toggleCompletion(for requirement: PlacementRequirement) {
         var updatedRequirement = requirement
-
+    
         updatedRequirement.isCompleted.toggle()
         repository.update(updatedRequirement)
         loadRequirements()
     }
+}
 
+enum RequirementValidationError: LocalizedError {
+    case emptyName
+    case notFound
+    case invalidDates
     
-    enum RequirementValidationError: LocalizedError {
-        case emptyName
-        case notFound
-
-        var errorDescription: String? {
-            switch self {
-            case .emptyName:
-                return "Please enter a requirement name."
-            case .notFound:
-                return "This requirement could not be found."
-            }
+    var errorDescription: String? {
+        switch self {
+            
+        case .emptyName:
+            return "Please enter a requirement name."
+            
+        case .notFound:
+            return "This requirement could not be found."
+            
+        case .invalidDates:
+            return "The expiry date cannot be earlier than the due date."
         }
     }
 }
