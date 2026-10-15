@@ -14,7 +14,6 @@ struct AddRequirementUseCase {
     enum AddRequirementError: LocalizedError {
         case missingName
         case invalidDueDate
-        case invalidExpiryDate
 
         var errorDescription: String? {
             switch self {
@@ -22,8 +21,6 @@ struct AddRequirementUseCase {
                 return "Enter a requirement name before saving."
             case .invalidDueDate:
                 return "The due date cannot be in the past. Choose today or a future date."
-            case .invalidExpiryDate:
-                return "The expiry date cannot be earlier than the due date."
             }
         }
     }
@@ -50,15 +47,6 @@ struct AddRequirementUseCase {
 
             guard selectedDueDate >= today else {
                 throw AddRequirementError.invalidDueDate
-            }
-        }
-
-        if let dueDate, let expiryDate {
-            let selectedDueDate = calendar.startOfDay(for: dueDate)
-            let selectedExpiryDate = calendar.startOfDay(for: expiryDate)
-
-            guard selectedExpiryDate >= selectedDueDate else {
-                throw AddRequirementError.invalidExpiryDate
             }
         }
 

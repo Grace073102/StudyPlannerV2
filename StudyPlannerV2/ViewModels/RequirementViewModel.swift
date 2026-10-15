@@ -117,19 +117,15 @@ final class RequirementViewModel: ObservableObject {
 enum RequirementValidationError: LocalizedError {
     case emptyName
     case notFound
-    case invalidDates
-    
+
     var errorDescription: String? {
         switch self {
-            
         case .emptyName:
             return "Please enter a requirement name."
-            
+
         case .notFound:
             return "This requirement could not be found."
-            
-        case .invalidDates:
-            return "The expiry date cannot be earlier than the due date."
         }
     }
 }
+

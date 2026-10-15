@@ -7,9 +7,6 @@
 
 import Foundation
 
-
-import Foundation
-
 struct UpdateRequirementUseCase {
 
     let repository: RequirementRepository
@@ -36,15 +33,6 @@ struct UpdateRequirementUseCase {
             where: { $0.id == id }
         ) else {
             throw RequirementValidationError.notFound
-        }
-
-        // Validate dates
-        if let dueDate = dueDate,
-           let expiryDate = expiryDate,
-           Calendar.current.startOfDay(for: expiryDate) <
-           Calendar.current.startOfDay(for: dueDate) {
-
-            throw RequirementValidationError.invalidDates
         }
 
         // Update existing requirement
