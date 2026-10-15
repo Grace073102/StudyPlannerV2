@@ -28,6 +28,17 @@ struct UpdateRequirementUseCase {
             throw RequirementValidationError.emptyName
         }
 
+        // Validate due date
+        if let dueDate {
+            let calendar = Calendar.current
+            let today = calendar.startOfDay(for: Date())
+            let selectedDueDate = calendar.startOfDay(for: dueDate)
+
+            guard selectedDueDate >= today else {
+                throw RequirementValidationError.invalidDueDate
+            }
+        }
+
         // Find existing requirement
         guard let existingRequirement = repository.load().first(
             where: { $0.id == id }

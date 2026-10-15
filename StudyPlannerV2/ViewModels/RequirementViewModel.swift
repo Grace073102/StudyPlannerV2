@@ -117,6 +117,7 @@ final class RequirementViewModel: ObservableObject {
 enum RequirementValidationError: LocalizedError {
     case emptyName
     case notFound
+    case invalidDueDate
 
     var errorDescription: String? {
         switch self {
@@ -125,6 +126,9 @@ enum RequirementValidationError: LocalizedError {
 
         case .notFound:
             return "This requirement could not be found."
+            
+        case .invalidDueDate:
+            return "The due date cannot be in the past. Choose today or a future date."
         }
     }
 }
