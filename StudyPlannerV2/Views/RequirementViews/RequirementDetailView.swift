@@ -10,6 +10,8 @@ import SwiftUI
 struct RequirementDetailView: View {
 
     @ObservedObject var viewModel: RequirementViewModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var showingDeleteConfirmation = false
     
     @State private var showingEditRequirement = false
 
@@ -138,18 +140,33 @@ struct RequirementDetailView: View {
                     .font(.subheadline)
                     .padding(16)
                     .background(Color(.secondarySystemGroupedBackground))
-                    .clipShape(
-                        RoundedRectangle(cornerRadius: 18)
-                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 18))
+                    
+                    
+                    // Delete Requirement
+                   Button(role: .destructive) {
+                       showingDeleteConfirmation = true
+                   } label: {
+                       HStack(spacing: 8) {
+                           Image(systemName: "trash")
+
+                           Text("Delete Requirement")
+                       }
+                       .font(.headline)
+                       .foregroundStyle(.white)
+                       .frame(maxWidth: .infinity)
+                       .padding(.vertical, 16)
+                       .background(Color.red)
+                       .clipShape(RoundedRectangle(cornerRadius: 14))
+                   }
+                   .buttonStyle(.plain)
 
                 } else {
 
                     ContentUnavailableView(
                         "Requirement Not Found",
                         systemImage: "exclamationmark.circle",
-                        description: Text(
-                            "This requirement is no longer available."
-                        )
+                        description: Text("This requirement is no longer available.")
                     )
                 }
             }
@@ -169,11 +186,21 @@ struct RequirementDetailView: View {
         }
         .sheet(isPresented: $showingEditRequirement) {
             if let requirement = viewModel.requirements.first(where: { $0.id == requirementID }) {
-                EditRequirementView(
-                    viewModel: viewModel,
-                    requirement: requirement
-                )
+                EditRequirementView(viewModel: viewModel, requirement: requirement)
             }
+        }
+        .alert(
+            "Delete Requirement?",
+            isPresented: $showingDeleteConfirmation
+        ) {
+            Button("Cancel", role: .cancel) { }
+
+            Button("Delete", role: .destructive) {
+                viewModel.deleteRequirement(id: requirementID)
+                dismiss()
+            }
+        } message: {
+            Text("Are you sure you want to delete this requirement? This action cannot be undone.")
         }
     }
 }
