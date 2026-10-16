@@ -28,6 +28,9 @@ struct SubtaskListView: View {
     
     @State private var addTaskErrorMessage = ""
     @State private var showAddTaskError = false
+    
+    @State private var editTaskErrorMessage = ""
+    @State private var showEditTaskError = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -364,6 +367,11 @@ struct SubtaskListView: View {
                         }
                     }
                 }
+                .alert("Unable to Save Subtask", isPresented: $showEditTaskError) {
+                    Button("OK", role: .cancel) {}
+                } message: {
+                    Text(editTaskErrorMessage)
+                }
             }
             .presentationDetents([.medium])
         }
@@ -414,18 +422,19 @@ struct SubtaskListView: View {
     }
 
     private func saveEditedTask() {
-        guard !cleanedEditingTitle.isEmpty else {
-            return
+        do {
+            try taskViewModel.editTask(
+                taskID: editingTaskID,
+                newTitle: editingTaskTitle,
+                plannedDate: editingPlannedDate,
+                estimatedMinutes: editingEstimatedMinutes
+            )
+
+            showEditTask = false
+        } catch {
+            editTaskErrorMessage = error.localizedDescription
+            showEditTaskError = true
         }
-
-        taskViewModel.editTask(
-            taskID: editingTaskID,
-            newTitle: cleanedEditingTitle,
-            plannedDate: editingPlannedDate,
-            estimatedMinutes: editingEstimatedMinutes
-        )
-
-        showEditTask = false
     }
 
     private func formattedDuration(_ minutes: Int) -> String {

@@ -12,10 +12,14 @@ final class TaskViewModel: ObservableObject {
 
     let assignmentViewModel: AssignmentViewModel
     private let addTaskUseCase: AddTaskUseCase
+    private let editTaskUseCase: EditTaskUseCase
 
     init(assignmentViewModel: AssignmentViewModel) {
         self.assignmentViewModel = assignmentViewModel
         self.addTaskUseCase = AddTaskUseCase(
+            repository: assignmentViewModel.repository
+        )
+        self.editTaskUseCase = EditTaskUseCase(
             repository: assignmentViewModel.repository
         )
     }
@@ -117,28 +121,15 @@ final class TaskViewModel: ObservableObject {
         newTitle: String,
         plannedDate: Date? = nil,
         estimatedMinutes: Int? = nil
-    ) {
-        let cleanedTitle = newTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+    ) throws {
+        try editTaskUseCase.execute(
+            taskID: taskID,
+            title: newTitle,
+            plannedDate: plannedDate,
+            estimatedMinutes: estimatedMinutes
+        )
 
-        guard !cleanedTitle.isEmpty else {
-            return
-        }
-
-        for assignment in assignmentViewModel.assignments {
-            guard let taskIndex = assignment.tasks.firstIndex(
-                where: { $0.id == taskID }
-            ) else {
-                continue
-            }
-
-            var updatedAssignment = assignment
-            updatedAssignment.tasks[taskIndex].title = cleanedTitle
-            updatedAssignment.tasks[taskIndex].plannedDate = plannedDate
-            updatedAssignment.tasks[taskIndex].estimatedMinutes = estimatedMinutes
-
-            assignmentViewModel.update(updatedAssignment)
-            return
-        }
+        assignmentViewModel.load()
     }
 
     func deleteTask(taskID: String) {
