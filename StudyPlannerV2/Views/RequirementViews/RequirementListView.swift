@@ -63,10 +63,10 @@ struct RequirementListView: View {
 
                     ProgressView(value: progress)
                 }
-                .padding(16)
+                .padding(Theme.padding)
                 .frame(maxWidth: .infinity)
-                .background(Color(.secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 18))
+                .background(Theme.card)
+                .clipShape(RoundedRectangle(cornerRadius: Theme.corner))
 
 
                 // Checklist Header
@@ -100,7 +100,7 @@ struct RequirementListView: View {
                                 .padding(.vertical, 10)
                                 .background(
                                     selectedFilter == filter
-                                        ? Color(.secondarySystemGroupedBackground)
+                                        ? Theme.card
                                         : Color.clear
                                 )
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -129,8 +129,8 @@ struct RequirementListView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(32)
-                    .background(Color(.secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 18))
+                    .background(Theme.card)
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.corner))
 
                 } else {
 
@@ -152,7 +152,7 @@ struct RequirementListView: View {
                                     .font(.title2)
                                     .foregroundStyle(
                                         requirement.isCompleted
-                                            ? Color.green : Color.secondary
+                                            ? Color.accentColor : Color.secondary
                                     )
                                     .frame(width: 30, height: 44)
                                     .contentShape(Rectangle())
@@ -276,7 +276,7 @@ struct RequirementListView: View {
                                 }
                                 .buttonStyle(.plain)
                             }
-                            .padding(16)
+                            .padding(Theme.padding)
 
                             if index < filteredRequirements.count - 1 {
                                 Divider()
@@ -284,13 +284,13 @@ struct RequirementListView: View {
                             }
                         }
                     }
-                    .background(Color(.secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 18))
+                    .background(Theme.card)
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.corner))
                 }
             }
-            .padding(16)
+            .padding(Theme.padding)
         }
-        .background(Color(.systemGroupedBackground))
+        .background(Theme.background)
         .navigationTitle("Requirements")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
