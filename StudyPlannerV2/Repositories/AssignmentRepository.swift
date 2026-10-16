@@ -9,6 +9,8 @@ import Foundation
 
 protocol AssignmentRepository {
     var assignments: [Assignment] { get }
+    var errorMessage: String? { get }
+    
     func load() -> [Assignment]
     func add(_ assignment: Assignment)
     func update(_ assignment: Assignment)

@@ -12,13 +12,20 @@ struct RootView: View {
 
     @StateObject private var taskViewModel: TaskViewModel
 
-    init() {
-        let assignmentViewModel =
-            AssignmentViewModel(repository:JSONAssignmentRepository())
+    init(repository: AssignmentRepository) {
+        let assignmentViewModel = AssignmentViewModel(
+            repository: repository
+        )
 
-        _assignmentViewModel = StateObject(wrappedValue: assignmentViewModel)
+        _assignmentViewModel = StateObject(
+            wrappedValue: assignmentViewModel
+        )
 
-        _taskViewModel = StateObject(wrappedValue: TaskViewModel(assignmentViewModel: assignmentViewModel))
+        _taskViewModel = StateObject(
+            wrappedValue: TaskViewModel(
+                assignmentViewModel: assignmentViewModel
+            )
+        )
     }
 
     var body: some View {
@@ -46,5 +53,5 @@ struct RootView: View {
 }
 
 #Preview {
-    RootView()
+    RootView(repository: LocalAssignmentRepository())
 }
