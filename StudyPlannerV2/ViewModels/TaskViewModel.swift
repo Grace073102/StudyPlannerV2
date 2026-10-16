@@ -13,15 +13,18 @@ final class TaskViewModel: ObservableObject {
     let assignmentViewModel: AssignmentViewModel
     private let addTaskUseCase: AddTaskUseCase
     private let editTaskUseCase: EditTaskUseCase
+    private let toggleTaskUseCase: ToggleTaskUseCase
+    private let deleteTaskUseCase: DeleteTaskUseCase
+
+    @Published var errorMessage: String?
 
     init(assignmentViewModel: AssignmentViewModel) {
         self.assignmentViewModel = assignmentViewModel
-        self.addTaskUseCase = AddTaskUseCase(
-            repository: assignmentViewModel.repository
-        )
-        self.editTaskUseCase = EditTaskUseCase(
-            repository: assignmentViewModel.repository
-        )
+        let repository = assignmentViewModel.repository
+        self.addTaskUseCase = AddTaskUseCase(repository: repository)
+        self.editTaskUseCase = EditTaskUseCase(repository: repository)
+        self.toggleTaskUseCase = ToggleTaskUseCase(repository: repository)
+        self.deleteTaskUseCase = DeleteTaskUseCase(repository: repository)
     }
 
     var allTasks: [AcademicTask] {
@@ -131,36 +134,22 @@ final class TaskViewModel: ObservableObject {
 
         assignmentViewModel.load()
     }
-
+    
     func deleteTask(taskID: String) {
-        for assignment in assignmentViewModel.assignments {
-            guard let taskIndex = assignment.tasks.firstIndex(
-                where: { $0.id == taskID }
-            ) else {
-                continue
-            }
-
-            var updatedAssignment = assignment
-            updatedAssignment.tasks.remove(at: taskIndex)
-
-            assignmentViewModel.update(updatedAssignment)
-            return
+        do {
+            try deleteTaskUseCase.execute(taskID: taskID)
+            assignmentViewModel.load()
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
-
+    
     func toggleTask(taskID: String) {
-        for assignment in assignmentViewModel.assignments {
-            guard let taskIndex = assignment.tasks.firstIndex(
-                where: { $0.id == taskID }
-            ) else {
-                continue
-            }
-
-            var updatedAssignment = assignment
-            updatedAssignment.tasks[taskIndex].isCompleted.toggle()
-
-            assignmentViewModel.update(updatedAssignment)
-            return
+        do {
+            try toggleTaskUseCase.execute(taskID: taskID)
+            assignmentViewModel.load()
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
 }
