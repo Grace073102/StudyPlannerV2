@@ -53,16 +53,14 @@ struct RequirementDetailView: View {
                         .font(.subheadline)
                         .foregroundStyle(
                             requirement.isCompleted
-                                ? Color.green
+                                ? Color.accentColor
                                 : Color.secondary
                         )
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(16)
-                    .background(Color(.secondarySystemGroupedBackground))
-                    .clipShape(
-                        RoundedRectangle(cornerRadius: 18)
-                    )
+                    .padding(Theme.padding)
+                    .background(Theme.card)
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.corner))
 
                     // Requirement Details
                     VStack(alignment: .leading, spacing: 16) {
@@ -140,28 +138,9 @@ struct RequirementDetailView: View {
                         }
                     }
                     .font(.subheadline)
-                    .padding(16)
-                    .background(Color(.secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 18))
-                    
-                    
-                    // Delete Requirement
-                   Button(role: .destructive) {
-                       showingDeleteConfirmation = true
-                   } label: {
-                       HStack(spacing: 8) {
-                           Image(systemName: "trash")
-
-                           Text("Delete Requirement")
-                       }
-                       .font(.headline)
-                       .foregroundStyle(.white)
-                       .frame(maxWidth: .infinity)
-                       .padding(.vertical, 16)
-                       .background(Color.red)
-                       .clipShape(RoundedRectangle(cornerRadius: 14))
-                   }
-                   .buttonStyle(.plain)
+                    .padding(Theme.padding)
+                    .background(Theme.card)
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.corner))
 
                 } else {
 
@@ -172,17 +151,35 @@ struct RequirementDetailView: View {
                     )
                 }
             }
-            .padding(16)
+            .padding(Theme.padding)
         }
-        .background(Color(.systemGroupedBackground))
+        .background(Theme.background)
         .navigationTitle("Requirement Details")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 if viewModel.requirements.contains(where: { $0.id == requirementID }) {
-                    Button("Edit") {
-                        showingEditRequirement = true
+                    HStack(spacing: 4) {
+                        Button {
+                            showingEditRequirement = true
+                        } label: {
+                            Image(systemName: "pencil")
+                                .foregroundStyle(Color.accentColor)
+                        }
+                        .accessibilityLabel("Edit Requirement")
+
+                        Button {
+                            showingDeleteConfirmation = true
+                        } label: {
+                            Image(systemName: "trash")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(.red)
+                                .frame(width: 26, height: 26)
+                        }
+                        .accessibilityLabel("Delete Requirement")
                     }
+                    .padding(.horizontal, 3)
+                    .padding(.vertical, 2)
                 }
             }
         }
