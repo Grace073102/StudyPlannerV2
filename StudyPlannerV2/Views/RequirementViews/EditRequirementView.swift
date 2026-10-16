@@ -61,18 +61,22 @@ struct EditRequirementView: View {
                 Section("Important Dates") {
 
                     Toggle("Set Due Date", isOn: $hasDueDate)
+                        .tint(Color.accentColor)
 
                     if hasDueDate {
                         DatePicker("Due Date", selection: $dueDate, displayedComponents: .date)
                     }
 
                     Toggle("Set Expiry Date", isOn: $hasExpiryDate)
+                        .tint(Color.accentColor)
 
                     if hasExpiryDate {
                         DatePicker("Expiry Date", selection: $expiryDate, displayedComponents: .date)
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(Theme.background)
             .navigationTitle("Edit Requirement")
             .navigationBarTitleDisplayMode(.inline)
 
@@ -103,6 +107,7 @@ struct EditRequirementView: View {
                             showingError = true
                         }
                     }
+                    .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     .fontWeight(.semibold)
                 }
             }

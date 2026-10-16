@@ -42,18 +42,22 @@ struct AddRequirementView: View {
                 Section("Important Dates") {
 
                     Toggle("Set Due Date", isOn: $hasDueDate)
+                        .tint(Color.accentColor)
 
                     if hasDueDate {
                         DatePicker("Due Date", selection: $dueDate, displayedComponents: .date)
                     }
 
                     Toggle("Set Expiry Date", isOn: $hasExpiryDate)
+                        .tint(Color.accentColor)
 
                     if hasExpiryDate {
                         DatePicker("Expiry Date", selection: $expiryDate, displayedComponents: .date)
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(Theme.background)
             .navigationTitle("Add Requirement")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -82,6 +86,8 @@ struct AddRequirementView: View {
                             showingError = true
                         }
                     }
+                    .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .fontWeight(.semibold)
                 }
             }
             .alert("Unable to Save", isPresented: $showingError) {
