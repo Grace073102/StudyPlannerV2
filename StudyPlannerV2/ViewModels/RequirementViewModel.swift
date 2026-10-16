@@ -33,6 +33,7 @@ final class RequirementViewModel: ObservableObject {
         }
     }
     
+    
     func add(
         placementID: UUID,
         name: String,
@@ -40,7 +41,7 @@ final class RequirementViewModel: ObservableObject {
         dueDate: Date?,
         expiryDate: Date?
     ) throws {
-        _ = try addRequirementUseCase.execute(
+        let requirement = try addRequirementUseCase.execute(
             placementID: placementID,
             name: name,
             category: category,
@@ -49,6 +50,20 @@ final class RequirementViewModel: ObservableObject {
         )
         
         loadRequirements()
+
+        Task {
+            do {
+                let granted = try await RequirementNotificationManager.shared.requestPermission()
+
+                if granted {
+                    try await RequirementNotificationManager.shared.scheduleNotifications(
+                        for: requirement
+                    )
+                }
+            } catch {
+                print("Notification scheduling failed: \(error.localizedDescription)")
+            }
+        }
     }
     
     func updateRequirement(
@@ -58,11 +73,11 @@ final class RequirementViewModel: ObservableObject {
         dueDate: Date?,
         expiryDate: Date?
     ) throws {
-        
+
         let useCase = UpdateRequirementUseCase(
             repository: repository
         )
-        
+
         try useCase.execute(
             id: id,
             name: name,
@@ -70,16 +85,29 @@ final class RequirementViewModel: ObservableObject {
             dueDate: dueDate,
             expiryDate: expiryDate
         )
-        
+
         loadRequirements()
+
+        if let updatedRequirement = requirements.first(where: { $0.id == id }) {
+            Task {
+                do {
+                    try await RequirementNotificationManager.shared.scheduleNotifications(
+                        for: updatedRequirement
+                    )
+                } catch {
+                    print("Failed to update notifications: \(error.localizedDescription)")
+                }
+            }
+        }
     }
     
     func deleteRequirement(id: UUID) throws {
-        let useCase = DeleteRequirementUseCase(
-            repository: repository
-        )
+        let useCase = DeleteRequirementUseCase(repository: repository)
 
         try useCase.execute(id: id)
+
+        RequirementNotificationManager.shared.removeNotifications(for: id)
+
         loadRequirements()
     }
 
@@ -107,10 +135,20 @@ final class RequirementViewModel: ObservableObject {
     
     func toggleCompletion(for requirement: PlacementRequirement) {
         var updatedRequirement = requirement
-    
+
         updatedRequirement.isCompleted.toggle()
         repository.update(updatedRequirement)
         loadRequirements()
+
+        Task {
+            do {
+                try await RequirementNotificationManager.shared.scheduleNotifications(
+                    for: updatedRequirement
+                )
+            } catch {
+                print("Failed to update notifications: \(error.localizedDescription)")
+            }
+        }
     }
 }
 
