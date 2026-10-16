@@ -11,9 +11,13 @@ import Combine
 final class TaskViewModel: ObservableObject {
 
     let assignmentViewModel: AssignmentViewModel
+    private let addTaskUseCase: AddTaskUseCase
 
     init(assignmentViewModel: AssignmentViewModel) {
         self.assignmentViewModel = assignmentViewModel
+        self.addTaskUseCase = AddTaskUseCase(
+            repository: assignmentViewModel.repository
+        )
     }
 
     var allTasks: [AcademicTask] {
@@ -97,28 +101,15 @@ final class TaskViewModel: ObservableObject {
         plannedDate: Date? = nil,
         estimatedMinutes: Int? = nil,
         to assignmentID: String
-    ) {
-        let cleanedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
-
-        guard !cleanedTitle.isEmpty else {
-            return
-        }
-
-        guard var assignment = assignmentViewModel.assignments.first(
-            where: { $0.id == assignmentID }
-        ) else {
-            return
-        }
-
-        let newTask = AcademicTask(
-            title: cleanedTitle,
-            isCompleted: false,
+    ) throws {
+        try addTaskUseCase.execute(
+            title: title,
             plannedDate: plannedDate,
-            estimatedMinutes: estimatedMinutes
+            estimatedMinutes: estimatedMinutes,
+            assignmentID: assignmentID
         )
 
-        assignment.tasks.append(newTask)
-        assignmentViewModel.update(assignment)
+        assignmentViewModel.load()
     }
 
     func editTask(

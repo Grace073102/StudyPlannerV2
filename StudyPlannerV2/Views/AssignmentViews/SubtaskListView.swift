@@ -25,6 +25,9 @@ struct SubtaskListView: View {
 
     @State private var deletingTaskID = ""
     @State private var showDeleteConfirmation = false
+    
+    @State private var addTaskErrorMessage = ""
+    @State private var showAddTaskError = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -373,6 +376,11 @@ struct SubtaskListView: View {
         } message: {
             Text("This subtask will be permanently removed.")
         }
+        .alert("Unable to Add Subtask", isPresented: $showAddTaskError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(addTaskErrorMessage)
+        }
     }
 
     private var completedTaskCount: Int {
@@ -388,20 +396,21 @@ struct SubtaskListView: View {
     }
 
     private func addTask() {
-        guard !cleanedTitle.isEmpty else {
-            return
+        do {
+            try taskViewModel.addTask(
+                title: newTaskTitle,
+                plannedDate: plannedDate,
+                estimatedMinutes: estimatedMinutes,
+                to: assignment.id
+            )
+
+            newTaskTitle = ""
+            plannedDate = Date()
+            estimatedMinutes = 30
+        } catch {
+            addTaskErrorMessage = error.localizedDescription
+            showAddTaskError = true
         }
-
-        taskViewModel.addTask(
-            title: cleanedTitle,
-            plannedDate: plannedDate,
-            estimatedMinutes: estimatedMinutes,
-            to: assignment.id
-        )
-
-        newTaskTitle = ""
-        plannedDate = Date()
-        estimatedMinutes = 30
     }
 
     private func saveEditedTask() {
@@ -433,4 +442,5 @@ struct SubtaskListView: View {
 
         return "\(hours) hr \(remainingMinutes) min"
     }
+    
 }
