@@ -42,7 +42,7 @@ struct AssignmentDetailView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(
                         RoundedRectangle(cornerRadius: 16)
-                            .fill(Color(.systemBackground))
+                            .fill(Color(Theme.card))
                     )
                 }
             }
@@ -58,9 +58,7 @@ struct AssignmentDetailView: View {
                         showEditAssignment = true
                     } label: {
                         Image(systemName: "pencil")
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(.blue)
-                            .frame(width: 26, height: 26)
+                            .foregroundStyle(Color.accentColor)
                     }
 
                     Button {

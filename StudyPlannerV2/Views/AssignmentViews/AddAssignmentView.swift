@@ -168,12 +168,12 @@ struct AddAssignmentView: View {
                     } label: {
                         Text("Add Assignment")
                             .fontWeight(.semibold)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(Theme.onAccent)
                             .frame(maxWidth: .infinity)
                             .frame(height: 50)
                             .background(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.blue)
+                                    .fill(Color.accentColor)
                             )
                     }
                     .disabled(!isValid)

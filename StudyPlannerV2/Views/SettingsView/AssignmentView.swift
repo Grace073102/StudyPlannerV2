@@ -17,9 +17,9 @@ struct AssignmentView: View {
             ScrollView {
                 VStack(spacing: 20) {
                     HStack {
-                        Text("Hi, Sarah!")
-                            .font(.title2)
-                            .fontWeight(.semibold)
+                        Text("Dashboard")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
 
                         Spacer()
 
@@ -29,120 +29,94 @@ struct AssignmentView: View {
                             Image(systemName: "plus")
                                 .font(.title3)
                                 .fontWeight(.semibold)
-                                .foregroundStyle(.white)
-                                .frame(width: 36, height: 36)
+                                .foregroundStyle(Theme.onAccent)
+                                .frame(width: 44, height: 44)
                                 .background(
                                     Circle()
-                                        .fill(Color.blue)
+                                        .fill(Color.accentColor)
                                 )
                         }
                         .buttonStyle(.plain)
                     }
-
+                    
+                    HStack(spacing: 12) {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Today's study plan")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                            
+                            let count = taskViewModel.todayIncompleteTasks.count
+                            Text("\(count) \(count == 1 ? "task" : "tasks")")
+                                .font(.title)
+                                .fontWeight(.bold)
+                            
+                            let minutes = taskViewModel.todayStudyMinutes
+                            Text(minutes > 0 ? "\(formattedDuration(minutes)) planned" : "Nothing planned")
+                                .font(.subheadline)
+                        }
+                        .foregroundStyle(Theme.onAccent)
+                        .padding(Theme.padding)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                        .background(Color.accentColor, in: .rect(cornerRadius: Theme.corner))
+                        
+                        ProgressOverviewView(
+                            progress: assignmentViewModel.overallProgress,
+                            completedCount: assignmentViewModel.completedTaskCount,
+                            totalCount: assignmentViewModel.totalTaskCount
+                        )
+                    }
+                    .fixedSize(horizontal: false, vertical: true)
                     UpcomingDeadlinesView(
                         assignments: assignmentViewModel.assignments
                     )
 
-                    VStack(alignment: .leading, spacing: 16) {
-                        HStack(alignment: .top) {
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text("Upcoming Tasks")
+                    VStack(alignment: .leading, spacing: 12){
+                        HStack(alignment: .firstTextBaseline){
+                            VStack(alignment: .leading, spacing: 3){
+                                Text("To-do list")
                                     .font(.headline)
-                                    .fontWeight(.semibold)
-
-                                Text("Tasks due within the next 7 days")
+                                    .fontWeight(.bold)
+                                
+                                Text(todoSubtitle)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
-
+                            
                             Spacer()
-
+                            
                             NavigationLink {
                                 DetailTaskView()
                                     .environmentObject(assignmentViewModel)
                                     .environmentObject(taskViewModel)
                             } label: {
-                                HStack(spacing: 3) {
-                                    Text("View All")
-                                    Image(systemName: "chevron.right")
-                                }
-                                .font(.caption)
-                                .fontWeight(.semibold)
+                                Text("See All")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
                             }
                         }
-
-                        if !taskViewModel.todayIncompleteTasks.isEmpty {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Today's Study Plan")
-                                        .font(.subheadline)
-                                        .fontWeight(.semibold)
-
-                                    Text(
-                                        "\(taskViewModel.todayIncompleteTasks.count) tasks"
-                                    )
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                }
-
-                                Spacer()
-
-                                HStack(spacing: 4) {
-                                    Image(systemName: "clock")
-                                    Text(
-                                        formattedDuration(
-                                            taskViewModel.todayStudyMinutes
-                                        )
-                                    )
-                                }
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            }
-                            .padding(12)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(
-                                        Color.blue.opacity(0.08)
-                                    )
-                            )
-                        }
-
-                        if taskViewModel.upcomingTasks.isEmpty {
-                            Text("No tasks due within the next 7 days")
+                        
+                        if taskViewModel.todayTasks.isEmpty {
+                            Text("Plan a subtask for today from any assignment to see it here.")
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
-                        } else {
-                            ForEach(taskViewModel.upcomingTasks) { task in
-                                TaskView(
-                                    task: task,
-                                    course: courseName(for: task)
+                        }
+                        else {
+                            ForEach(taskViewModel.todayTasks) { task in
+                                TaskView(task: task,
+                                         course: courseName(for: task)
                                 ) {
-                                    taskViewModel.toggleTask(
-                                        taskID: task.id
-                                    )
+                                    taskViewModel.toggleTask(taskID: task.id)
+                                }
+                                
+                                if task.id != taskViewModel.todayTasks.last?.id {
+                                    Divider()
                                 }
                             }
                         }
                     }
-                    .padding(16)
-                    .frame(
-                        maxWidth: .infinity,
-                        alignment: .leading
-                    )
-                    .background(
-                        RoundedRectangle(cornerRadius: 20)
-                            .fill(Color(.systemBackground))
-                            .shadow(
-                                color: .black.opacity(0.06),
-                                radius: 5,
-                                x: 0,
-                                y: 2
-                            )
-                    )
-
-                    ProgressOverviewView(
-                        progress: assignmentViewModel.overallProgress
-                    )
+                    .padding(Theme.padding)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Theme.card, in: .rect(cornerRadius: Theme.corner))
 
                     Spacer(minLength: 20)
                 }
@@ -170,6 +144,15 @@ struct AssignmentView: View {
             }
         }?.course
     }
+    
+    private var todoSubtitle: String {
+        if taskViewModel.todayTasks.isEmpty {
+            return "Nothing planned for today"
+        }
+
+        let minutes = taskViewModel.todayStudyMinutes
+        return minutes > 0 ? "\(formattedDuration(minutes)) left" : "All done for today"
+    }
 
     private func formattedDuration(
         _ minutes: Int
@@ -187,4 +170,16 @@ struct AssignmentView: View {
 
         return "\(hours) hr \(remainingMinutes) min"
     }
+}
+
+#Preview {
+    let assignmentViewModel = AssignmentViewModel(
+        repository: LocalAssignmentRepository()
+    )
+
+    AssignmentView()
+        .environmentObject(assignmentViewModel)
+        .environmentObject(
+            TaskViewModel(assignmentViewModel: assignmentViewModel)
+        )
 }
