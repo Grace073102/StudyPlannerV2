@@ -201,9 +201,9 @@ final class SwiftDataAssignmentRepository: AssignmentRepository {
         if let sourceURL {
             let data = try Data(contentsOf: sourceURL)
             legacyAssignments = try JSONDecoder().decode(
-                [Assignment].self,
+                [LegacyAssignment].self,
                 from: data
-            )
+            ).map { $0.makeAssignment() }
         } else {
             legacyAssignments = []
         }
@@ -228,4 +228,42 @@ final class SwiftDataAssignmentRepository: AssignmentRepository {
 
         assignments = load()
     }
+}
+
+private struct LegacyAssignment: Decodable {
+    let id: String
+    let title: String
+    let course: String
+    let dueDate: Date
+    let priority: Assignment.Priority
+    let description: String?
+    let tasks: [LegacyAcademicTask]
+
+    func makeAssignment() -> Assignment {
+        Assignment(
+            id: id,
+            title: title,
+            course: course,
+            dueDate: dueDate,
+            priority: priority,
+            description: description,
+            tasks: tasks.map {
+                AcademicTask(
+                    id: $0.id,
+                    title: $0.title,
+                    isCompleted: $0.isCompleted,
+                    plannedDate: $0.plannedDate,
+                    estimatedMinutes: $0.estimatedMinutes
+                )
+            }
+        )
+    }
+}
+
+private struct LegacyAcademicTask: Decodable {
+    let id: String
+    let title: String
+    let isCompleted: Bool
+    let plannedDate: Date?
+    let estimatedMinutes: Int?
 }

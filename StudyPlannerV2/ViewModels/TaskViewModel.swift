@@ -104,19 +104,19 @@ final class TaskViewModel: ObservableObject {
     }
 
     func addTask(
-        title: String,
-        plannedDate: Date? = nil,
-        estimatedMinutes: Int? = nil,
-        to assignmentID: String
-    ) throws {
-        try addTaskUseCase.execute(
-            title: title,
-            plannedDate: plannedDate,
-            estimatedMinutes: estimatedMinutes,
-            assignmentID: assignmentID
-        )
+            title: String,
+            plannedDate: Date? = nil,
+            estimatedMinutes: Int? = nil,
+            to assignmentID: String
+        ) throws {
+            try addTaskUseCase.execute(
+                title: title,
+                plannedDate: plannedDate,
+                estimatedMinutes: estimatedMinutes,
+                assignmentID: assignmentID
+            )
 
-        assignmentViewModel.load()
+            assignmentViewModel.load()
     }
 
     func editTask(
@@ -131,7 +131,6 @@ final class TaskViewModel: ObservableObject {
             plannedDate: plannedDate,
             estimatedMinutes: estimatedMinutes
         )
-
         assignmentViewModel.load()
     }
     

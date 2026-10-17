@@ -186,6 +186,11 @@ struct EditAssignmentView: View {
                 priority: priority,
                 description: description
             )
+            
+            if let message = assignmentViewModel.repositoryErrorMessage {
+                showErrorMessage(message)
+                return
+            }
 
             dismiss()
         } catch {
