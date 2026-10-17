@@ -11,6 +11,7 @@ import SwiftData
 struct AppRepositories {
     let assignments: SwiftDataAssignmentRepository
     let requirements: SwiftDataRequirementRepository
+    let subjects: SwiftDataSubjectRepository
 }
 
 @main
@@ -58,7 +59,8 @@ struct StudyPlannerApp: App {
                 StoredAssignment.self,
                 StoredAcademicTask.self,
                 StoredMigration.self,
-                StoredPlacementRequirement.self
+                StoredPlacementRequirement.self,
+                StoredSubject.self
             ])
 
             let configuration = ModelConfiguration(
@@ -84,10 +86,15 @@ struct StudyPlannerApp: App {
                 container: container
             )
 
+            let subjectRepository = SwiftDataSubjectRepository(
+                container: container
+            )
+
             return .success(
                 AppRepositories(
                     assignments: repository,
-                    requirements: requirementRepository
+                    requirements: requirementRepository,
+                    subjects: subjectRepository
                 )
             )
         } catch {
