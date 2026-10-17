@@ -5,6 +5,9 @@
 //  Created by Eden Fernando on 17/10/2026.
 //
 
+/// A placement or internship the student has secured and is preparing for or completing.
+///
+/// Created and managed by the student; CampusFlow does not verify it with the university.
 import Foundation
 import SwiftData
 
@@ -18,6 +21,7 @@ final class StoredPlacement {
     var startDate: Date
     var endDate: Date
     var placementDescription: String?
+    var subjectID: UUID?
 
     var description: String? {
         get { placementDescription }
@@ -34,7 +38,8 @@ final class StoredPlacement {
         discipline: String,
         startDate: Date,
         endDate: Date,
-        description: String = ""
+        description: String = "",
+        subjectID: UUID? = nil
     ) {
         self.id = id
         self.name = name
@@ -42,6 +47,7 @@ final class StoredPlacement {
         self.startDate = startDate
         self.endDate = endDate
         placementDescription = description
+        self.subjectID = subjectID
     }
 
     func status(on date: Date, calendar: Calendar = .current) -> Status {
@@ -58,6 +64,7 @@ final class StoredPlacement {
         startDate = placement.startDate
         endDate = placement.endDate
         placementDescription = placement.description
+        subjectID = placement.subjectID
     }
 
     func toPlacement() -> Placement {
@@ -66,7 +73,8 @@ final class StoredPlacement {
             name: name,
             discipline: discipline,
             startDate: startDate,
-            endDate: endDate
+            endDate: endDate,
+            subjectID: subjectID
         )
 
         placement.description = placementDescription

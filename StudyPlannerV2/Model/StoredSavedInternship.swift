@@ -5,6 +5,9 @@
 //  Created by Eden Fernando on 17/10/2026.
 //
 
+/// An internship the student saved from the Job API, to consider or apply for.
+/// Not the same as a Placement, this is a listing the student is tracking, while a Placement is one they have secured. A saved internship that reaches
+
 import Foundation
 import SwiftData
 
