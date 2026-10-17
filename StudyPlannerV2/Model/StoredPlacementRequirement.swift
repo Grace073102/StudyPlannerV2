@@ -8,6 +8,8 @@
 import Foundation
 import SwiftData
 
+typealias PlacementRequirement = StoredPlacementRequirement
+
 @Model
 final class StoredPlacementRequirement {
     @Attribute(.unique) var id: UUID
@@ -17,6 +19,51 @@ final class StoredPlacementRequirement {
     var dueDate: Date?
     var expiryDate: Date?
     var isCompleted: Bool
+
+    enum Category: String, CaseIterable, Codable {
+        case applicationsAndRegistration = "Applications & Registration"
+        case checksAndClearances = "Checks & Clearances"
+        case trainingAndCertificates = "Training & Certificates"
+        case placementPreparation = "Placement Preparation"
+        case placementProgress = "Placement Progress"
+    }
+
+    var category: Category {
+        get { Category(rawValue: categoryRawValue) ?? .placementPreparation }
+        set { categoryRawValue = newValue.rawValue }
+    }
+
+    init(
+        id: UUID = UUID(),
+        placementID: UUID,
+        name: String,
+        category: Category,
+        dueDate: Date? = nil,
+        expiryDate: Date? = nil,
+        isCompleted: Bool = false
+    ) {
+        self.id = id
+        self.placementID = placementID
+        self.name = name
+        categoryRawValue = category.rawValue
+        self.dueDate = dueDate
+        self.expiryDate = expiryDate
+        self.isCompleted = isCompleted
+    }
+
+    func copy() -> PlacementRequirement {
+        let result = PlacementRequirement(
+            id: id,
+            placementID: placementID,
+            name: name,
+            category: category,
+            dueDate: dueDate,
+            expiryDate: expiryDate,
+            isCompleted: isCompleted
+        )
+        result.categoryRawValue = categoryRawValue
+        return result
+    }
 
     init(requirement: PlacementRequirement) {
         id = requirement.id

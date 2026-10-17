@@ -138,7 +138,7 @@ final class RequirementViewModel: ObservableObject {
     
     
     func toggleCompletion(for requirement: PlacementRequirement) {
-        var updatedRequirement = requirement
+        let updatedRequirement = requirement.copy()
 
         updatedRequirement.isCompleted.toggle()
         repository.update(updatedRequirement)
@@ -202,4 +202,3 @@ enum RequirementValidationError: LocalizedError {
         }
     }
 }
-

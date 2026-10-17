@@ -8,6 +8,8 @@
 import Foundation
 import SwiftData
 
+typealias Placement = StoredPlacement
+
 @Model
 final class StoredPlacement {
     @Attribute(.unique) var id: UUID
@@ -16,6 +18,38 @@ final class StoredPlacement {
     var startDate: Date
     var endDate: Date
     var placementDescription: String?
+
+    var description: String? {
+        get { placementDescription }
+        set { placementDescription = newValue }
+    }
+
+    enum Status: String, Sendable {
+        case upcoming, inProgress, completed
+    }
+
+    init(
+        id: UUID = UUID(),
+        name: String,
+        discipline: String,
+        startDate: Date,
+        endDate: Date,
+        description: String = ""
+    ) {
+        self.id = id
+        self.name = name
+        self.discipline = discipline
+        self.startDate = startDate
+        self.endDate = endDate
+        placementDescription = description
+    }
+
+    func status(on date: Date, calendar: Calendar = .current) -> Status {
+        let day = calendar.startOfDay(for: date)
+        if day < calendar.startOfDay(for: startDate) { return .upcoming }
+        if day > calendar.startOfDay(for: endDate) { return .completed }
+        return .inProgress
+    }
 
     init(placement: Placement) {
         id = placement.id
@@ -27,7 +61,7 @@ final class StoredPlacement {
     }
 
     func toPlacement() -> Placement {
-        var placement = Placement(
+        let placement = Placement(
             id: id,
             name: name,
             discipline: discipline,

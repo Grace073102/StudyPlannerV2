@@ -8,6 +8,8 @@
 import Foundation
 import SwiftData
 
+typealias SavedInternship = StoredSavedInternship
+
 @Model
 final class StoredSavedInternship {
     @Attribute(.unique) var id: UUID
@@ -19,6 +21,33 @@ final class StoredSavedInternship {
     var applicationDeadline: Date?
     var savedDate: Date
     var applicationStatusRawValue: String
+
+    var applicationStatus: ApplicationStatus {
+        get { ApplicationStatus(rawValue: applicationStatusRawValue) ?? .saved }
+        set { applicationStatusRawValue = newValue.rawValue }
+    }
+
+    init(
+        id: UUID = UUID(),
+        jobID: String,
+        title: String,
+        company: String,
+        location: String? = nil,
+        applicationURL: URL? = nil,
+        applicationDeadline: Date? = nil,
+        savedDate: Date = Date(),
+        applicationStatus: ApplicationStatus = .saved
+    ) {
+        self.id = id
+        self.jobID = jobID
+        self.title = title
+        self.company = company
+        self.location = location
+        self.applicationURL = applicationURL
+        self.applicationDeadline = applicationDeadline
+        self.savedDate = savedDate
+        applicationStatusRawValue = applicationStatus.rawValue
+    }
 
     init(internship: SavedInternship) {
         id = internship.id
