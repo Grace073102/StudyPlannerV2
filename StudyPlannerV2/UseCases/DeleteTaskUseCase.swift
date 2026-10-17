@@ -22,13 +22,14 @@ struct DeleteTaskUseCase {
 
     func execute(taskID: String) throws {
         for assignment in repository.assignments {
-            guard let taskIndex = assignment.tasks.firstIndex(
+            let updatedAssignment = assignment.copy()
+            
+            guard let taskIndex = updatedAssignment.tasks.firstIndex(
                 where: { $0.id == taskID }
             ) else {
                 continue
             }
 
-            var updatedAssignment = assignment
             updatedAssignment.tasks.remove(at: taskIndex)
             repository.update(updatedAssignment)
             return

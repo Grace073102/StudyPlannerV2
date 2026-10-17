@@ -53,12 +53,13 @@ struct UpdateAssignmentUseCase {
             throw UpdateAssignmentError.missingCourse
         }
 
-        guard var assignment = repository.assignments.first(
+        guard let existingAssignment = repository.assignments.first(
             where: { $0.id == assignmentID }
         ) else {
             throw UpdateAssignmentError.assignmentNotFound
         }
 
+        let assignment = existingAssignment.copy()
         let calendar = Calendar.current
         let dueDateChanged = !calendar.isDate(dueDate, inSameDayAs: assignment.dueDate)
         let today = calendar.startOfDay(for: .now)

@@ -45,11 +45,13 @@ struct AddTaskUseCase {
             throw AddTaskError.invalidEstimatedTime
         }
 
-        guard var assignment = repository.assignments.first(
+        guard let existingAssignment = repository.assignments.first(
             where: { $0.id == assignmentID }
         ) else {
             throw AddTaskError.assignmentNotFound
         }
+        
+        let assignment = existingAssignment.copy()
 
         let task = AcademicTask(
             title: cleanedTitle,

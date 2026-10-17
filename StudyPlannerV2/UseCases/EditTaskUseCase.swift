@@ -46,13 +46,14 @@ struct EditTaskUseCase {
         }
 
         for assignment in repository.assignments {
-            guard let taskIndex = assignment.tasks.firstIndex(
+            let updatedAssignment = assignment.copy()
+            
+            guard let taskIndex = updatedAssignment.tasks.firstIndex(
                 where: { $0.id == taskID }
             ) else {
                 continue
             }
 
-            var updatedAssignment = assignment
             updatedAssignment.tasks[taskIndex].title = cleanedTitle
             updatedAssignment.tasks[taskIndex].plannedDate = plannedDate
             updatedAssignment.tasks[taskIndex].estimatedMinutes = estimatedMinutes
