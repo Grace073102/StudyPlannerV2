@@ -47,7 +47,7 @@ struct UpdateRequirementUseCase {
         }
 
         // Update existing requirement
-        var updatedRequirement = existingRequirement
+        let updatedRequirement = existingRequirement.copy()
 
         updatedRequirement.name = trimmedName
         updatedRequirement.category = category

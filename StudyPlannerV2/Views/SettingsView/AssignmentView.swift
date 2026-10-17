@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct AssignmentView: View {
     @EnvironmentObject var assignmentViewModel: AssignmentViewModel
@@ -173,8 +174,27 @@ struct AssignmentView: View {
 }
 
 #Preview {
+    let schema = Schema([
+        StoredAssignment.self,
+        StoredAcademicTask.self
+    ])
+
+    let configuration = ModelConfiguration(
+        schema: schema,
+        isStoredInMemoryOnly: true
+    )
+
+    let container = try! ModelContainer(
+        for: schema,
+        configurations: [configuration]
+    )
+
+    let repository = SwiftDataAssignmentRepository(
+        container: container
+    )
+
     let assignmentViewModel = AssignmentViewModel(
-        repository: LocalAssignmentRepository()
+        repository: repository
     )
 
     AssignmentView()

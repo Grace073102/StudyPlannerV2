@@ -92,9 +92,7 @@ struct DetailTaskView: View {
         title: String,
         priority: Assignment.Priority
     ) -> some View {
-        let assignments = filteredAssignments.filter {
-            $0.priority == priority && !$0.tasks.isEmpty
-        }
+        let assignments = visibleAssignments(priority: priority)
 
         return Group {
             if !assignments.isEmpty {
@@ -104,7 +102,7 @@ struct DetailTaskView: View {
 
                     VStack(spacing: 0) {
                         ForEach(assignments) { assignment in
-                            ForEach(assignment.tasks) { task in
+                            ForEach(visibleTasks(for: assignment)) { task in
                                 TaskView(
                                     task: task,
                                     course: assignment.course
@@ -127,43 +125,43 @@ struct DetailTaskView: View {
         }
     }
 
-    private var filteredAssignments: [Assignment] {
-        assignmentViewModel.assignments.map { assignment in
-            var updatedAssignment = assignment
-
+    private func visibleTasks(
+        for assignment: Assignment
+    ) -> [AcademicTask] {
+        assignment.tasks.filter { task in
             switch selectedFilter {
             case "Today":
-                updatedAssignment.tasks = assignment.tasks.filter { task in
-                    guard let plannedDate = task.plannedDate else {
-                        return false
-                    }
-
-                    return Calendar.current.isDateInToday(plannedDate)
+                guard let plannedDate = task.plannedDate else {
+                    return false
                 }
+
+                return Calendar.current.isDateInToday(plannedDate)
 
             case "This Week":
-                updatedAssignment.tasks = assignment.tasks.filter { task in
-                    guard let plannedDate = task.plannedDate else {
-                        return false
-                    }
-
-                    return Calendar.current.isDate(
-                        plannedDate,
-                        equalTo: Date(),
-                        toGranularity: .weekOfYear
-                    )
+                guard let plannedDate = task.plannedDate else {
+                    return false
                 }
+
+                return Calendar.current.isDate(
+                    plannedDate,
+                    equalTo: Date(),
+                    toGranularity: .weekOfYear
+                )
 
             case "Completed":
-                updatedAssignment.tasks = assignment.tasks.filter {
-                    $0.isCompleted
-                }
+                return task.isCompleted
 
             default:
-                updatedAssignment.tasks = assignment.tasks
+                return true
             }
+        }
+    }
 
-            return updatedAssignment
+    private func visibleAssignments(
+        priority: Assignment.Priority
+    ) -> [Assignment] {
+        assignmentViewModel.assignments.filter {
+            $0.priority == priority && !visibleTasks(for: $0).isEmpty
         }
     }
 }

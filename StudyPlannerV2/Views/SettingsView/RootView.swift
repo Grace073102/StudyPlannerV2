@@ -5,14 +5,20 @@
 //  Created by Grace Chi Yen Chong on 14/10/2026.
 //
 
+import SwiftData
 import SwiftUI
 
 struct RootView: View {
     @StateObject private var assignmentViewModel: AssignmentViewModel
 
     @StateObject private var taskViewModel: TaskViewModel
+    
+    @StateObject private var requirementViewModel: RequirementViewModel
 
-    init(repository: AssignmentRepository) {
+    init(
+        repository: AssignmentRepository,
+        requirementRepository: RequirementRepository
+    ) {
         let assignmentViewModel = AssignmentViewModel(
             repository: repository
         )
@@ -24,6 +30,12 @@ struct RootView: View {
         _taskViewModel = StateObject(
             wrappedValue: TaskViewModel(
                 assignmentViewModel: assignmentViewModel
+            )
+        )
+
+        _requirementViewModel = StateObject(
+            wrappedValue: RequirementViewModel(
+                repository: requirementRepository
             )
         )
     }
@@ -49,9 +61,33 @@ struct RootView: View {
         }
         .environmentObject(assignmentViewModel)
         .environmentObject(taskViewModel)
+        .environmentObject(requirementViewModel)
     }
 }
 
 #Preview {
-    RootView(repository: LocalAssignmentRepository())
+    let schema = Schema([
+        StoredAssignment.self,
+        StoredAcademicTask.self,
+        StoredPlacementRequirement.self
+    ])
+
+    let configuration = ModelConfiguration(
+        schema: schema,
+        isStoredInMemoryOnly: true
+    )
+
+    let container = try! ModelContainer(
+        for: schema,
+        configurations: [configuration]
+    )
+
+    RootView(
+        repository: SwiftDataAssignmentRepository(
+            container: container
+        ),
+        requirementRepository: SwiftDataRequirementRepository(
+            container: container
+        )
+    )
 }

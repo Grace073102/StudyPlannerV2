@@ -200,7 +200,7 @@ struct EditAssignmentView: View {
             return
         }
 
-        var updatedAssignment = assignment
+        let updatedAssignment = assignment.copy()
         updatedAssignment.title = cleanedTitle
         updatedAssignment.course = cleanedCourse
         updatedAssignment.dueDate = dueDate
@@ -208,6 +208,10 @@ struct EditAssignmentView: View {
         updatedAssignment.description = cleanedDescription.isEmpty ? nil : cleanedDescription
 
         assignmentViewModel.update(updatedAssignment)
+        if let message = assignmentViewModel.repositoryErrorMessage {
+            showErrorMessage(message)
+            return
+        }
         dismiss()
     }
 

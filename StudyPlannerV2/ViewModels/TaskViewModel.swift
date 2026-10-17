@@ -104,12 +104,13 @@ final class TaskViewModel: ObservableObject {
             return
         }
 
-        guard var assignment = assignmentViewModel.assignments.first(
+        guard let existingAssignment = assignmentViewModel.assignments.first(
             where: { $0.id == assignmentID }
         ) else {
             return
         }
 
+        let assignment = existingAssignment.copy()
         let newTask = AcademicTask(
             title: cleanedTitle,
             isCompleted: false,
@@ -140,7 +141,7 @@ final class TaskViewModel: ObservableObject {
                 continue
             }
 
-            var updatedAssignment = assignment
+            let updatedAssignment = assignment.copy()
             updatedAssignment.tasks[taskIndex].title = cleanedTitle
             updatedAssignment.tasks[taskIndex].plannedDate = plannedDate
             updatedAssignment.tasks[taskIndex].estimatedMinutes = estimatedMinutes
@@ -158,7 +159,7 @@ final class TaskViewModel: ObservableObject {
                 continue
             }
 
-            var updatedAssignment = assignment
+            let updatedAssignment = assignment.copy()
             updatedAssignment.tasks.remove(at: taskIndex)
 
             assignmentViewModel.update(updatedAssignment)
@@ -174,7 +175,7 @@ final class TaskViewModel: ObservableObject {
                 continue
             }
 
-            var updatedAssignment = assignment
+            let updatedAssignment = assignment.copy()
             updatedAssignment.tasks[taskIndex].isCompleted.toggle()
 
             assignmentViewModel.update(updatedAssignment)
