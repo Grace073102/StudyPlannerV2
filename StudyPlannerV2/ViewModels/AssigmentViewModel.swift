@@ -15,10 +15,12 @@ final class AssignmentViewModel: ObservableObject {
 
     let repository: AssignmentRepository
     private let addAssignmentUseCase: AddAssignmentUseCase
+    private let updateAssignmentUseCase: UpdateAssignmentUseCase
 
     init(repository: AssignmentRepository) {
         self.repository = repository
         self.addAssignmentUseCase = AddAssignmentUseCase(repository: repository)
+        self.updateAssignmentUseCase = UpdateAssignmentUseCase(repository: repository)
         load()
     }
 
@@ -35,6 +37,27 @@ final class AssignmentViewModel: ObservableObject {
         description: String
     ) throws {
         _ = try addAssignmentUseCase.execute(
+            title: title,
+            course: course,
+            dueDate: dueDate,
+            priority: priority,
+            description: description
+        )
+
+        assignments = repository.assignments
+        repositoryErrorMessage = repository.errorMessage
+    }
+    
+    func updateAssignment(
+        id: String,
+        title: String,
+        course: String,
+        dueDate: Date,
+        priority: Assignment.Priority,
+        description: String
+    ) throws {
+        try updateAssignmentUseCase.execute(
+            assignmentID: id,
             title: title,
             course: course,
             dueDate: dueDate,

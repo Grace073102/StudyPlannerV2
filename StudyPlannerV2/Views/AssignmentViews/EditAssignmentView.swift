@@ -177,42 +177,25 @@ struct EditAssignmentView: View {
     }
 
     private func saveChanges() {
-        let cleanedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
-        let cleanedCourse = course.trimmingCharacters(in: .whitespacesAndNewlines)
-        let cleanedDescription = description.trimmingCharacters(in: .whitespacesAndNewlines)
+        do {
+            try assignmentViewModel.updateAssignment(
+                id: assignment.id,
+                title: title,
+                course: course,
+                dueDate: dueDate,
+                priority: priority,
+                description: description
+            )
+            
+            if let message = assignmentViewModel.repositoryErrorMessage {
+                showErrorMessage(message)
+                return
+            }
 
-        guard !cleanedTitle.isEmpty else {
-            showErrorMessage("Enter an assignment title before saving.")
-            return
+            dismiss()
+        } catch {
+            showErrorMessage(error.localizedDescription)
         }
-
-        guard !cleanedCourse.isEmpty else {
-            showErrorMessage("Enter the course for this assignment before saving.")
-            return
-        }
-
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        let selectedDueDate = calendar.startOfDay(for: dueDate)
-
-        guard selectedDueDate >= today else {
-            showErrorMessage("The due date cannot be in the past. Choose today or a future date.")
-            return
-        }
-
-        let updatedAssignment = assignment.copy()
-        updatedAssignment.title = cleanedTitle
-        updatedAssignment.course = cleanedCourse
-        updatedAssignment.dueDate = dueDate
-        updatedAssignment.priority = priority
-        updatedAssignment.description = cleanedDescription.isEmpty ? nil : cleanedDescription
-
-        assignmentViewModel.update(updatedAssignment)
-        if let message = assignmentViewModel.repositoryErrorMessage {
-            showErrorMessage(message)
-            return
-        }
-        dismiss()
     }
 
     private func showErrorMessage(_ message: String) {

@@ -62,6 +62,17 @@ struct RootView: View {
         .environmentObject(assignmentViewModel)
         .environmentObject(taskViewModel)
         .environmentObject(requirementViewModel)
+        .alert(
+            "Something Went Wrong",
+            isPresented: Binding(
+                get: { taskViewModel.errorMessage != nil },
+                set: { if !$0 { taskViewModel.errorMessage = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(taskViewModel.errorMessage ?? "")
+        }
     }
 }
 
