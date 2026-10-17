@@ -308,6 +308,26 @@ struct RequirementListView: View {
                 placementID: placementID
             )
         }
+        .alert(
+            "Requirement Storage Error",
+            isPresented: Binding(
+                get: { viewModel.repositoryErrorMessage != nil },
+                set: { isPresented in
+                    if !isPresented {
+                        viewModel.clearRepositoryError()
+                    }
+                }
+            )
+        ) {
+            Button("OK") {
+                viewModel.clearRepositoryError()
+            }
+        } message: {
+            Text(
+                viewModel.repositoryErrorMessage
+                    ?? "Your requirements could not be saved or loaded."
+            )
+        }
     }
 }
 

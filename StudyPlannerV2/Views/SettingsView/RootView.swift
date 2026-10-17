@@ -11,8 +11,13 @@ struct RootView: View {
     @StateObject private var assignmentViewModel: AssignmentViewModel
 
     @StateObject private var taskViewModel: TaskViewModel
+    
+    @StateObject private var requirementViewModel: RequirementViewModel
 
-    init(repository: AssignmentRepository) {
+    init(
+        repository: AssignmentRepository,
+        requirementRepository: RequirementRepository
+    ) {
         let assignmentViewModel = AssignmentViewModel(
             repository: repository
         )
@@ -24,6 +29,12 @@ struct RootView: View {
         _taskViewModel = StateObject(
             wrappedValue: TaskViewModel(
                 assignmentViewModel: assignmentViewModel
+            )
+        )
+
+        _requirementViewModel = StateObject(
+            wrappedValue: RequirementViewModel(
+                repository: requirementRepository
             )
         )
     }
@@ -49,9 +60,13 @@ struct RootView: View {
         }
         .environmentObject(assignmentViewModel)
         .environmentObject(taskViewModel)
+        .environmentObject(requirementViewModel)
     }
 }
 
 #Preview {
-    RootView(repository: LocalAssignmentRepository())
+    RootView(
+        repository: LocalAssignmentRepository(),
+        requirementRepository: LocalRequirementRepository()
+    )
 }

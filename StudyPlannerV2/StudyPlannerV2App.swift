@@ -8,10 +8,15 @@
 import SwiftUI
 import SwiftData
 
+struct AppRepositories {
+    let assignments: SwiftDataAssignmentRepository
+    let requirements: SwiftDataRequirementRepository
+}
+
 @main
 struct StudyPlannerApp: App {
-    @State private var startup: Result<SwiftDataAssignmentRepository, Error>
-
+    @State private var startup: Result<AppRepositories, Error>
+    
     init() {
         _startup = State(initialValue: Self.prepareStorage())
     }
@@ -19,9 +24,12 @@ struct StudyPlannerApp: App {
     var body: some Scene {
         WindowGroup {
             switch startup {
-            case .success(let repository):
-                RootView(repository: repository)
-
+            case .success(let repositories):
+                RootView(
+                    repository: repositories.assignments,
+                    requirementRepository: repositories.requirements
+                )
+                
             case .failure:
                 VStack(spacing: 16) {
                     Text("Unable to Open Your Planner")
@@ -44,12 +52,13 @@ struct StudyPlannerApp: App {
     }
 
     private static func prepareStorage()
-        -> Result<SwiftDataAssignmentRepository, Error> {
+        -> Result<AppRepositories, Error> {
         do {
             let schema = Schema([
                 StoredAssignment.self,
                 StoredAcademicTask.self,
-                StoredMigration.self
+                StoredMigration.self,
+                StoredPlacementRequirement.self
             ])
 
             let configuration = ModelConfiguration(
@@ -66,10 +75,21 @@ struct StudyPlannerApp: App {
             let repository = SwiftDataAssignmentRepository(
                 container: container
             )
+            
+            
 
             try repository.migrateLegacyAssignmentsIfNeeded()
 
-            return .success(repository)
+            let requirementRepository = SwiftDataRequirementRepository(
+                container: container
+            )
+
+            return .success(
+                AppRepositories(
+                    assignments: repository,
+                    requirements: requirementRepository
+                )
+            )
         } catch {
             return .failure(error)
         }

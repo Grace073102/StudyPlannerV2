@@ -10,6 +10,7 @@ import Foundation
 protocol RequirementRepository {
     
     var requirements: [PlacementRequirement] { get }
+    var errorMessage: String? { get }
 
     func load() -> [PlacementRequirement]
     func add(_ requirement: PlacementRequirement)

@@ -12,6 +12,8 @@ final class RequirementViewModel: ObservableObject {
     
     @Published private(set) var requirements: [PlacementRequirement] = []
     
+    @Published private(set) var repositoryErrorMessage: String?
+    
     private let repository: RequirementRepository
     private let addRequirementUseCase: AddRequirementUseCase
     
@@ -25,6 +27,7 @@ final class RequirementViewModel: ObservableObject {
     
     func loadRequirements() {
         requirements = repository.load()
+        repositoryErrorMessage = repository.errorMessage
     }
     
     func requirements(for placementID: UUID) -> [PlacementRequirement] {
@@ -42,13 +45,14 @@ final class RequirementViewModel: ObservableObject {
         expiryDate: Date?
     ) throws {
         let requirement = try addRequirementUseCase.execute(
+
             placementID: placementID,
             name: name,
             category: category,
             dueDate: dueDate,
             expiryDate: expiryDate
         )
-        
+        try checkRepositoryError()
         loadRequirements()
 
         Task {
@@ -85,7 +89,7 @@ final class RequirementViewModel: ObservableObject {
             dueDate: dueDate,
             expiryDate: expiryDate
         )
-
+        try checkRepositoryError()
         loadRequirements()
 
         if let updatedRequirement = requirements.first(where: { $0.id == id }) {
@@ -105,9 +109,9 @@ final class RequirementViewModel: ObservableObject {
         let useCase = DeleteRequirementUseCase(repository: repository)
 
         try useCase.execute(id: id)
+        try checkRepositoryError()
 
         RequirementNotificationManager.shared.removeNotifications(for: id)
-
         loadRequirements()
     }
 
@@ -138,6 +142,12 @@ final class RequirementViewModel: ObservableObject {
 
         updatedRequirement.isCompleted.toggle()
         repository.update(updatedRequirement)
+
+        if let message = repository.errorMessage {
+            repositoryErrorMessage = message
+            return
+        }
+
         loadRequirements()
 
         Task {
@@ -149,6 +159,28 @@ final class RequirementViewModel: ObservableObject {
                 print("Failed to update notifications: \(error.localizedDescription)")
             }
         }
+    }
+    
+    func clearRepositoryError() {
+        repositoryErrorMessage = nil
+    }
+    
+    private func checkRepositoryError() throws {
+        if let message = repository.errorMessage {
+            repositoryErrorMessage = message
+            throw RequirementPersistenceError(message: message)
+        }
+
+        repositoryErrorMessage = nil
+    }
+    
+}
+
+struct RequirementPersistenceError: LocalizedError {
+    let message: String
+
+    var errorDescription: String? {
+        message
     }
 }
 
