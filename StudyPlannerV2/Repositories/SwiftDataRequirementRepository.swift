@@ -8,6 +8,8 @@
 import Foundation
 import SwiftData
 
+
+
 final class SwiftDataRequirementRepository: RequirementRepository {
     private(set) var requirements: [PlacementRequirement] = []
     private(set) var errorMessage: String?

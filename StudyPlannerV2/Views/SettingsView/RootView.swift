@@ -5,6 +5,7 @@
 //  Created by Grace Chi Yen Chong on 14/10/2026.
 //
 
+import SwiftData
 import SwiftUI
 
 struct RootView: View {
@@ -65,8 +66,28 @@ struct RootView: View {
 }
 
 #Preview {
+    let schema = Schema([
+        StoredAssignment.self,
+        StoredAcademicTask.self,
+        StoredPlacementRequirement.self
+    ])
+
+    let configuration = ModelConfiguration(
+        schema: schema,
+        isStoredInMemoryOnly: true
+    )
+
+    let container = try! ModelContainer(
+        for: schema,
+        configurations: [configuration]
+    )
+
     RootView(
-        repository: LocalAssignmentRepository(),
-        requirementRepository: LocalRequirementRepository()
+        repository: SwiftDataAssignmentRepository(
+            container: container
+        ),
+        requirementRepository: SwiftDataRequirementRepository(
+            container: container
+        )
     )
 }

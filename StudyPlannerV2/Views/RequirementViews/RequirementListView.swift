@@ -7,6 +7,7 @@
 
 
 import SwiftUI
+import SwiftData
 
 struct RequirementListView: View {
 
@@ -364,7 +365,27 @@ struct RequirementListView: View {
         )
     ]
 
-    let repository = LocalRequirementRepository(requirements: sampleRequirements)
+    let schema = Schema([
+        StoredPlacementRequirement.self
+    ])
+
+    let configuration = ModelConfiguration(
+        schema: schema,
+        isStoredInMemoryOnly: true
+    )
+
+    let container = try! ModelContainer(
+        for: schema,
+        configurations: [configuration]
+    )
+
+    let repository = SwiftDataRequirementRepository(
+        container: container
+    )
+
+    for requirement in sampleRequirements {
+        repository.add(requirement)
+    }
 
     let viewModel = RequirementViewModel(repository: repository)
 

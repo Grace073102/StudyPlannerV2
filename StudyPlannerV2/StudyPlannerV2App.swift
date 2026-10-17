@@ -12,6 +12,8 @@ struct AppRepositories {
     let assignments: SwiftDataAssignmentRepository
     let requirements: SwiftDataRequirementRepository
     let subjects: SwiftDataSubjectRepository
+    let placements: SwiftDataPlacementRepository
+    let savedInternships: SwiftDataSavedInternshipRepository
 }
 
 @main
@@ -60,7 +62,9 @@ struct StudyPlannerApp: App {
                 StoredAcademicTask.self,
                 StoredMigration.self,
                 StoredPlacementRequirement.self,
-                StoredSubject.self
+                StoredSubject.self,
+                StoredPlacement.self,
+                StoredSavedInternship.self
             ])
 
             let configuration = ModelConfiguration(
@@ -90,11 +94,21 @@ struct StudyPlannerApp: App {
                 container: container
             )
 
+            let placementRepository = SwiftDataPlacementRepository(
+                container: container
+            )
+
+            let savedInternshipRepository = SwiftDataSavedInternshipRepository(
+                container: container
+            )
+
             return .success(
                 AppRepositories(
                     assignments: repository,
                     requirements: requirementRepository,
-                    subjects: subjectRepository
+                    subjects: subjectRepository,
+                    placements: placementRepository,
+                    savedInternships: savedInternshipRepository
                 )
             )
         } catch {
