@@ -14,20 +14,6 @@ struct AssignmentListView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                HStack {
-                    Button {
-                        dismiss()
-                    } label: {
-                        HStack(spacing: 5) {
-                            Image(systemName: "chevron.left")
-                            Text("Back")
-                        }
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                    }
-
-                    Spacer()
-                }
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Assignments")
@@ -156,7 +142,6 @@ struct AssignmentListView: View {
         .background(
             Color(.systemGroupedBackground)
         )
-        .navigationBarBackButtonHidden(true)
     }
 
     private var sortedAssignments: [Assignment] {

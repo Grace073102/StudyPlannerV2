@@ -12,22 +12,46 @@ struct RootView: View {
 
     @StateObject private var taskViewModel: TaskViewModel
 
-    init() {
-        let assignmentViewModel =
-            AssignmentViewModel(repository:JSONAssignmentRepository())
+    init(repository: AssignmentRepository) {
+        let assignmentViewModel = AssignmentViewModel(
+            repository: repository
+        )
 
-        _assignmentViewModel = StateObject(wrappedValue: assignmentViewModel)
+        _assignmentViewModel = StateObject(
+            wrappedValue: assignmentViewModel
+        )
 
-        _taskViewModel = StateObject(wrappedValue: TaskViewModel(assignmentViewModel: assignmentViewModel))
+        _taskViewModel = StateObject(
+            wrappedValue: TaskViewModel(
+                assignmentViewModel: assignmentViewModel
+            )
+        )
     }
 
     var body: some View {
-        AssignmentView()
-            .environmentObject(assignmentViewModel)
-            .environmentObject(taskViewModel)
+        TabView {
+            Tab("Dashboard", systemImage: "house") {
+                AssignmentView()
+            }
+            Tab("Assignments", systemImage: "doc.text") {
+                NavigationStack {
+                    AssignmentListView()
+                }
+            }
+
+            Tab("Placements", systemImage: "briefcase") {
+                PlaceholderView(title: "Placements", systemImage: "briefcase")
+            }
+
+            Tab("Settings", systemImage: "gearshape") {
+                PlaceholderView(title: "Settings", systemImage: "gearshape")
+            }
+        }
+        .environmentObject(assignmentViewModel)
+        .environmentObject(taskViewModel)
     }
 }
 
 #Preview {
-    RootView()
+    RootView(repository: LocalAssignmentRepository())
 }
