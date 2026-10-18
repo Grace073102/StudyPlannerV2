@@ -11,9 +11,20 @@ import Combine
 final class TaskViewModel: ObservableObject {
 
     let assignmentViewModel: AssignmentViewModel
+    private let addTaskUseCase: AddTaskUseCase
+    private let editTaskUseCase: EditTaskUseCase
+    private let toggleTaskUseCase: ToggleTaskUseCase
+    private let deleteTaskUseCase: DeleteTaskUseCase
+
+    @Published var errorMessage: String?
 
     init(assignmentViewModel: AssignmentViewModel) {
         self.assignmentViewModel = assignmentViewModel
+        let repository = assignmentViewModel.repository
+        self.addTaskUseCase = AddTaskUseCase(repository: repository)
+        self.editTaskUseCase = EditTaskUseCase(repository: repository)
+        self.toggleTaskUseCase = ToggleTaskUseCase(repository: repository)
+        self.deleteTaskUseCase = DeleteTaskUseCase(repository: repository)
     }
 
     var allTasks: [AcademicTask] {
@@ -93,33 +104,19 @@ final class TaskViewModel: ObservableObject {
     }
 
     func addTask(
-        title: String,
-        plannedDate: Date? = nil,
-        estimatedMinutes: Int? = nil,
-        to assignmentID: String
-    ) {
-        let cleanedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+            title: String,
+            plannedDate: Date? = nil,
+            estimatedMinutes: Int? = nil,
+            to assignmentID: String
+        ) throws {
+            try addTaskUseCase.execute(
+                title: title,
+                plannedDate: plannedDate,
+                estimatedMinutes: estimatedMinutes,
+                assignmentID: assignmentID
+            )
 
-        guard !cleanedTitle.isEmpty else {
-            return
-        }
-
-        guard let existingAssignment = assignmentViewModel.assignments.first(
-            where: { $0.id == assignmentID }
-        ) else {
-            return
-        }
-
-        let assignment = existingAssignment.copy()
-        let newTask = AcademicTask(
-            title: cleanedTitle,
-            isCompleted: false,
-            plannedDate: plannedDate,
-            estimatedMinutes: estimatedMinutes
-        )
-
-        assignment.tasks.append(newTask)
-        assignmentViewModel.update(assignment)
+            assignmentViewModel.load()
     }
 
     func editTask(
@@ -127,59 +124,31 @@ final class TaskViewModel: ObservableObject {
         newTitle: String,
         plannedDate: Date? = nil,
         estimatedMinutes: Int? = nil
-    ) {
-        let cleanedTitle = newTitle.trimmingCharacters(in: .whitespacesAndNewlines)
-
-        guard !cleanedTitle.isEmpty else {
-            return
-        }
-
-        for assignment in assignmentViewModel.assignments {
-            guard let taskIndex = assignment.tasks.firstIndex(
-                where: { $0.id == taskID }
-            ) else {
-                continue
-            }
-
-            let updatedAssignment = assignment.copy()
-            updatedAssignment.tasks[taskIndex].title = cleanedTitle
-            updatedAssignment.tasks[taskIndex].plannedDate = plannedDate
-            updatedAssignment.tasks[taskIndex].estimatedMinutes = estimatedMinutes
-
-            assignmentViewModel.update(updatedAssignment)
-            return
-        }
+    ) throws {
+        try editTaskUseCase.execute(
+            taskID: taskID,
+            title: newTitle,
+            plannedDate: plannedDate,
+            estimatedMinutes: estimatedMinutes
+        )
+        assignmentViewModel.load()
     }
-
+    
     func deleteTask(taskID: String) {
-        for assignment in assignmentViewModel.assignments {
-            guard let taskIndex = assignment.tasks.firstIndex(
-                where: { $0.id == taskID }
-            ) else {
-                continue
-            }
-
-            let updatedAssignment = assignment.copy()
-            updatedAssignment.tasks.remove(at: taskIndex)
-
-            assignmentViewModel.update(updatedAssignment)
-            return
+        do {
+            try deleteTaskUseCase.execute(taskID: taskID)
+            assignmentViewModel.load()
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
-
+    
     func toggleTask(taskID: String) {
-        for assignment in assignmentViewModel.assignments {
-            guard let taskIndex = assignment.tasks.firstIndex(
-                where: { $0.id == taskID }
-            ) else {
-                continue
-            }
-
-            let updatedAssignment = assignment.copy()
-            updatedAssignment.tasks[taskIndex].isCompleted.toggle()
-
-            assignmentViewModel.update(updatedAssignment)
-            return
+        do {
+            try toggleTaskUseCase.execute(taskID: taskID)
+            assignmentViewModel.load()
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
 }

@@ -25,6 +25,12 @@ struct SubtaskListView: View {
 
     @State private var deletingTaskID = ""
     @State private var showDeleteConfirmation = false
+    
+    @State private var addTaskErrorMessage = ""
+    @State private var showAddTaskError = false
+    
+    @State private var editTaskErrorMessage = ""
+    @State private var showEditTaskError = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -361,6 +367,11 @@ struct SubtaskListView: View {
                         }
                     }
                 }
+                .alert("Unable to Save Subtask", isPresented: $showEditTaskError) {
+                    Button("OK", role: .cancel) {}
+                } message: {
+                    Text(editTaskErrorMessage)
+                }
             }
             .presentationDetents([.medium])
         }
@@ -372,6 +383,11 @@ struct SubtaskListView: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("This subtask will be permanently removed.")
+        }
+        .alert("Unable to Add Subtask", isPresented: $showAddTaskError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(addTaskErrorMessage)
         }
     }
 
@@ -388,35 +404,37 @@ struct SubtaskListView: View {
     }
 
     private func addTask() {
-        guard !cleanedTitle.isEmpty else {
-            return
+        do {
+            try taskViewModel.addTask(
+                title: newTaskTitle,
+                plannedDate: plannedDate,
+                estimatedMinutes: estimatedMinutes,
+                to: assignment.id
+            )
+
+            newTaskTitle = ""
+            plannedDate = Date()
+            estimatedMinutes = 30
+        } catch {
+            addTaskErrorMessage = error.localizedDescription
+            showAddTaskError = true
         }
-
-        taskViewModel.addTask(
-            title: cleanedTitle,
-            plannedDate: plannedDate,
-            estimatedMinutes: estimatedMinutes,
-            to: assignment.id
-        )
-
-        newTaskTitle = ""
-        plannedDate = Date()
-        estimatedMinutes = 30
     }
 
     private func saveEditedTask() {
-        guard !cleanedEditingTitle.isEmpty else {
-            return
+        do {
+            try taskViewModel.editTask(
+                taskID: editingTaskID,
+                newTitle: editingTaskTitle,
+                plannedDate: editingPlannedDate,
+                estimatedMinutes: editingEstimatedMinutes
+            )
+
+            showEditTask = false
+        } catch {
+            editTaskErrorMessage = error.localizedDescription
+            showEditTaskError = true
         }
-
-        taskViewModel.editTask(
-            taskID: editingTaskID,
-            newTitle: cleanedEditingTitle,
-            plannedDate: editingPlannedDate,
-            estimatedMinutes: editingEstimatedMinutes
-        )
-
-        showEditTask = false
     }
 
     private func formattedDuration(_ minutes: Int) -> String {
@@ -433,4 +451,5 @@ struct SubtaskListView: View {
 
         return "\(hours) hr \(remainingMinutes) min"
     }
+    
 }
