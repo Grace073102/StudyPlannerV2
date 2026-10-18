@@ -23,6 +23,9 @@ final class StoredPlacement {
     var placementDescription: String?
     var subjectID: UUID?
 
+    @Relationship(deleteRule: .cascade, inverse: \StoredPlacementRequirement.placement)
+    var requirements: [StoredPlacementRequirement] = []
+
     var description: String? {
         get { placementDescription }
         set { placementDescription = newValue }

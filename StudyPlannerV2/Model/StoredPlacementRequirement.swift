@@ -19,6 +19,7 @@ final class StoredPlacementRequirement {
     var dueDate: Date?
     var expiryDate: Date?
     var isCompleted: Bool
+    var placement: StoredPlacement?
 
     enum Category: String, CaseIterable, Codable {
         case applicationsAndRegistration = "Applications & Registration"

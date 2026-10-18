@@ -95,8 +95,12 @@ struct StudyPlannerApp: App {
             )
 
             let placementRepository = SwiftDataPlacementRepository(
-                container: container
+                container: container,
+                onRequirementsChanged: {
+                    requirementRepository.reloadAfterPlacementDeletion()
+                }
             )
+            try placementRepository.linkExistingRequirements()
 
             let savedInternshipRepository = SwiftDataSavedInternshipRepository(
                 container: container

@@ -16,6 +16,7 @@ final class RequirementViewModel: ObservableObject {
     
     private let repository: RequirementRepository
     private let addRequirementUseCase: AddRequirementUseCase
+    private var repositoryChanges: AnyCancellable?
     
     init(repository: RequirementRepository) {
         
@@ -23,6 +24,9 @@ final class RequirementViewModel: ObservableObject {
         self.addRequirementUseCase = AddRequirementUseCase(repository: repository)
         
         loadRequirements()
+        repositoryChanges = repository.changes.sink { [weak self] in
+            self?.loadRequirements()
+        }
     }
     
     func loadRequirements() {
