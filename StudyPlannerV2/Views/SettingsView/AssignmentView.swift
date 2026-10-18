@@ -191,16 +191,65 @@ struct AssignmentView: View {
         configurations: [configuration]
     )
 
-    let assignmentViewModel = AssignmentViewModel(repository: SwiftDataAssignmentRepository(container: container)
-    )
-
-    let requirementViewModel = RequirementViewModel(repository: SwiftDataRequirementRepository(container: container)
-    )
+    let assignmentRepository = SwiftDataAssignmentRepository(container: container)
+    let requirementRepository = SwiftDataRequirementRepository(container: container)
     
-    AssignmentView()
-        .environmentObject(assignmentViewModel)
-        .environmentObject(
-            TaskViewModel(assignmentViewModel: assignmentViewModel)
+        let days: (Int) -> Date = { n in
+            Calendar.current.date(byAdding: .day, value: n, to: .now)!
+        }
+
+        // Sample assignments
+        let _ = try? assignmentRepository.add(
+            Assignment(
+                title: "Capstone App Store package",
+                course: "40005 Advanced iOS",
+                dueDate: days(3),
+                priority: .high,
+                tasks: [
+                    AcademicTask(title: "Draft architecture diagram", isCompleted: false, plannedDate: .now, estimatedMinutes: 75),
+                    AcademicTask(title: "Record walkthrough video", isCompleted: true, plannedDate: .now, estimatedMinutes: 30)
+                ]
+            )
         )
-        .environmentObject(requirementViewModel)
+
+        let _ = try? assignmentRepository.add(
+            Assignment(
+                title: "IPPR Section 4 report",
+                course: "31256 Image Processing",
+                dueDate: days(-1),
+                priority: .medium,
+                tasks: [
+                    AcademicTask(title: "Revise lecture 9 notes", isCompleted: false, plannedDate: .now, estimatedMinutes: 45)
+                ]
+            )
+        )
+
+        // Sample placement requirements
+        let placementID = UUID()
+
+        let _ = requirementRepository.add(
+            PlacementRequirement(
+                placementID: placementID,
+                name: "Police Check",
+                category: .checksAndClearances,
+                dueDate: days(2)
+            )
+        )
+
+        let _ = requirementRepository.add(
+            PlacementRequirement(
+                placementID: placementID,
+                name: "Induction form",
+                category: .placementPreparation,
+                dueDate: days(13)
+            )
+        )
+
+        let assignmentViewModel = AssignmentViewModel(repository: assignmentRepository)
+        let requirementViewModel = RequirementViewModel(repository: requirementRepository)
+
+        AssignmentView()
+            .environmentObject(assignmentViewModel)
+            .environmentObject(TaskViewModel(assignmentViewModel: assignmentViewModel))
+            .environmentObject(requirementViewModel)
 }
