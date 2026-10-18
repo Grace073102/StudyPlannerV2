@@ -16,6 +16,8 @@ struct AssignmentDetailView: View {
 
     @State private var showEditAssignment = false
     @State private var showDeleteConfirmation = false
+    @State private var deleteErrorMessage = ""
+    @State private var showDeleteError = false
 
     var body: some View {
         ScrollView {
@@ -85,8 +87,13 @@ struct AssignmentDetailView: View {
             isPresented: $showDeleteConfirmation
         ) {
             Button("Delete", role: .destructive) {
-                assignmentViewModel.delete(currentAssignment)
-                dismiss()
+                do {
+                    try assignmentViewModel.delete(currentAssignment)
+                    dismiss()
+                } catch {
+                    deleteErrorMessage = error.localizedDescription
+                    showDeleteError = true
+                }
             }
 
             Button("Cancel", role: .cancel) {}
@@ -94,6 +101,11 @@ struct AssignmentDetailView: View {
             Text(
                 "This assignment and all of its subtasks will be permanently deleted."
             )
+        }
+        .alert("Unable to Delete Assignment", isPresented: $showDeleteError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(deleteErrorMessage)
         }
     }
 

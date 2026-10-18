@@ -58,7 +58,7 @@ struct EditTaskUseCase {
             updatedAssignment.tasks[taskIndex].plannedDate = plannedDate
             updatedAssignment.tasks[taskIndex].estimatedMinutes = estimatedMinutes
 
-            repository.update(updatedAssignment)
+            try repository.update(updatedAssignment)
             return
         }
 

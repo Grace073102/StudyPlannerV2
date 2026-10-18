@@ -31,7 +31,7 @@ struct ToggleTaskUseCase {
             }
 
             updatedAssignment.tasks[taskIndex].isCompleted.toggle()
-            repository.update(updatedAssignment)
+            try repository.update(updatedAssignment)
             return
         }
 

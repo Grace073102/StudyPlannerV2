@@ -31,7 +31,7 @@ struct DeleteTaskUseCase {
             }
 
             updatedAssignment.tasks.remove(at: taskIndex)
-            repository.update(updatedAssignment)
+            try repository.update(updatedAssignment)
             return
         }
 

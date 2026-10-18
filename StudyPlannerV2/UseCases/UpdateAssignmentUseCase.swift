@@ -75,7 +75,7 @@ struct UpdateAssignmentUseCase {
         assignment.priority = priority
         assignment.description = cleanedDescription.isEmpty ? nil : cleanedDescription
 
-        repository.update(assignment)
+        try repository.update(assignment)
         return assignment
     }
 }

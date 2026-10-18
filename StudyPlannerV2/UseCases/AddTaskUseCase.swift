@@ -61,7 +61,7 @@ struct AddTaskUseCase {
         )
 
         assignment.tasks.append(task)
-        repository.update(assignment)
+        try repository.update(assignment)
 
         return task
     }

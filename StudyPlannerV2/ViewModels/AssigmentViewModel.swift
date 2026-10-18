@@ -69,16 +69,9 @@ final class AssignmentViewModel: ObservableObject {
         repositoryErrorMessage = repository.errorMessage
     }
 
-    func update(_ assignment: Assignment) {
-        repository.update(assignment)
+    func delete(_ assignment: Assignment) throws {
+        try repository.delete(assignment)
         assignments = repository.assignments
-        repositoryErrorMessage = repository.errorMessage
-    }
-
-    func delete(_ assignment: Assignment) {
-        repository.delete(assignment)
-        assignments = repository.assignments
-        repositoryErrorMessage = repository.errorMessage
     }
 
     var totalTaskCount: Int {
