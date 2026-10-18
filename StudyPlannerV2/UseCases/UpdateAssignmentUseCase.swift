@@ -39,7 +39,8 @@ struct UpdateAssignmentUseCase {
         course: String,
         dueDate: Date,
         priority: Assignment.Priority,
-        description: String
+        description: String,
+        today: Date = .now
     ) throws -> Assignment {
         let cleanedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let cleanedCourse = course.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -62,9 +63,9 @@ struct UpdateAssignmentUseCase {
         let assignment = existingAssignment.copy()
         let calendar = Calendar.current
         let dueDateChanged = !calendar.isDate(dueDate, inSameDayAs: assignment.dueDate)
-        let today = calendar.startOfDay(for: .now)
+        let startOfToday = calendar.startOfDay(for: today)
 
-        if dueDateChanged && calendar.startOfDay(for: dueDate) < today {
+        if dueDateChanged && calendar.startOfDay(for: dueDate) < startOfToday {
             throw UpdateAssignmentError.dueDateInPast
         }
 
