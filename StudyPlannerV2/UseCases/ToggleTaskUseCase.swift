@@ -7,7 +7,10 @@
 
 
 import Foundation
-
+/// Marks a subtask as complete or incomplete
+///
+/// Business rules:
+/// 1. Only an existing subtask can be toggled
 struct ToggleTaskUseCase {
 
     let repository: AssignmentRepository

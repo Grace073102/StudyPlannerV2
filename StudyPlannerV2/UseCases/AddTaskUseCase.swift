@@ -7,6 +7,14 @@
 
 import Foundation
 
+/// Adds subtask to an existing assignment
+/// ViewModel calls this type and never touches the repository directly
+///
+/// Business rules:
+/// 1. A subtask must have a title (blank/space only is rejected).
+/// 2. Title is trimmed before it is saved.
+/// 3. Estimated study time (if given) must be more than 0 minutes.
+/// 4. The assignment must exist.
 struct AddTaskUseCase {
 
     let repository: AssignmentRepository

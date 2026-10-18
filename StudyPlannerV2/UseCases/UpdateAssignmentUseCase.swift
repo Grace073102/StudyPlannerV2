@@ -7,7 +7,14 @@
 
 
 import Foundation
-
+/// Updates an exisiting assignment's details
+/// The edit screen calls this through the ViewModel instead of checking the rules itself
+///
+/// Business rules:
+/// 1. An assignment must have a title and a course (blank/space is rejected)
+/// 2. Title, course and description are trimmed and empty description is saved as nil
+/// 3. Due date can only be moved into the past if it isn't being chnaged, so overdue assignments can still be edited
+/// 4, Only an exisitng assignment can be updated
 struct UpdateAssignmentUseCase {
 
     let repository: AssignmentRepository

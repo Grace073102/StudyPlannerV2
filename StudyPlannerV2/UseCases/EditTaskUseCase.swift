@@ -7,7 +7,13 @@
 
 
 import Foundation
-
+/// Edits the title, planned date, and estimated time of an existing subtask.
+///
+/// Business rules:
+/// 1. A subtask must have a title (blank/space only is rejected).
+/// 2. Title is trimmed before it is saved
+/// 3. Estimated study time (if given) must be more than 0 mminutes
+/// 4. Only an existing subtask can be edited.
 struct EditTaskUseCase {
 
     let repository: AssignmentRepository
