@@ -51,6 +51,7 @@ final class SwiftDataPlacementRepository: PlacementRepository {
             record.startDate = placement.startDate
             record.endDate = placement.endDate
             record.placementDescription = placement.description
+            record.subjectID = placement.subjectID
         }
     }
 
