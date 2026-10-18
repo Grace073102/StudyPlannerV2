@@ -11,6 +11,7 @@ import SwiftData
 struct AssignmentView: View {
     @EnvironmentObject var assignmentViewModel: AssignmentViewModel
     @EnvironmentObject var taskViewModel: TaskViewModel
+    @EnvironmentObject var requirementViewModel: RequirementViewModel
     @State private var showAddAssignment = false
 
     var body: some View {
@@ -68,7 +69,7 @@ struct AssignmentView: View {
                     }
                     .fixedSize(horizontal: false, vertical: true)
                     UpcomingDeadlinesView(
-                        assignments: assignmentViewModel.assignments
+                        items: UpcomingItem.make(assignments: assignmentViewModel.assignments, requirements: requirementViewModel.requirements)
                     )
 
                     VStack(alignment: .leading, spacing: 12){
@@ -176,7 +177,8 @@ struct AssignmentView: View {
 #Preview {
     let schema = Schema([
         StoredAssignment.self,
-        StoredAcademicTask.self
+        StoredAcademicTask.self,
+        StoredPlacementRequirement.self
     ])
 
     let configuration = ModelConfiguration(
@@ -189,17 +191,16 @@ struct AssignmentView: View {
         configurations: [configuration]
     )
 
-    let repository = SwiftDataAssignmentRepository(
-        container: container
+    let assignmentViewModel = AssignmentViewModel(repository: SwiftDataAssignmentRepository(container: container)
     )
 
-    let assignmentViewModel = AssignmentViewModel(
-        repository: repository
+    let requirementViewModel = RequirementViewModel(repository: SwiftDataRequirementRepository(container: container)
     )
-
+    
     AssignmentView()
         .environmentObject(assignmentViewModel)
         .environmentObject(
             TaskViewModel(assignmentViewModel: assignmentViewModel)
         )
+        .environmentObject(requirementViewModel)
 }
