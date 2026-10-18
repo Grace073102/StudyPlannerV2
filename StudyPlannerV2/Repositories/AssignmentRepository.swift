@@ -12,9 +12,9 @@ protocol AssignmentRepository {
     var errorMessage: String? { get }
     
     func load() -> [Assignment]
-    func add(_ assignment: Assignment)
-    func update(_ assignment: Assignment)
-    func delete(_ assignment: Assignment)
+    func add(_ assignment: Assignment) throws
+    func update(_ assignment: Assignment) throws
+    func delete(_ assignment: Assignment) throws
 }
 
 extension AssignmentRepository {

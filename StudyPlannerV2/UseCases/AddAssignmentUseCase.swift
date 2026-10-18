@@ -63,7 +63,7 @@ struct AddAssignmentUseCase {
             tasks: []
         )
 
-        repository.add(assignment)
+        try repository.add(assignment)
         return assignment
     }
 }

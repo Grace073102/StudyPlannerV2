@@ -7,7 +7,10 @@
 
 
 import Foundation
-
+/// Marks a subtask as complete or incomplete
+///
+/// Business rules:
+/// 1. Only an existing subtask can be toggled
 struct ToggleTaskUseCase {
 
     let repository: AssignmentRepository
@@ -31,7 +34,7 @@ struct ToggleTaskUseCase {
             }
 
             updatedAssignment.tasks[taskIndex].isCompleted.toggle()
-            repository.update(updatedAssignment)
+            try repository.update(updatedAssignment)
             return
         }
 

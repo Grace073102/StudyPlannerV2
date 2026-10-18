@@ -13,8 +13,15 @@ import Testing
 @MainActor
 struct UpdateAssignmentUseCaseTests {
 
-    private let threeDaysAgo = Calendar.current.date(byAdding: .day, value: -3, to: .now)!
-    private let nextWeek = Calendar.current.date(byAdding: .day, value: 7, to: .now)!
+    private let today = Calendar.current.date(
+        from: DateComponents(year: 2026, month: 10, day: 20)
+    )!
+    private var threeDaysAgo: Date {
+        Calendar.current.date(byAdding: .day, value: -3, to: today)!
+    }
+    private var nextWeek: Date {
+        Calendar.current.date(byAdding: .day, value: 7, to: today)!
+    }
 
     private func makeAssignment(dueDate: Date) -> Assignment {
         Assignment(
@@ -38,7 +45,8 @@ struct UpdateAssignmentUseCaseTests {
             course: "40005 Advanced iOS",
             dueDate: nextWeek,
             priority: .high,
-            description: "   "
+            description: "   ",
+            today: today
         )
 
         let updated = repository.assignments.first
@@ -59,7 +67,8 @@ struct UpdateAssignmentUseCaseTests {
                 course: "40005 Advanced iOS",
                 dueDate: nextWeek,
                 priority: .low,
-                description: ""
+                description: "",
+                today: today
             )
         }
 
@@ -78,7 +87,8 @@ struct UpdateAssignmentUseCaseTests {
                 course: "40005 Advanced iOS",
                 dueDate: threeDaysAgo,
                 priority: .low,
-                description: ""
+                description: "",
+                today: today
             )
         }
 
@@ -96,7 +106,8 @@ struct UpdateAssignmentUseCaseTests {
             course: "40005 Advanced iOS",
             dueDate: threeDaysAgo,
             priority: .low,
-            description: ""
+            description: "",
+            today: today
         )
 
         #expect(repository.assignments.first?.title == "Fixed typo")
@@ -113,7 +124,8 @@ struct UpdateAssignmentUseCaseTests {
                 course: "40005 Advanced iOS",
                 dueDate: nextWeek,
                 priority: .low,
-                description: ""
+                description: "",
+                today: today
             )
         }
     }

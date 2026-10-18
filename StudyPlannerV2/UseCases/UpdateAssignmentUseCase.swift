@@ -7,7 +7,14 @@
 
 
 import Foundation
-
+/// Updates an exisiting assignment's details
+/// The edit screen calls this through the ViewModel instead of checking the rules itself
+///
+/// Business rules:
+/// 1. An assignment must have a title and a course (blank/space is rejected)
+/// 2. Title, course and description are trimmed and empty description is saved as nil
+/// 3. Due date can only be moved into the past if it isn't being chnaged, so overdue assignments can still be edited
+/// 4, Only an exisitng assignment can be updated
 struct UpdateAssignmentUseCase {
 
     let repository: AssignmentRepository
@@ -39,7 +46,8 @@ struct UpdateAssignmentUseCase {
         course: String,
         dueDate: Date,
         priority: Assignment.Priority,
-        description: String
+        description: String,
+        today: Date = .now
     ) throws -> Assignment {
         let cleanedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let cleanedCourse = course.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -62,9 +70,9 @@ struct UpdateAssignmentUseCase {
         let assignment = existingAssignment.copy()
         let calendar = Calendar.current
         let dueDateChanged = !calendar.isDate(dueDate, inSameDayAs: assignment.dueDate)
-        let today = calendar.startOfDay(for: .now)
+        let startOfToday = calendar.startOfDay(for: today)
 
-        if dueDateChanged && calendar.startOfDay(for: dueDate) < today {
+        if dueDateChanged && calendar.startOfDay(for: dueDate) < startOfToday {
             throw UpdateAssignmentError.dueDateInPast
         }
 
@@ -74,7 +82,7 @@ struct UpdateAssignmentUseCase {
         assignment.priority = priority
         assignment.description = cleanedDescription.isEmpty ? nil : cleanedDescription
 
-        repository.update(assignment)
+        try repository.update(assignment)
         return assignment
     }
 }

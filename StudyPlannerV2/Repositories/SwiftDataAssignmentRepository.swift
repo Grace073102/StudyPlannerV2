@@ -40,8 +40,8 @@ final class SwiftDataAssignmentRepository: AssignmentRepository {
         return assignments
     }
 
-    func add(_ assignment: Assignment) {
-        performSave {
+    func add(_ assignment: Assignment) throws {
+        try performSave {
             guard try findAssignment(id: assignment.id) == nil else {
                 throw RepositoryError.duplicateAssignment
             }
@@ -52,8 +52,8 @@ final class SwiftDataAssignmentRepository: AssignmentRepository {
         }
     }
 
-    func update(_ assignment: Assignment) {
-        performSave {
+    func update(_ assignment: Assignment) throws {
+        try performSave {
             guard let record = try findAssignment(id: assignment.id) else {
                 throw RepositoryError.assignmentNotFound
             }
@@ -68,8 +68,8 @@ final class SwiftDataAssignmentRepository: AssignmentRepository {
         }
     }
 
-    func delete(_ assignment: Assignment) {
-        performSave {
+    func delete(_ assignment: Assignment) throws {
+        try performSave {
             guard let record = try findAssignment(id: assignment.id) else {
                 throw RepositoryError.assignmentNotFound
             }
@@ -133,14 +133,16 @@ final class SwiftDataAssignmentRepository: AssignmentRepository {
         record.tasks = updatedTasks
     }
 
-    private func performSave(_ operation: () throws -> Void) {
+    private func performSave(_ operation: () throws -> Void) throws {
         do {
             try operation()
             try context.save()
+        } catch let error as RepositoryError {
+            context.rollback()
+            throw error
         } catch {
             context.rollback()
-            errorMessage = "Your changes could not be saved. \(error.localizedDescription)"
-            return
+            throw RepositoryError.saveFailed
         }
 
         assignments = load()
@@ -149,6 +151,7 @@ final class SwiftDataAssignmentRepository: AssignmentRepository {
     private enum RepositoryError: LocalizedError {
         case duplicateAssignment
         case assignmentNotFound
+        case saveFailed
 
         var errorDescription: String? {
             switch self {
@@ -156,6 +159,8 @@ final class SwiftDataAssignmentRepository: AssignmentRepository {
                 return "An assignment with this ID already exists."
             case .assignmentNotFound:
                 return "The assignment could not be found."
+            case .saveFailed:
+                return "Your changes could not be saved. Please try again."
             }
         }
     }

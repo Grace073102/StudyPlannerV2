@@ -7,7 +7,10 @@
 
 
 import Foundation
-
+/// Removes a subtask from its assignment
+///
+/// Business rules:
+/// 1. Only an exisitng subtask can be deleted.
 struct DeleteTaskUseCase {
 
     let repository: AssignmentRepository
@@ -31,7 +34,7 @@ struct DeleteTaskUseCase {
             }
 
             updatedAssignment.tasks.remove(at: taskIndex)
-            repository.update(updatedAssignment)
+            try repository.update(updatedAssignment)
             return
         }
 
