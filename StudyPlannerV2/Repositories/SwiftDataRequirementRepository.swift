@@ -89,17 +89,16 @@ final class SwiftDataRequirementRepository: RequirementRepository {
         return try context.fetch(descriptor).first
     }
 
-    private func performSave(
-        _ operation: () throws -> Void
-    ) throws {
+    private func performSave(_ operation: () throws -> Void) throws {
         do {
             try operation()
             try context.save()
-            requirements = try load()
         } catch {
             context.rollback()
             throw error
         }
+
+        requirements = try load()
     }
 
     private enum RepositoryError: LocalizedError {
