@@ -139,22 +139,22 @@ final class RequirementViewModel: ObservableObject {
     
     
     func toggleCompletion(for requirement: PlacementRequirement) {
-        let updatedRequirement = requirement.copy()
-        updatedRequirement.isCompleted.toggle()
+        let useCase = ToggleRequirementCompletionUseCase(repository: repository)
 
         do {
-            try repository.update(updatedRequirement)
+            let updatedRequirement = try useCase.execute(id: requirement.id)
+
             loadRequirements()
 
             Task {
                 do {
-                    try await RequirementNotificationManager.shared.scheduleNotifications(
-                        for: updatedRequirement
-                    )
+                    try await RequirementNotificationManager.shared
+                        .scheduleNotifications(for: updatedRequirement)
                 } catch {
-                    print("Failed to update notifications: \(error.localizedDescription)")
+                    print("Failed to schedule requirement notifications: \(error)")
                 }
             }
+
         } catch {
             repositoryErrorMessage = error.localizedDescription
         }
