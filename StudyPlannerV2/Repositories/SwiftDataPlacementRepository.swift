@@ -10,39 +10,30 @@ import SwiftData
 
 final class SwiftDataPlacementRepository: PlacementRepository {
     private let context: ModelContext
-    private let cancelRequirementNotifications: (UUID) -> Void
     private let onRequirementsChanged: () -> Void
 
     init(
         container: ModelContainer,
-        cancelRequirementNotifications: @escaping (UUID) -> Void = {
-            RequirementNotificationManager.shared.cancelNotifications(for: $0)
-        },
         onRequirementsChanged: @escaping () -> Void = {}
     ) {
         context = ModelContext(container)
         context.autosaveEnabled = false
-        self.cancelRequirementNotifications = cancelRequirementNotifications
         self.onRequirementsChanged = onRequirementsChanged
     }
 
+
     func linkExistingRequirements() throws {
-        do {
+        try saveChanges {
             let placements = try context.fetch(FetchDescriptor<StoredPlacement>())
             let placementsByID = Dictionary(uniqueKeysWithValues: placements.map { ($0.id, $0) })
             let requirements = try context.fetch(FetchDescriptor<StoredPlacementRequirement>())
             for requirement in requirements {
-                if let placement = placementsByID[requirement.placementID],
-                   requirement.placement?.id != placement.id {
+                if let placement = requirement.placement {
+                    requirement.placementID = placement.id
+                } else if let placement = placementsByID[requirement.placementID] {
                     requirement.placement = placement
                 }
             }
-            if context.hasChanges {
-                try context.save()
-            }
-        } catch {
-            context.rollback()
-            throw PlacementRepositoryError.saveFailed
         }
     }
 
@@ -86,26 +77,15 @@ final class SwiftDataPlacementRepository: PlacementRepository {
     }
 
     func delete(_ placement: Placement) throws {
-        var requirementIDs: [UUID] = []
+        try linkExistingRequirements()
         try saveChanges {
             guard let record = try findPlacement(id: placement.id) else {
                 throw PlacementRepositoryError.notFound
             }
 
-            let placementID = placement.id
-            let descriptor = FetchDescriptor<StoredPlacementRequirement>(
-                predicate: #Predicate { $0.placementID == placementID }
-            )
-            let requirements = try context.fetch(descriptor)
-            for requirement in requirements {
-                requirement.placement = record
-            }
-            requirementIDs = Array(Set((record.requirements + requirements).map(\.id)))
             context.delete(record)
         }
-        for requirementID in requirementIDs {
-            cancelRequirementNotifications(requirementID)
-        }
+
         onRequirementsChanged()
     }
 

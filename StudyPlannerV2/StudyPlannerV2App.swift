@@ -14,6 +14,7 @@ struct AppRepositories {
     let subjects: SwiftDataSubjectRepository
     let placements: SwiftDataPlacementRepository
     let savedInternships: SwiftDataSavedInternshipRepository
+    let managePlacements: ManagePlacementsUseCase
 }
 
 @main
@@ -101,6 +102,28 @@ struct StudyPlannerApp: App {
                 }
             )
             try placementRepository.linkExistingRequirements()
+            requirementRepository.reloadAfterPlacementDeletion()
+
+            let managePlacements = ManagePlacementsUseCase(
+                repository: placementRepository,
+                loadRequirementIDs: { placementID in
+                    let requirements = requirementRepository.load()
+
+                    // load() returns cached data on failure, so check its error.
+                    guard requirementRepository.errorMessage == nil else {
+                        throw PlacementRepositoryError.loadFailed
+                    }
+
+                    return requirements
+                        .filter { $0.placementID == placementID }
+                        .map(\.id)
+                },
+                cancelRequirementNotifications: { requirementID in
+                    RequirementNotificationManager.shared.cancelNotifications(
+                        for: requirementID
+                    )
+                }
+            )
 
             let savedInternshipRepository = SwiftDataSavedInternshipRepository(
                 container: container
@@ -112,7 +135,9 @@ struct StudyPlannerApp: App {
                     requirements: requirementRepository,
                     subjects: subjectRepository,
                     placements: placementRepository,
-                    savedInternships: savedInternshipRepository
+                    savedInternships: savedInternshipRepository,
+                    managePlacements: managePlacements
+
                 )
             )
         } catch {
