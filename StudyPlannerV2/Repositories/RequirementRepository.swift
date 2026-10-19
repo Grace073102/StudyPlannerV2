@@ -8,18 +8,11 @@
 import Foundation
 
 protocol RequirementRepository {
-    
+
     var requirements: [PlacementRequirement] { get }
-    var errorMessage: String? { get }
 
-    func load() -> [PlacementRequirement]
-    func add(_ requirement: PlacementRequirement)
-    func update(_ requirement: PlacementRequirement)
-    func delete(_ requirement: PlacementRequirement)
-}
-
-extension RequirementRepository {
-    var errorMessage: String? {
-        nil
-    }
+    func load() throws -> [PlacementRequirement]
+    func add(_ requirement: PlacementRequirement) throws
+    func update(_ requirement: PlacementRequirement) throws
+    func delete(_ requirement: PlacementRequirement) throws
 }
