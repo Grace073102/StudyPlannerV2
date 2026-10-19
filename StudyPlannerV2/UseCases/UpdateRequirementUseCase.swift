@@ -30,7 +30,7 @@ struct UpdateRequirementUseCase {
         }
 
         // Find existing requirement
-        guard let existingRequirement = repository.load().first(
+        guard let existingRequirement = try repository.load().first(
             where: { $0.id == id }
         ) else {
             throw RequirementValidationError.notFound
@@ -57,6 +57,6 @@ struct UpdateRequirementUseCase {
         updatedRequirement.dueDate = dueDate
         updatedRequirement.expiryDate = expiryDate
 
-        repository.update(updatedRequirement)
+        try repository.update(updatedRequirement)
     }
 }
