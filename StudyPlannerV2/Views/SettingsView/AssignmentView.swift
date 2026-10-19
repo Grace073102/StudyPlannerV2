@@ -11,6 +11,7 @@ import SwiftData
 struct AssignmentView: View {
     @EnvironmentObject var assignmentViewModel: AssignmentViewModel
     @EnvironmentObject var taskViewModel: TaskViewModel
+    @EnvironmentObject var requirementViewModel: RequirementViewModel
     @State private var showAddAssignment = false
 
     var body: some View {
@@ -68,7 +69,7 @@ struct AssignmentView: View {
                     }
                     .fixedSize(horizontal: false, vertical: true)
                     UpcomingDeadlinesView(
-                        assignments: assignmentViewModel.assignments
+                        items: UpcomingItem.make(assignments: assignmentViewModel.assignments, requirements: requirementViewModel.requirements)
                     )
 
                     VStack(alignment: .leading, spacing: 12){
@@ -176,7 +177,8 @@ struct AssignmentView: View {
 #Preview {
     let schema = Schema([
         StoredAssignment.self,
-        StoredAcademicTask.self
+        StoredAcademicTask.self,
+        StoredPlacementRequirement.self
     ])
 
     let configuration = ModelConfiguration(
@@ -189,17 +191,65 @@ struct AssignmentView: View {
         configurations: [configuration]
     )
 
-    let repository = SwiftDataAssignmentRepository(
-        container: container
-    )
+    let assignmentRepository = SwiftDataAssignmentRepository(container: container)
+    let requirementRepository = SwiftDataRequirementRepository(container: container)
+    
+        let days: (Int) -> Date = { n in
+            Calendar.current.date(byAdding: .day, value: n, to: .now)!
+        }
 
-    let assignmentViewModel = AssignmentViewModel(
-        repository: repository
-    )
-
-    AssignmentView()
-        .environmentObject(assignmentViewModel)
-        .environmentObject(
-            TaskViewModel(assignmentViewModel: assignmentViewModel)
+        // Sample assignments
+        let _ = try? assignmentRepository.add(
+            Assignment(
+                title: "Capstone App Store package",
+                course: "40005 Advanced iOS",
+                dueDate: days(3),
+                priority: .high,
+                tasks: [
+                    AcademicTask(title: "Draft architecture diagram", isCompleted: false, plannedDate: .now, estimatedMinutes: 75),
+                    AcademicTask(title: "Record walkthrough video", isCompleted: true, plannedDate: .now, estimatedMinutes: 30)
+                ]
+            )
         )
+
+        let _ = try? assignmentRepository.add(
+            Assignment(
+                title: "IPPR Section 4 report",
+                course: "31256 Image Processing",
+                dueDate: days(-1),
+                priority: .medium,
+                tasks: [
+                    AcademicTask(title: "Revise lecture 9 notes", isCompleted: false, plannedDate: .now, estimatedMinutes: 45)
+                ]
+            )
+        )
+
+        // Sample placement requirements
+        let placementID = UUID()
+
+        let _ = requirementRepository.add(
+            PlacementRequirement(
+                placementID: placementID,
+                name: "Police Check",
+                category: .checksAndClearances,
+                dueDate: days(2)
+            )
+        )
+
+        let _ = requirementRepository.add(
+            PlacementRequirement(
+                placementID: placementID,
+                name: "Induction form",
+                category: .placementPreparation,
+                dueDate: days(13)
+            )
+        )
+
+        let assignmentViewModel = AssignmentViewModel(repository: assignmentRepository)
+        let requirementViewModel = RequirementViewModel(repository: requirementRepository)
+
+        AssignmentView()
+            .environmentObject(assignmentViewModel)
+            .environmentObject(TaskViewModel(assignmentViewModel: assignmentViewModel))
+            .environmentObject(requirementViewModel)
 }
