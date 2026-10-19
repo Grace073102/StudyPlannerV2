@@ -12,40 +12,32 @@ import SwiftData
 
 final class SwiftDataRequirementRepository: RequirementRepository {
     private(set) var requirements: [PlacementRequirement] = []
-    private(set) var errorMessage: String?
 
     private let context: ModelContext
 
     init(container: ModelContainer) {
         context = ModelContext(container)
         context.autosaveEnabled = false
-        requirements = load()
     }
 
-    func load() -> [PlacementRequirement] {
-        do {
-            let descriptor = FetchDescriptor<StoredPlacementRequirement>(
-                sortBy: [
-                    SortDescriptor(\StoredPlacementRequirement.name)
-                ]
-            )
+    func load() throws -> [PlacementRequirement] {
+        let descriptor = FetchDescriptor<StoredPlacementRequirement>(
+            sortBy: [
+                SortDescriptor(\StoredPlacementRequirement.name)
+            ]
+        )
 
-            let records = try context.fetch(descriptor)
-            let loadedRequirements = try records.map {
-                try $0.toRequirement()
-            }
-
-            requirements = loadedRequirements
-            errorMessage = nil
-        } catch {
-            errorMessage = "Your saved requirements could not be loaded."
+        let records = try context.fetch(descriptor)
+        let loadedRequirements = try records.map {
+            try $0.toRequirement()
         }
 
+        requirements = loadedRequirements
         return requirements
     }
 
-    func add(_ requirement: PlacementRequirement) {
-        performSave {
+    func add(_ requirement: PlacementRequirement) throws {
+        try performSave {
             guard try findRequirement(id: requirement.id) == nil else {
                 throw RepositoryError.duplicateRequirement
             }
@@ -56,8 +48,8 @@ final class SwiftDataRequirementRepository: RequirementRepository {
         }
     }
 
-    func update(_ requirement: PlacementRequirement) {
-        performSave {
+    func update(_ requirement: PlacementRequirement) throws {
+        try performSave {
             guard let record = try findRequirement(id: requirement.id) else {
                 throw RepositoryError.requirementNotFound
             }
@@ -71,8 +63,8 @@ final class SwiftDataRequirementRepository: RequirementRepository {
         }
     }
 
-    func delete(_ requirement: PlacementRequirement) {
-        performSave {
+    func delete(_ requirement: PlacementRequirement) throws {
+        try performSave {
             guard let record = try findRequirement(id: requirement.id) else {
                 throw RepositoryError.requirementNotFound
             }
@@ -84,6 +76,7 @@ final class SwiftDataRequirementRepository: RequirementRepository {
     private func findRequirement(
         id: UUID
     ) throws -> StoredPlacementRequirement? {
+
         let requirementID = id
 
         var descriptor = FetchDescriptor<StoredPlacementRequirement>(
@@ -96,17 +89,17 @@ final class SwiftDataRequirementRepository: RequirementRepository {
         return try context.fetch(descriptor).first
     }
 
-    private func performSave(_ operation: () throws -> Void) {
+    private func performSave(
+        _ operation: () throws -> Void
+    ) throws {
         do {
             try operation()
             try context.save()
+            requirements = try load()
         } catch {
             context.rollback()
-            errorMessage = "Your changes could not be saved. \(error.localizedDescription)"
-            return
+            throw error
         }
-
-        requirements = load()
     }
 
     private enum RepositoryError: LocalizedError {
