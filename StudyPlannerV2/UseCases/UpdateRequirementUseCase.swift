@@ -16,7 +16,8 @@ struct UpdateRequirementUseCase {
         name: String,
         category: PlacementRequirement.Category,
         dueDate: Date?,
-        expiryDate: Date?
+        expiryDate: Date?,
+        today: Date = Date()
     ) throws {
 
         // Validate requirement name
@@ -28,22 +29,24 @@ struct UpdateRequirementUseCase {
             throw RequirementValidationError.emptyName
         }
 
-        // Validate due date
-        if let dueDate {
-            let calendar = Calendar.current
-            let today = calendar.startOfDay(for: Date())
-            let selectedDueDate = calendar.startOfDay(for: dueDate)
-
-            guard selectedDueDate >= today else {
-                throw RequirementValidationError.invalidDueDate
-            }
-        }
-
         // Find existing requirement
         guard let existingRequirement = repository.load().first(
             where: { $0.id == id }
         ) else {
             throw RequirementValidationError.notFound
+        }
+
+        // Validate due date only when it changes
+        if let dueDate,
+           existingRequirement.dueDate != dueDate {
+
+            let calendar = Calendar.current
+            let currentDay = calendar.startOfDay(for: today)
+            let selectedDueDate = calendar.startOfDay(for: dueDate)
+
+            guard selectedDueDate >= currentDay else {
+                throw RequirementValidationError.invalidDueDate
+            }
         }
 
         // Update existing requirement
