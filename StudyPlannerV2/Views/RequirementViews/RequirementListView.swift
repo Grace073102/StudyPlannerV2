@@ -384,7 +384,11 @@ struct RequirementListView: View {
     )
 
     for requirement in sampleRequirements {
-        repository.add(requirement)
+        do {
+            try repository.add(requirement)
+        } catch {
+            print("Failed to add preview requirement: \(error.localizedDescription)")
+        }
     }
 
     let viewModel = RequirementViewModel(repository: repository)

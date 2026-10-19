@@ -26,8 +26,12 @@ final class RequirementViewModel: ObservableObject {
     }
     
     func loadRequirements() {
-        requirements = repository.load()
-        repositoryErrorMessage = repository.errorMessage
+        do {
+            requirements = try repository.load()
+            repositoryErrorMessage = nil
+        } catch {
+            repositoryErrorMessage = error.localizedDescription
+        }
     }
     
     func requirements(for placementID: UUID) -> [PlacementRequirement] {
@@ -52,7 +56,6 @@ final class RequirementViewModel: ObservableObject {
             dueDate: dueDate,
             expiryDate: expiryDate
         )
-        try checkRepositoryError()
         loadRequirements()
 
         Task {
@@ -89,7 +92,6 @@ final class RequirementViewModel: ObservableObject {
             dueDate: dueDate,
             expiryDate: expiryDate
         )
-        try checkRepositoryError()
         loadRequirements()
 
         if let updatedRequirement = requirements.first(where: { $0.id == id }) {
@@ -109,7 +111,6 @@ final class RequirementViewModel: ObservableObject {
         let useCase = DeleteRequirementUseCase(repository: repository)
 
         try useCase.execute(id: id)
-        try checkRepositoryError()
 
         RequirementNotificationManager.shared.removeNotifications(for: id)
         loadRequirements()
@@ -139,41 +140,29 @@ final class RequirementViewModel: ObservableObject {
     
     func toggleCompletion(for requirement: PlacementRequirement) {
         let updatedRequirement = requirement.copy()
-
         updatedRequirement.isCompleted.toggle()
-        repository.update(updatedRequirement)
 
-        if let message = repository.errorMessage {
-            repositoryErrorMessage = message
-            return
-        }
+        do {
+            try repository.update(updatedRequirement)
+            loadRequirements()
 
-        loadRequirements()
-
-        Task {
-            do {
-                try await RequirementNotificationManager.shared.scheduleNotifications(
-                    for: updatedRequirement
-                )
-            } catch {
-                print("Failed to update notifications: \(error.localizedDescription)")
+            Task {
+                do {
+                    try await RequirementNotificationManager.shared.scheduleNotifications(
+                        for: updatedRequirement
+                    )
+                } catch {
+                    print("Failed to update notifications: \(error.localizedDescription)")
+                }
             }
+        } catch {
+            repositoryErrorMessage = error.localizedDescription
         }
     }
     
     func clearRepositoryError() {
         repositoryErrorMessage = nil
     }
-    
-    private func checkRepositoryError() throws {
-        if let message = repository.errorMessage {
-            repositoryErrorMessage = message
-            throw RequirementPersistenceError(message: message)
-        }
-
-        repositoryErrorMessage = nil
-    }
-    
 }
 
 struct RequirementPersistenceError: LocalizedError {
