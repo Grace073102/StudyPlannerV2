@@ -1,3 +1,4 @@
+
 //
 //  DeleteRequirementUseCase.swift
 //  StudyPlannerV2
@@ -14,14 +15,13 @@ struct DeleteRequirementUseCase {
     func execute(id: UUID) throws {
 
         // Find the requirement
-        guard let requirement = repository.load().first(
+        guard let requirement = try repository.load().first(
             where: { $0.id == id }
         ) else {
             throw RequirementValidationError.notFound
         }
 
         // Delete the requirement
-        repository.delete(requirement)
+        try repository.delete(requirement)
     }
 }
-
