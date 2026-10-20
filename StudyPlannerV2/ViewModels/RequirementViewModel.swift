@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 
+@MainActor
 final class RequirementViewModel: ObservableObject {
     
     @Published private(set) var requirements: [PlacementRequirement] = []
