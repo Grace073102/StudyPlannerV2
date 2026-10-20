@@ -10,15 +10,27 @@ import Foundation
 @testable import StudyPlannerV2
 
 struct MockSaveError: Error, Equatable {}
+struct MockNotFoundError: Error, Equatable {}
+
 @MainActor
 final class MockAssignmentRepository: AssignmentRepository {
 
-    private(set) var assignments: [Assignment]
+    private var stored: [Assignment] = []
     private(set) var updateCallCount = 0
     var shouldFailOnSave = false
 
+    var assignments: [Assignment] {
+        var result: [Assignment] = []
+        for assignment in stored {
+            result.append(assignment.copy())
+        }
+        return result
+    }
+    
     init(assignments: [Assignment] = []) {
-        self.assignments = assignments
+        for assignment in assignments {
+            stored.append(assignment.copy())
+        }
     }
 
     func load() -> [Assignment] {
@@ -27,20 +39,27 @@ final class MockAssignmentRepository: AssignmentRepository {
 
     func add(_ assignment: Assignment) throws {
         if shouldFailOnSave { throw MockSaveError() }
-        assignments.append(assignment)
+        stored.append(assignment.copy())
     }
 
     func update(_ assignment: Assignment) throws {
         updateCallCount += 1
         if shouldFailOnSave { throw MockSaveError() }
 
-        if let index = assignments.firstIndex(where: { $0.id == assignment.id }) {
-            assignments[index] = assignment
+        guard let index = stored.firstIndex(where: { $0.id == assignment.id }) else {
+            throw MockNotFoundError()
         }
+        
+        stored[index] = assignment.copy()
     }
 
     func delete(_ assignment: Assignment) throws {
         if shouldFailOnSave { throw MockSaveError() }
-        assignments.removeAll { $0.id == assignment.id }
+        
+        guard let index = stored.firstIndex(where: { $0.id == assignment.id }) else {
+            throw MockNotFoundError()
+        }
+        
+        stored.remove(at: index)
     }
 }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct UpcomingDeadlinesView: View {
-    let assignments: [Assignment]
+    let items: [UpcomingItem]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -34,37 +34,33 @@ struct UpcomingDeadlinesView: View {
                 }
             }
 
-            if assignments.isEmpty {
+            if items.isEmpty {
                 Text("No upcoming deadlines")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
             } else {
-                ForEach(
-                    assignments
-                        .sorted { $0.dueDate < $1.dueDate }
-                        .prefix(5)
-                ) { assignment in
+                ForEach(items) { item in
                     HStack(spacing: 12) {
-                        Image(systemName: "doc.text")
+                        Image(systemName: item.kind == .assignment ? "doc.text": "briefcase")
                             .font(.subheadline)
                             .fontWeight(.semibold)
-                            .foregroundStyle(Color.accentColor)
+                            .foregroundStyle(iconColour(for: item))
                             .frame(width: 36, height: 36)
                             .background(
-                                Color.accentColor.opacity(0.15),
+                                iconColour(for: item).opacity(0.15),
                                 in: .rect(cornerRadius: 10)
                             )
-                            .accessibilityLabel("Assignment")
+                            .accessibilityLabel(item.kind == .assignment ? "Assignment": "Placement requirement")
 
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(assignment.title)
+                            Text(item.title)
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
                                 .lineLimit(1)
 
-                            Text(assignment.course)
+                            Text(item.subtitle)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                                 .lineLimit(1)
@@ -73,20 +69,22 @@ struct UpcomingDeadlinesView: View {
                         Spacer()
 
                         Text(
-                            assignment.dueDate,
+                            item.dueDate,
                             format: .dateTime.day().month(.abbreviated)
                         )
                         .font(.caption)
                         .foregroundStyle(.secondary)
 
-                        Text(assignment.priority.rawValue)
-                            .font(.caption2)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(assignment.priority.color)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(assignment.priority.color.opacity(0.12))
-                            .clipShape(Capsule())
+                        if let priority = item.priority {
+                            Text(priority.rawValue)
+                                .font(.caption2)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(priority.color)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(priority.color.opacity(0.12))
+                                .clipShape(Capsule())
+                        }
                     }
                     .padding(10)
                     .frame(minHeight: 56)
@@ -108,5 +106,9 @@ struct UpcomingDeadlinesView: View {
                     y: 2
                 )
         )
+    }
+    
+    private func iconColour(for item: UpcomingItem) -> Color {
+        item.kind == .assignment ? .accentColor : .yellow
     }
 }
