@@ -13,6 +13,7 @@ final class RequirementViewModel: ObservableObject {
     @Published private(set) var requirements: [PlacementRequirement] = []
     
     @Published private(set) var repositoryErrorMessage: String?
+    @Published private(set) var notificationErrorMessage: String?
     
     private let repository: RequirementRepository
     private let addRequirementUseCase: AddRequirementUseCase
@@ -31,6 +32,17 @@ final class RequirementViewModel: ObservableObject {
             repositoryErrorMessage = nil
         } catch {
             repositoryErrorMessage = error.localizedDescription
+        }
+    }
+    
+    private func reloadRequirements() throws {
+        do {
+            requirements = try repository.load()
+            repositoryErrorMessage = nil
+        } catch {
+            let message = "Your changes were saved, but the requirements could not be refreshed. Please reopen the page to check the latest information."
+
+            throw RequirementPersistenceError(message: message)
         }
     }
     
@@ -56,7 +68,7 @@ final class RequirementViewModel: ObservableObject {
             dueDate: dueDate,
             expiryDate: expiryDate
         )
-        loadRequirements()
+        try reloadRequirements()
 
         Task {
             do {
@@ -68,7 +80,11 @@ final class RequirementViewModel: ObservableObject {
                     )
                 }
             } catch {
-                print("Notification scheduling failed: \(error.localizedDescription)")
+                let message = "The requirement was saved, but its reminder could not be scheduled. \(error.localizedDescription)"
+
+                    await MainActor.run {
+                        notificationErrorMessage = message
+                    }
             }
         }
     }
@@ -92,7 +108,7 @@ final class RequirementViewModel: ObservableObject {
             dueDate: dueDate,
             expiryDate: expiryDate
         )
-        loadRequirements()
+        try reloadRequirements()
 
         if let updatedRequirement = requirements.first(where: { $0.id == id }) {
             Task {
@@ -101,7 +117,11 @@ final class RequirementViewModel: ObservableObject {
                         for: updatedRequirement
                     )
                 } catch {
-                    print("Failed to update notifications: \(error.localizedDescription)")
+                    let message = "The requirement was saved, but its reminder could not be scheduled. \(error.localizedDescription)"
+
+                        await MainActor.run {
+                            notificationErrorMessage = message
+                        }
                 }
             }
         }
@@ -113,7 +133,7 @@ final class RequirementViewModel: ObservableObject {
         try useCase.execute(id: id)
 
         RequirementNotificationManager.shared.removeNotifications(for: id)
-        loadRequirements()
+        try reloadRequirements()
     }
 
     
@@ -144,14 +164,18 @@ final class RequirementViewModel: ObservableObject {
         do {
             let updatedRequirement = try useCase.execute(id: requirement.id)
 
-            loadRequirements()
+            try reloadRequirements()
 
             Task {
                 do {
                     try await RequirementNotificationManager.shared
                         .scheduleNotifications(for: updatedRequirement)
                 } catch {
-                    print("Failed to schedule requirement notifications: \(error)")
+                    let message = "The requirement was saved, but its reminder could not be scheduled. \(error.localizedDescription)"
+
+                        await MainActor.run {
+                            notificationErrorMessage = message
+                        }
                 }
             }
 
@@ -162,6 +186,10 @@ final class RequirementViewModel: ObservableObject {
     
     func clearRepositoryError() {
         repositoryErrorMessage = nil
+    }
+    
+    func clearNotificationError() {
+        notificationErrorMessage = nil
     }
 }
 

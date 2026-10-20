@@ -310,23 +310,31 @@ struct RequirementListView: View {
             )
         }
         .alert(
-            "Requirement Storage Error",
+            viewModel.repositoryErrorMessage != nil
+                ? "Requirement Storage Error"
+                : "Reminder Error",
             isPresented: Binding(
-                get: { viewModel.repositoryErrorMessage != nil },
+                get: {
+                    viewModel.repositoryErrorMessage != nil ||
+                    viewModel.notificationErrorMessage != nil
+                },
                 set: { isPresented in
                     if !isPresented {
                         viewModel.clearRepositoryError()
+                        viewModel.clearNotificationError()
                     }
                 }
             )
         ) {
             Button("OK") {
                 viewModel.clearRepositoryError()
+                viewModel.clearNotificationError()
             }
         } message: {
             Text(
                 viewModel.repositoryErrorMessage
-                    ?? "Your requirements could not be saved or loaded."
+                    ?? viewModel.notificationErrorMessage
+                    ?? "An unexpected error occurred."
             )
         }
     }
