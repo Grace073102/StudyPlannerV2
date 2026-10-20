@@ -7,6 +7,7 @@
 
 import SwiftUI
 import UniformTypeIdentifiers
+import PDFKit
 
 struct AssignmentPDFSection: View {
     let assignmentID: String
@@ -36,7 +37,7 @@ struct AssignmentPDFSection: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
-            AssignmentPDFContainerView(attachedPDFs: attachedPDFs)
+            AssignmentPDFContainerView(attachedPDFs: attachedPDFs, onDelete: deletePDF)
 
             Button {
                 showPDFPicker = true
@@ -67,7 +68,7 @@ struct AssignmentPDFSection: View {
                 showImportError(error)
             }
         }
-        .alert("PDF Import Failed", isPresented: $showError) {
+        .alert("PDF Operation Failed", isPresented: $showError) {
             Button("OK", role: .cancel) {}
         } message: {
             Text(errorMessage)
@@ -77,6 +78,7 @@ struct AssignmentPDFSection: View {
         }
     }
 
+    
     private func importPDF(from sourceURL: URL) {
         let hasAccess = sourceURL.startAccessingSecurityScopedResource()
 
@@ -87,6 +89,22 @@ struct AssignmentPDFSection: View {
         }
 
         do {
+            // Check file extension
+            guard sourceURL.pathExtension.lowercased() == "pdf" else {
+                throw PDFImportError.invalidFileType
+            }
+
+            // Check that the file is readable
+            guard FileManager.default.isReadableFile(atPath: sourceURL.path) else {
+                throw PDFImportError.fileNotReadable
+            }
+
+            // Validate the PDF contents
+            guard let document = PDFDocument(url: sourceURL),
+                  document.pageCount > 0 else {
+                throw PDFImportError.invalidPDF
+            }
+
             let fileManager = FileManager.default
 
             try fileManager.createDirectory(
@@ -103,22 +121,27 @@ struct AssignmentPDFSection: View {
 
             var counter = 1
 
-            while FileManager.default.fileExists(atPath: destinationURL.path) {
+            while fileManager.fileExists(atPath: destinationURL.path) {
                 destinationURL = attachmentFolder
-                    .appendingPathComponent("\(baseName) (\(counter)).\(fileExtension)")
+                    .appendingPathComponent(
+                        "\(baseName) (\(counter)).\(fileExtension)"
+                    )
                 counter += 1
             }
 
+            // Copy to the assignment's local folder
             try fileManager.copyItem(
                 at: sourceURL,
                 to: destinationURL
             )
 
             loadPDFs()
+
         } catch {
             showImportError(error)
         }
     }
+
 
     private func loadPDFs() {
         do {
@@ -143,4 +166,37 @@ struct AssignmentPDFSection: View {
         errorMessage = error.localizedDescription
         showError = true
     }
+    
+    private func deletePDF(_ pdf: URL) {
+        do {
+            guard pdf.deletingLastPathComponent() == attachmentFolder else {
+                throw CocoaError(.fileReadNoPermission)
+            }
+
+            try FileManager.default.removeItem(at: pdf)
+            loadPDFs()
+        } catch {
+            showImportError(error)
+        }
+    }
+    
+    private enum PDFImportError: LocalizedError {
+        case invalidFileType
+        case fileNotReadable
+        case invalidPDF
+
+        var errorDescription: String? {
+            switch self {
+            case .invalidFileType:
+                return "Only PDF files can be attached to an assignment."
+
+            case .fileNotReadable:
+                return "This file cannot be accessed. Please check its permissions and try again."
+
+            case .invalidPDF:
+                return "This PDF is invalid, corrupted, or contains no readable pages. Please select another PDF."
+            }
+        }
+    }
+
 }
