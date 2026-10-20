@@ -71,21 +71,21 @@ final class RequirementViewModel: ObservableObject {
         )
         try reloadRequirements()
 
-        Task {
-            do {
-                let granted = try await RequirementNotificationManager.shared.requestPermission()
-
-                if granted {
-                    try await RequirementNotificationManager.shared.scheduleNotifications(
-                        for: requirement
-                    )
-                }
-            } catch {
-                let message = "The requirement was saved, but its reminder could not be scheduled. \(error.localizedDescription)"
-
-                    await MainActor.run {
-                        notificationErrorMessage = message
+        if requirement.dueDate != nil || requirement.expiryDate != nil {
+            Task {
+                do {
+                    let granted = try await RequirementNotificationManager.shared.requestPermission()
+                    
+                    guard granted else {
+                        notificationErrorMessage = "The requirement was saved, but notifications are disabled. You can enable them in Settings to receive reminders."
+                        return
                     }
+                    
+                    try await RequirementNotificationManager.shared.scheduleNotifications(for: requirement)
+                    
+                } catch {
+                    notificationErrorMessage = "The requirement was saved, but its reminder could not be scheduled. \(error.localizedDescription)"
+                }
             }
         }
     }
@@ -112,17 +112,30 @@ final class RequirementViewModel: ObservableObject {
         try reloadRequirements()
 
         if let updatedRequirement = requirements.first(where: { $0.id == id }) {
-            Task {
-                do {
-                    try await RequirementNotificationManager.shared.scheduleNotifications(
-                        for: updatedRequirement
-                    )
-                } catch {
-                    let message = "The requirement was saved, but its reminder could not be scheduled. \(error.localizedDescription)"
 
-                        await MainActor.run {
-                            notificationErrorMessage = message
+            if updatedRequirement.dueDate == nil &&
+               updatedRequirement.expiryDate == nil {
+
+                RequirementNotificationManager.shared.removeNotifications(for: id)
+
+            } else {
+
+                Task {
+                    do {
+                        let granted = try await RequirementNotificationManager.shared.requestPermission()
+
+                        guard granted else {
+                            RequirementNotificationManager.shared.removeNotifications(for: id)
+
+                            notificationErrorMessage = "The requirement was saved, but notifications are disabled. You can enable them in Settings to receive reminders."
+                            return
                         }
+
+                        try await RequirementNotificationManager.shared.scheduleNotifications(for: updatedRequirement)
+
+                    } catch {
+                        notificationErrorMessage = "The requirement was saved, but its reminder could not be scheduled. \(error.localizedDescription)"
+                    }
                 }
             }
         }
@@ -167,19 +180,28 @@ final class RequirementViewModel: ObservableObject {
 
             try reloadRequirements()
 
-            Task {
-                do {
-                    try await RequirementNotificationManager.shared
-                        .scheduleNotifications(for: updatedRequirement)
-                } catch {
-                    let message = "The requirement was saved, but its reminder could not be scheduled. \(error.localizedDescription)"
+            if (updatedRequirement.isCompleted || updatedRequirement.dueDate == nil) && updatedRequirement.expiryDate == nil {
+                RequirementNotificationManager.shared.removeNotifications(for: updatedRequirement.id)
+            } else {
 
-                        await MainActor.run {
-                            notificationErrorMessage = message
+                Task {
+                    do {
+                        let granted = try await RequirementNotificationManager.shared.requestPermission()
+
+                        guard granted else {
+                            RequirementNotificationManager.shared.removeNotifications(for: updatedRequirement.id)
+
+                            notificationErrorMessage = "The requirement was saved, but notifications are disabled. You can enable them in Settings to receive reminders."
+                            return
                         }
+
+                        try await RequirementNotificationManager.shared.scheduleNotifications(for: updatedRequirement)
+
+                    } catch {
+                        notificationErrorMessage = "The requirement was saved, but its reminder could not be scheduled. \(error.localizedDescription)"
+                    }
                 }
             }
-
         } catch {
             repositoryErrorMessage = error.localizedDescription
         }
