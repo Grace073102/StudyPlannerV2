@@ -8,6 +8,12 @@
 
 import Foundation
 
+/// Deletes an existing placement requirement.
+/// The ViewModel calls this use case when a requirement is deleted.
+///
+/// Business rules:
+/// 1. Only an existing requirement can be deleted.
+/// 2. The deletion is saved through the repository.
 struct DeleteRequirementUseCase {
 
     let repository: RequirementRepository

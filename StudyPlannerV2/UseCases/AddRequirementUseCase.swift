@@ -7,6 +7,13 @@
 
 import Foundation
 
+/// Adds a new requirement to a placement.
+/// The ViewModel calls this use case to validate and save requirement details.
+///
+/// Business rules:
+/// 1. A requirement must have a name (blank/space is rejected).
+/// 2. A due date cannot be in the past.
+/// 3. The requirement is saved through the repository.
 struct AddRequirementUseCase {
 
     let repository: RequirementRepository

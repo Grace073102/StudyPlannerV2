@@ -7,6 +7,13 @@
 
 import Foundation
 
+/// Updates an existing placement requirement.
+/// The ViewModel calls this use case to validate and save changes.
+///
+/// Business rules:
+/// 1. A requirement must have a name (blank/space is rejected).
+/// 2. An unchanged overdue due date is allowed when editing.
+/// 3. Only an existing requirement can be updated.
 struct UpdateRequirementUseCase {
 
     let repository: RequirementRepository

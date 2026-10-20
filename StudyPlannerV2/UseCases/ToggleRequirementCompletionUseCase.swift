@@ -7,6 +7,12 @@
 
 import Foundation
 
+/// Toggles the completion status of a placement requirement.
+/// The ViewModel calls this use case when a requirement is marked complete or incomplete.
+///
+/// Business rules:
+/// 1. Only an existing requirement can be updated.
+/// 2. The completion status is saved through the repository.
 struct ToggleRequirementCompletionUseCase {
 
     let repository: RequirementRepository
