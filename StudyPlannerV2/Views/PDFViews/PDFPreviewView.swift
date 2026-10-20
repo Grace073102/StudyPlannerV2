@@ -5,10 +5,12 @@
 //  Created by Grace Chi Yen Chong on 20/10/2026.
 //
 
+
 import SwiftUI
 import PDFKit
 
 struct PDFPreviewView: View {
+
     let pdfURL: URL
 
     @State private var pdfDocument: PDFDocument?
@@ -51,6 +53,25 @@ struct PDFPreviewView: View {
         .background(Color(.systemBackground))
         .navigationTitle(pdfURL.lastPathComponent)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                ShareLink(
+                    item: pdfURL,
+                    preview: SharePreview(pdfURL.lastPathComponent)
+                ) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.body)
+                }
+                .disabled(
+                    isLoading ||
+                    pdfDocument == nil ||
+                    !FileManager.default.isReadableFile(
+                        atPath: pdfURL.path
+                    )
+                )
+                .accessibilityLabel("Share PDF")
+            }
+        }
         .onAppear {
             loadPDF()
         }
@@ -61,27 +82,35 @@ struct PDFPreviewView: View {
         errorMessage = nil
         pdfDocument = nil
 
-        guard FileManager.default.fileExists(atPath: pdfURL.path) else {
-            errorMessage = "This PDF file no longer exists. It may have been deleted or moved."
+        guard FileManager.default.fileExists(
+            atPath: pdfURL.path
+        ) else {
+            errorMessage =
+                "This PDF file no longer exists. It may have been deleted or moved."
             isLoading = false
             return
         }
 
-        guard FileManager.default.isReadableFile(atPath: pdfURL.path) else {
-            errorMessage = "This PDF cannot be accessed. Please check the file permissions."
+        guard FileManager.default.isReadableFile(
+            atPath: pdfURL.path
+        ) else {
+            errorMessage =
+                "This PDF cannot be accessed. Please check the file permissions."
             isLoading = false
             return
         }
 
         guard let document = PDFDocument(url: pdfURL),
               document.pageCount > 0 else {
-            errorMessage = "This PDF is corrupted, invalid, password-protected, or contains no readable pages."
+            errorMessage =
+                "This PDF is corrupted, invalid, password-protected, or contains no readable pages."
             isLoading = false
             return
         }
 
         if document.isLocked {
-            errorMessage = "This PDF is password-protected and cannot be previewed without unlocking it."
+            errorMessage =
+                "This PDF is password-protected and cannot be previewed without unlocking it."
             isLoading = false
             return
         }
@@ -92,10 +121,12 @@ struct PDFPreviewView: View {
 }
 
 private struct PDFKitView: UIViewRepresentable {
+
     let document: PDFDocument
 
     func makeUIView(context: Context) -> PDFView {
         let pdfView = PDFView()
+
         pdfView.autoScales = true
         pdfView.displayMode = .singlePageContinuous
         pdfView.displayDirection = .vertical
@@ -104,7 +135,10 @@ private struct PDFKitView: UIViewRepresentable {
         return pdfView
     }
 
-    func updateUIView(_ uiView: PDFView, context: Context) {
+    func updateUIView(
+        _ uiView: PDFView,
+        context: Context
+    ) {
         if uiView.document !== document {
             uiView.document = document
         }
