@@ -22,13 +22,11 @@ struct AssignmentDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                AssignmentProgressView(
-                    assignment: currentAssignment
-                )
+                AssignmentProgressView(assignment: currentAssignment)
 
-                SubtaskListView(
-                    assignment: currentAssignment
-                )
+                SubtaskListView(assignment: currentAssignment)
+                
+                AssignmentPDFSection(assignmentID: currentAssignment.id)
 
                 if let description = currentAssignment.description,
                    !description.isEmpty {
