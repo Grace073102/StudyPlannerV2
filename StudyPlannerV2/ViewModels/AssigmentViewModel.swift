@@ -5,6 +5,7 @@
 //  Created by Grace Chi Yen Chong on 14/10/2026.
 //
 
+
 import Foundation
 import Combine
 
@@ -21,12 +22,14 @@ final class AssignmentViewModel: ObservableObject {
         self.repository = repository
         self.addAssignmentUseCase = AddAssignmentUseCase(repository: repository)
         self.updateAssignmentUseCase = UpdateAssignmentUseCase(repository: repository)
+
         load()
     }
 
     func load() {
         assignments = repository.assignments
         repositoryErrorMessage = repository.errorMessage
+        syncAssignmentsToShareExtension()
     }
 
     func add(
@@ -46,6 +49,7 @@ final class AssignmentViewModel: ObservableObject {
 
         assignments = repository.assignments
         repositoryErrorMessage = repository.errorMessage
+        syncAssignmentsToShareExtension()
     }
     
     func updateAssignment(
@@ -67,11 +71,15 @@ final class AssignmentViewModel: ObservableObject {
 
         assignments = repository.assignments
         repositoryErrorMessage = repository.errorMessage
+        syncAssignmentsToShareExtension()
     }
 
     func delete(_ assignment: Assignment) throws {
         try repository.delete(assignment)
         assignments = repository.assignments
+        repositoryErrorMessage = repository.errorMessage
+
+        syncAssignmentsToShareExtension()
     }
 
     var totalTaskCount: Int {
@@ -79,14 +87,30 @@ final class AssignmentViewModel: ObservableObject {
     }
 
     var completedTaskCount: Int {
-        assignments.flatMap { $0.tasks }.filter { $0.isCompleted }.count
+        assignments.flatMap { $0.tasks }
+            .filter { $0.isCompleted }
+            .count
     }
 
     var overallProgress: Double {
         guard totalTaskCount > 0 else {
             return 0
         }
-
         return Double(completedTaskCount) / Double(totalTaskCount)
+    }
+
+    private func syncAssignmentsToShareExtension() {
+        let sharedAssignments = assignments.map {
+            SharedAssignment(
+                id: $0.id,
+                title: $0.title
+            )
+        }
+        do {
+            try SharedAssignmentStore.save(sharedAssignments)
+        } catch {
+            repositoryErrorMessage =
+                "Assignments are available in CampusFlow, but could not be shared with the PDF extension: \(error.localizedDescription)"
+        }
     }
 }

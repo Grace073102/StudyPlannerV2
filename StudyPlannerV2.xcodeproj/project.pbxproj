@@ -63,11 +63,22 @@
 			);
 			target = 1D6A896D3087526800C2475A /* CampusFlowShareExtension */;
 		};
+		1D8062F3308792AB00856003 /* Exceptions for "StudyPlannerV2" folder in "CampusFlowShareExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Services/ShareAssignmentPickerView.swift,
+				Services/SharedAssignmentStore.swift,
+			);
+			target = 1D6A896D3087526800C2475A /* CampusFlowShareExtension */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		1D5EE27D307E69CE0007DC0D /* StudyPlannerV2 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1D8062F3308792AB00856003 /* Exceptions for "StudyPlannerV2" folder in "CampusFlowShareExtension" target */,
+			);
 			path = StudyPlannerV2;
 			sourceTree = "<group>";
 		};
