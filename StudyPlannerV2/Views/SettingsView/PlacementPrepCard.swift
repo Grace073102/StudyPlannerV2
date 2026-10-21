@@ -36,6 +36,7 @@ struct PlacementPrepCard: View {
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
                 
             }
             

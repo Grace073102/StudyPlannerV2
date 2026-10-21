@@ -135,7 +135,7 @@ struct AssignmentView: View {
                 .padding(.top, 20)
             }
             .background(
-                Color(.systemGroupedBackground)
+                Theme.background
             )
             .sheet(
                 isPresented: $showAddAssignment
