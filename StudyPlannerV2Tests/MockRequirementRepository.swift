@@ -47,7 +47,7 @@ final class MockRequirementRepository: RequirementRepository {
             throw MockRequirementRepositoryError.simulatedFailure
         }
 
-        requirements.append(requirement)
+        requirements.append(requirement.copy())
     }
 
     func update(_ requirement: PlacementRequirement) throws {
