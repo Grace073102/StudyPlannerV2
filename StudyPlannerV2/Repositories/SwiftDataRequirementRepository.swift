@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import Combine
 
 
 
@@ -15,6 +16,16 @@ final class SwiftDataRequirementRepository: RequirementRepository {
     private(set) var errorMessage: String?
 
     private let context: ModelContext
+    private let changesSubject = PassthroughSubject<Void, Never>()
+
+    var changes: AnyPublisher<Void, Never> {
+        changesSubject.eraseToAnyPublisher()
+    }
+
+    func reloadAfterPlacementDeletion() {
+        requirements = load()
+        changesSubject.send()
+    }
 
     init(container: ModelContainer) {
         context = ModelContext(container)
@@ -50,9 +61,10 @@ final class SwiftDataRequirementRepository: RequirementRepository {
                 throw RepositoryError.duplicateRequirement
             }
 
-            context.insert(
-                StoredPlacementRequirement(requirement: requirement)
-            )
+            let placement = try findPlacement(id: requirement.placementID)
+            let record = StoredPlacementRequirement(requirement: requirement)
+            context.insert(record)
+            record.placement = placement
         }
     }
 
@@ -62,7 +74,9 @@ final class SwiftDataRequirementRepository: RequirementRepository {
                 throw RepositoryError.requirementNotFound
             }
 
+            let placement = try findPlacement(id: requirement.placementID)
             record.placementID = requirement.placementID
+            record.placement = placement
             record.name = requirement.name
             record.categoryRawValue = requirement.category.rawValue
             record.dueDate = requirement.dueDate
@@ -79,6 +93,18 @@ final class SwiftDataRequirementRepository: RequirementRepository {
 
             context.delete(record)
         }
+    }
+
+    private func findPlacement(id: UUID) throws -> StoredPlacement {
+        let placementID = id
+        var descriptor = FetchDescriptor<StoredPlacement>(
+            predicate: #Predicate { $0.id == placementID }
+        )
+        descriptor.fetchLimit = 1
+        guard let placement = try context.fetch(descriptor).first else {
+            throw RepositoryError.placementNotFound
+        }
+        return placement
     }
 
     private func findRequirement(
@@ -112,6 +138,7 @@ final class SwiftDataRequirementRepository: RequirementRepository {
     private enum RepositoryError: LocalizedError {
         case duplicateRequirement
         case requirementNotFound
+        case placementNotFound
 
         var errorDescription: String? {
             switch self {
@@ -119,6 +146,8 @@ final class SwiftDataRequirementRepository: RequirementRepository {
                 return "A requirement with this ID already exists."
             case .requirementNotFound:
                 return "The requirement could not be found."
+            case .placementNotFound:
+                return "The placement could not be found. Save the placement before adding requirements."
             }
         }
     }

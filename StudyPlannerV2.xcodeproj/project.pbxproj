@@ -52,6 +52,7 @@
 		1D5EE27B307E69CE0007DC0D /* StudyPlannerV2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StudyPlannerV2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D5EE28D307E69D00007DC0D /* StudyPlannerV2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StudyPlannerV2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D5EE297307E69D00007DC0D /* StudyPlannerV2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StudyPlannerV2UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D8619A6530862BFF009BE1CC /* StudyPlannerV2.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = file; path = StudyPlannerV2.xctestplan; sourceTree = "<group>"; };
 		1D6A896E3087526800C2475A /* CampusFlowShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CampusFlowShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -137,6 +138,7 @@
 		1D5EE272307E69CE0007DC0D = {
 			isa = PBXGroup;
 			children = (
+				D8619A6530862BFF009BE1CC /* StudyPlannerV2.xctestplan */,
 				1D5EE27D307E69CE0007DC0D /* StudyPlannerV2 */,
 				1D5EE290307E69D00007DC0D /* StudyPlannerV2Tests */,
 				1D5EE29A307E69D00007DC0D /* StudyPlannerV2UITests */,
