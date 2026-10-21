@@ -320,15 +320,21 @@ struct RequirementListView: View {
                 },
                 set: { isPresented in
                     if !isPresented {
-                        viewModel.clearRepositoryError()
-                        viewModel.clearNotificationError()
+                        if viewModel.repositoryErrorMessage != nil {
+                            viewModel.clearRepositoryError()
+                        } else {
+                            viewModel.clearNotificationError()
+                        }
                     }
                 }
             )
         ) {
             Button("OK") {
-                viewModel.clearRepositoryError()
-                viewModel.clearNotificationError()
+                if viewModel.repositoryErrorMessage != nil {
+                    viewModel.clearRepositoryError()
+                } else {
+                    viewModel.clearNotificationError()
+                }
             }
         } message: {
             Text(
@@ -374,7 +380,8 @@ struct RequirementListView: View {
     ]
 
     let schema = Schema([
-        StoredPlacementRequirement.self
+        StoredPlacementRequirement.self,
+        StoredPlacement.self
     ])
 
     let configuration = ModelConfiguration(
@@ -386,6 +393,15 @@ struct RequirementListView: View {
         for: schema,
         configurations: [configuration]
     )
+
+    let placementRepository = SwiftDataPlacementRepository(container: container)
+    try! placementRepository.add(Placement(
+        id: placementID,
+        name: "Education Placement",
+        discipline: "Education",
+        startDate: Date(),
+        endDate: Date().addingTimeInterval(86400 * 30)
+    ))
 
     let repository = SwiftDataRequirementRepository(
         container: container

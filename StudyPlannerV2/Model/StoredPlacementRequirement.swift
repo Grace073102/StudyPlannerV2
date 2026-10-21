@@ -13,12 +13,14 @@ typealias PlacementRequirement = StoredPlacementRequirement
 @Model
 final class StoredPlacementRequirement {
     @Attribute(.unique) var id: UUID
-    var placementID: UUID
+    var placementID: UUID = UUID()
     var name: String
     var categoryRawValue: String
     var dueDate: Date?
     var expiryDate: Date?
     var isCompleted: Bool
+
+    var placement: StoredPlacement?
 
     enum Category: String, CaseIterable, Codable {
         case applicationsAndRegistration = "Applications & Registration"
@@ -29,8 +31,13 @@ final class StoredPlacementRequirement {
     }
 
     var category: Category {
-        get { Category(rawValue: categoryRawValue) ?? .placementPreparation }
-        set { categoryRawValue = newValue.rawValue }
+        get {
+            Category(rawValue: categoryRawValue)
+                ?? .placementPreparation
+        }
+        set {
+            categoryRawValue = newValue.rawValue
+        }
     }
 
     init(
@@ -45,16 +52,26 @@ final class StoredPlacementRequirement {
         self.id = id
         self.placementID = placementID
         self.name = name
-        categoryRawValue = category.rawValue
+        self.categoryRawValue = category.rawValue
         self.dueDate = dueDate
         self.expiryDate = expiryDate
         self.isCompleted = isCompleted
     }
 
+    init(requirement: PlacementRequirement) {
+        id = requirement.id
+        placementID = requirement.placement?.id ?? requirement.placementID
+        name = requirement.name
+        categoryRawValue = requirement.category.rawValue
+        dueDate = requirement.dueDate
+        expiryDate = requirement.expiryDate
+        isCompleted = requirement.isCompleted
+    }
+
     func copy() -> PlacementRequirement {
         let result = PlacementRequirement(
             id: id,
-            placementID: placementID,
+            placementID: placement?.id ?? placementID,
             name: name,
             category: category,
             dueDate: dueDate,
@@ -65,18 +82,8 @@ final class StoredPlacementRequirement {
         return result
     }
 
-    init(requirement: PlacementRequirement) {
-        id = requirement.id
-        placementID = requirement.placementID
-        name = requirement.name
-        categoryRawValue = requirement.category.rawValue
-        dueDate = requirement.dueDate
-        expiryDate = requirement.expiryDate
-        isCompleted = requirement.isCompleted
-    }
-
     func toRequirement() throws -> PlacementRequirement {
-        guard let category = PlacementRequirement.Category(
+        guard let category = Category(
             rawValue: categoryRawValue
         ) else {
             throw RequirementStorageError.invalidCategory
@@ -84,7 +91,7 @@ final class StoredPlacementRequirement {
 
         return PlacementRequirement(
             id: id,
-            placementID: placementID,
+            placementID: placement?.id ?? placementID,
             name: name,
             category: category,
             dueDate: dueDate,

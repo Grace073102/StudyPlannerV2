@@ -18,6 +18,7 @@ final class RequirementViewModel: ObservableObject {
     
     private let repository: RequirementRepository
     private let addRequirementUseCase: AddRequirementUseCase
+    private var repositoryChanges: AnyCancellable?
     
     init(repository: RequirementRepository) {
         
@@ -25,6 +26,9 @@ final class RequirementViewModel: ObservableObject {
         self.addRequirementUseCase = AddRequirementUseCase(repository: repository)
         
         loadRequirements()
+        repositoryChanges = repository.changes.sink { [weak self] in
+            self?.loadRequirements()
+        }
     }
     
     func loadRequirements() {
@@ -82,6 +86,7 @@ final class RequirementViewModel: ObservableObject {
                     }
                     
                     try await RequirementNotificationManager.shared.scheduleNotifications(for: requirement)
+                    notificationErrorMessage = nil
                     
                 } catch {
                     notificationErrorMessage = "The requirement was saved, but its reminder could not be scheduled. \(error.localizedDescription)"
@@ -113,10 +118,10 @@ final class RequirementViewModel: ObservableObject {
 
         if let updatedRequirement = requirements.first(where: { $0.id == id }) {
 
-            if updatedRequirement.dueDate == nil &&
-               updatedRequirement.expiryDate == nil {
+            if updatedRequirement.dueDate == nil && updatedRequirement.expiryDate == nil {
 
                 RequirementNotificationManager.shared.removeNotifications(for: id)
+                notificationErrorMessage = nil
 
             } else {
 
@@ -132,6 +137,7 @@ final class RequirementViewModel: ObservableObject {
                         }
 
                         try await RequirementNotificationManager.shared.scheduleNotifications(for: updatedRequirement)
+                        notificationErrorMessage = nil
 
                     } catch {
                         notificationErrorMessage = "The requirement was saved, but its reminder could not be scheduled. \(error.localizedDescription)"
@@ -182,6 +188,7 @@ final class RequirementViewModel: ObservableObject {
 
             if (updatedRequirement.isCompleted || updatedRequirement.dueDate == nil) && updatedRequirement.expiryDate == nil {
                 RequirementNotificationManager.shared.removeNotifications(for: updatedRequirement.id)
+                notificationErrorMessage = nil
             } else {
 
                 Task {
@@ -196,6 +203,7 @@ final class RequirementViewModel: ObservableObject {
                         }
 
                         try await RequirementNotificationManager.shared.scheduleNotifications(for: updatedRequirement)
+                        notificationErrorMessage = nil
 
                     } catch {
                         notificationErrorMessage = "The requirement was saved, but its reminder could not be scheduled. \(error.localizedDescription)"

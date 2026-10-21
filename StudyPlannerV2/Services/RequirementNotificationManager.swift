@@ -11,6 +11,7 @@ import UserNotifications
 final class RequirementNotificationManager {
 
     static let shared = RequirementNotificationManager()
+    private var cancelledRequirementIDs: Set<UUID> = []
 
     private init() {
         
@@ -24,6 +25,13 @@ final class RequirementNotificationManager {
 
     // Schedule reminders for a requirement
     func scheduleNotifications(for requirement: PlacementRequirement) async throws {
+
+        guard !cancelledRequirementIDs.contains(requirement.id) else { return }
+        defer {
+            if cancelledRequirementIDs.contains(requirement.id) {
+                removeNotifications(for: requirement.id)
+            }
+        }
 
         removeNotifications(for: requirement.id)
 
@@ -133,6 +141,11 @@ final class RequirementNotificationManager {
         try await UNUserNotificationCenter.current().add(request)
     }
 
+
+    func cancelNotifications(for id: UUID) {
+        cancelledRequirementIDs.insert(id)
+        removeNotifications(for: id)
+    }
 
     // Cancel pending reminders
     func removeNotifications(for id: UUID) {

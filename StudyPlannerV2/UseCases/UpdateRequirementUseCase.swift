@@ -43,16 +43,21 @@ struct UpdateRequirementUseCase {
             throw RequirementValidationError.notFound
         }
 
-        // Validate due date only when it changes
-        if let dueDate,
-           existingRequirement.dueDate != dueDate {
-
+        // Validate due date only when the calendar day changes
+        if let dueDate {
             let calendar = Calendar.current
-            let currentDay = calendar.startOfDay(for: today)
-            let selectedDueDate = calendar.startOfDay(for: dueDate)
 
-            guard selectedDueDate >= currentDay else {
-                throw RequirementValidationError.invalidDueDate
+            let isSameDay = existingRequirement.dueDate.map {
+                calendar.isDate($0, inSameDayAs: dueDate)
+            } ?? false
+
+            if !isSameDay {
+                let currentDay = calendar.startOfDay(for: today)
+                let selectedDueDate = calendar.startOfDay(for: dueDate)
+
+                guard selectedDueDate >= currentDay else {
+                    throw RequirementValidationError.invalidDueDate
+                }
             }
         }
 

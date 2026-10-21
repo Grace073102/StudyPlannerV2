@@ -10,10 +10,31 @@ import SwiftData
 
 final class SwiftDataPlacementRepository: PlacementRepository {
     private let context: ModelContext
+    private let onRequirementsChanged: () -> Void
 
-    init(container: ModelContainer) {
+    init(
+        container: ModelContainer,
+        onRequirementsChanged: @escaping () -> Void = {}
+    ) {
         context = ModelContext(container)
         context.autosaveEnabled = false
+        self.onRequirementsChanged = onRequirementsChanged
+    }
+
+
+    func linkExistingRequirements() throws {
+        try saveChanges {
+            let placements = try context.fetch(FetchDescriptor<StoredPlacement>())
+            let placementsByID = Dictionary(uniqueKeysWithValues: placements.map { ($0.id, $0) })
+            let requirements = try context.fetch(FetchDescriptor<StoredPlacementRequirement>())
+            for requirement in requirements {
+                if let placement = requirement.placement {
+                    requirement.placementID = placement.id
+                } else if let placement = placementsByID[requirement.placementID] {
+                    requirement.placement = placement
+                }
+            }
+        }
     }
 
     func load() throws -> [Placement] {
@@ -56,6 +77,7 @@ final class SwiftDataPlacementRepository: PlacementRepository {
     }
 
     func delete(_ placement: Placement) throws {
+        try linkExistingRequirements()
         try saveChanges {
             guard let record = try findPlacement(id: placement.id) else {
                 throw PlacementRepositoryError.notFound
@@ -63,6 +85,8 @@ final class SwiftDataPlacementRepository: PlacementRepository {
 
             context.delete(record)
         }
+
+        onRequirementsChanged()
     }
 
     private func findPlacement(
