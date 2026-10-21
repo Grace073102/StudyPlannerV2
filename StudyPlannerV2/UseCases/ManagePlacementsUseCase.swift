@@ -18,6 +18,7 @@ import Foundation
 /// 5. Only an existing placement can be updated or deleted.
 /// 6. A placement's status (upcoming, in progress, completed) is derived from its dates.
 /// 7. Placements are listed with the earliest start date first.
+/// 8. Requirement reminders are cancelled only after placement deletion saves successfully.
 
 struct ManagePlacementsUseCase {
 
@@ -45,6 +46,18 @@ struct ManagePlacementsUseCase {
     }
 
     let repository: PlacementRepository
+    let loadRequirementIDs: (UUID) throws -> [UUID]
+    let cancelRequirementNotifications: (UUID) -> Void
+    
+    init(
+        repository: PlacementRepository,
+        loadRequirementIDs: @escaping (UUID) throws -> [UUID] = { _ in [] },
+        cancelRequirementNotifications: @escaping (UUID) -> Void = { _ in }
+    ) {
+        self.repository = repository
+        self.loadRequirementIDs = loadRequirementIDs
+        self.cancelRequirementNotifications = cancelRequirementNotifications
+    }
     
     // MARK: - Business Logic
     ///
@@ -75,13 +88,25 @@ struct ManagePlacementsUseCase {
         try repository.update(cleaned)
     }
 
-    /// Deletes the placement with the given ID.
+    /// Deletes a placement and cancels its requirement reminders after saving.
+    /// If loading or deleting fails, reminders remain unchanged.
     /// - Throws: `PlacementError.placementNotFound` or `PlacementRepositoryError.saveFailed`.
     func delete(id: UUID) throws {
-        guard let placement = try repository.load().first(where: { $0.id == id }) else {
+        guard let placement = try repository.load().first(where: {
+            $0.id == id
+        }) else {
             throw PlacementError.placementNotFound
         }
+
+        // Collect IDs before cascade deletion removes the requirements.
+        let requirementIDs = try loadRequirementIDs(id)
+
+        // If this throws, reminder cancellation is skipped.
         try repository.delete(placement)
+
+        for requirementID in requirementIDs {
+            cancelRequirementNotifications(requirementID)
+        }
     }
 
     // MARK: - Rules

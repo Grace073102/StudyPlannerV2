@@ -6,11 +6,13 @@
 //
 
 import Foundation
+import Combine
 
 protocol RequirementRepository {
     
     var requirements: [PlacementRequirement] { get }
     var errorMessage: String? { get }
+    var changes: AnyPublisher<Void, Never> { get }
 
     func load() -> [PlacementRequirement]
     func add(_ requirement: PlacementRequirement)
@@ -19,6 +21,10 @@ protocol RequirementRepository {
 }
 
 extension RequirementRepository {
+    var changes: AnyPublisher<Void, Never> {
+        Empty().eraseToAnyPublisher()
+    }
+
     var errorMessage: String? {
         nil
     }
