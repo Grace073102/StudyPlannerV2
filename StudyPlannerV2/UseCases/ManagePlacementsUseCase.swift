@@ -49,6 +49,16 @@ struct ManagePlacementsUseCase {
     let loadRequirementIDs: (UUID) throws -> [UUID]
     let cancelRequirementNotifications: (UUID) -> Void
     
+    init(
+        repository: PlacementRepository,
+        loadRequirementIDs: @escaping (UUID) throws -> [UUID] = { _ in [] },
+        cancelRequirementNotifications: @escaping (UUID) -> Void = { _ in }
+    ) {
+        self.repository = repository
+        self.loadRequirementIDs = loadRequirementIDs
+        self.cancelRequirementNotifications = cancelRequirementNotifications
+    }
+    
     // MARK: - Business Logic
     ///
     /// Returns all placements with their status on the given date, earliest start first.
