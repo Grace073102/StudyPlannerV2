@@ -12,6 +12,7 @@ struct AssignmentView: View {
     @EnvironmentObject var assignmentViewModel: AssignmentViewModel
     @EnvironmentObject var taskViewModel: TaskViewModel
     @EnvironmentObject var requirementViewModel: RequirementViewModel
+    @EnvironmentObject var placementViewModel: PlacementViewModel
     @State private var showAddAssignment = false
 
     var body: some View {
@@ -71,6 +72,14 @@ struct AssignmentView: View {
                     UpcomingDeadlinesView(
                         items: UpcomingItem.make(assignments: assignmentViewModel.assignments, requirements: requirementViewModel.requirements)
                     )
+                    
+                    if let next = nextPlacement {
+                        PlacementPrepCard(
+                            summary: next,
+                            completedCount: requirementViewModel.completedCount(for: next.placement.id),
+                            totalCount: requirementViewModel.requirements(for: next.placement.id).count
+                        )
+                    }
 
                     VStack(alignment: .leading, spacing: 12){
                         HStack(alignment: .firstTextBaseline){
@@ -155,6 +164,10 @@ struct AssignmentView: View {
         let minutes = taskViewModel.todayStudyMinutes
         return minutes > 0 ? "\(formattedDuration(minutes)) left" : "All done for today"
     }
+    
+    private var nextPlacement: ManagePlacementsUseCase.PlacementSummary? {
+        placementViewModel.placements.first { $0.status != .completed }
+    }
 
     private func formattedDuration(
         _ minutes: Int
@@ -178,7 +191,8 @@ struct AssignmentView: View {
     let schema = Schema([
         StoredAssignment.self,
         StoredAcademicTask.self,
-        StoredPlacementRequirement.self
+        StoredPlacementRequirement.self,
+        StoredPlacement.self
     ])
 
     let configuration = ModelConfiguration(
@@ -193,6 +207,7 @@ struct AssignmentView: View {
 
     let assignmentRepository = SwiftDataAssignmentRepository(container: container)
     let requirementRepository = SwiftDataRequirementRepository(container: container)
+    let placementRepository = SwiftDataPlacementRepository(container: container)
     
         let days: (Int) -> Date = { n in
             Calendar.current.date(byAdding: .day, value: n, to: .now)!
@@ -225,11 +240,18 @@ struct AssignmentView: View {
         )
 
         // Sample placement requirements
-        let placementID = UUID()
+    let placement = Placement(
+        name: "Clinical Placement",
+        discipline: "Nursing",
+        startDate: days(14),
+        endDate: days(70)
+    )
+    
+    let _ = try? placementRepository.add(placement)
 
         let _ = requirementRepository.add(
             PlacementRequirement(
-                placementID: placementID,
+                placementID: placement.id,
                 name: "Police Check",
                 category: .checksAndClearances,
                 dueDate: days(2)
@@ -238,18 +260,20 @@ struct AssignmentView: View {
 
         let _ = requirementRepository.add(
             PlacementRequirement(
-                placementID: placementID,
+                placementID: placement.id,
                 name: "Induction form",
                 category: .placementPreparation,
-                dueDate: days(13)
+                dueDate: days(-5),
+                isCompleted: true
             )
         )
 
+    // ViewModels
         let assignmentViewModel = AssignmentViewModel(repository: assignmentRepository)
-        let requirementViewModel = RequirementViewModel(repository: requirementRepository)
 
         AssignmentView()
             .environmentObject(assignmentViewModel)
             .environmentObject(TaskViewModel(assignmentViewModel: assignmentViewModel))
-            .environmentObject(requirementViewModel)
+            .environmentObject(RequirementViewModel(repository: requirementRepository))
+            .environmentObject(PlacementViewModel(repository: placementRepository))
 }

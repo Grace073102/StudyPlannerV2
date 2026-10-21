@@ -80,6 +80,8 @@ struct RootView: View {
         .environmentObject(assignmentViewModel)
         .environmentObject(taskViewModel)
         .environmentObject(requirementViewModel)
+        .environmentObject(placementViewModel)
+        .environmentObject(savedInternshipViewModel)
         .alert(
             "Something Went Wrong",
             isPresented: Binding(
