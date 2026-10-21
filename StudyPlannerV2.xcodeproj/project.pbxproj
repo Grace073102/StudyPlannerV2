@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		1D6A89783087526800C2475A /* CampusFlowShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1D6A896E3087526800C2475A /* CampusFlowShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		1D5EE28E307E69D00007DC0D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -21,18 +25,61 @@
 			remoteGlobalIDString = 1D5EE27A307E69CE0007DC0D;
 			remoteInfo = StudyPlannerV2;
 		};
+		1D6A89763087526800C2475A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1D5EE273307E69CE0007DC0D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1D6A896D3087526800C2475A;
+			remoteInfo = CampusFlowShareExtension;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1D6A897D3087526800C2475A /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				1D6A89783087526800C2475A /* CampusFlowShareExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		1D5EE27B307E69CE0007DC0D /* StudyPlannerV2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StudyPlannerV2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D5EE28D307E69D00007DC0D /* StudyPlannerV2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StudyPlannerV2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D5EE297307E69D00007DC0D /* StudyPlannerV2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StudyPlannerV2UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8619A6530862BFF009BE1CC /* StudyPlannerV2.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = file; path = StudyPlannerV2.xctestplan; sourceTree = "<group>"; };
+		1D6A896E3087526800C2475A /* CampusFlowShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CampusFlowShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		1D6A89793087526800C2475A /* Exceptions for "CampusFlowShareExtension" folder in "CampusFlowShareExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 1D6A896D3087526800C2475A /* CampusFlowShareExtension */;
+		};
+		1D8062F3308792AB00856003 /* Exceptions for "StudyPlannerV2" folder in "CampusFlowShareExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Services/ShareAssignmentPickerView.swift,
+				Services/SharedAssignmentStore.swift,
+			);
+			target = 1D6A896D3087526800C2475A /* CampusFlowShareExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		1D5EE27D307E69CE0007DC0D /* StudyPlannerV2 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1D8062F3308792AB00856003 /* Exceptions for "StudyPlannerV2" folder in "CampusFlowShareExtension" target */,
+			);
 			path = StudyPlannerV2;
 			sourceTree = "<group>";
 		};
@@ -44,6 +91,14 @@
 		1D5EE29A307E69D00007DC0D /* StudyPlannerV2UITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = StudyPlannerV2UITests;
+			sourceTree = "<group>";
+		};
+		1D6A896F3087526800C2475A /* CampusFlowShareExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1D6A89793087526800C2475A /* Exceptions for "CampusFlowShareExtension" folder in "CampusFlowShareExtension" target */,
+			);
+			path = CampusFlowShareExtension;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -70,6 +125,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1D6A896B3087526800C2475A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -80,6 +142,7 @@
 				1D5EE27D307E69CE0007DC0D /* StudyPlannerV2 */,
 				1D5EE290307E69D00007DC0D /* StudyPlannerV2Tests */,
 				1D5EE29A307E69D00007DC0D /* StudyPlannerV2UITests */,
+				1D6A896F3087526800C2475A /* CampusFlowShareExtension */,
 				1D5EE27C307E69CE0007DC0D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +153,7 @@
 				1D5EE27B307E69CE0007DC0D /* StudyPlannerV2.app */,
 				1D5EE28D307E69D00007DC0D /* StudyPlannerV2Tests.xctest */,
 				1D5EE297307E69D00007DC0D /* StudyPlannerV2UITests.xctest */,
+				1D6A896E3087526800C2475A /* CampusFlowShareExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -104,10 +168,12 @@
 				1D5EE277307E69CE0007DC0D /* Sources */,
 				1D5EE278307E69CE0007DC0D /* Frameworks */,
 				1D5EE279307E69CE0007DC0D /* Resources */,
+				1D6A897D3087526800C2475A /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				1D6A89773087526800C2475A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				1D5EE27D307E69CE0007DC0D /* StudyPlannerV2 */,
@@ -165,6 +231,28 @@
 			productReference = 1D5EE297307E69D00007DC0D /* StudyPlannerV2UITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		1D6A896D3087526800C2475A /* CampusFlowShareExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1D6A897A3087526800C2475A /* Build configuration list for PBXNativeTarget "CampusFlowShareExtension" */;
+			buildPhases = (
+				1D6A896A3087526800C2475A /* Sources */,
+				1D6A896B3087526800C2475A /* Frameworks */,
+				1D6A896C3087526800C2475A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				1D6A896F3087526800C2475A /* CampusFlowShareExtension */,
+			);
+			name = CampusFlowShareExtension;
+			packageProductDependencies = (
+			);
+			productName = CampusFlowShareExtension;
+			productReference = 1D6A896E3087526800C2475A /* CampusFlowShareExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -186,6 +274,9 @@
 						CreatedOnToolsVersion = 26.1;
 						TestTargetID = 1D5EE27A307E69CE0007DC0D;
 					};
+					1D6A896D3087526800C2475A = {
+						CreatedOnToolsVersion = 26.1;
+					};
 				};
 			};
 			buildConfigurationList = 1D5EE276307E69CE0007DC0D /* Build configuration list for PBXProject "StudyPlannerV2" */;
@@ -205,6 +296,7 @@
 				1D5EE27A307E69CE0007DC0D /* StudyPlannerV2 */,
 				1D5EE28C307E69D00007DC0D /* StudyPlannerV2Tests */,
 				1D5EE296307E69D00007DC0D /* StudyPlannerV2UITests */,
+				1D6A896D3087526800C2475A /* CampusFlowShareExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -225,6 +317,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		1D5EE295307E69D00007DC0D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1D6A896C3087526800C2475A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -255,6 +354,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1D6A896A3087526800C2475A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -267,6 +373,11 @@
 			isa = PBXTargetDependency;
 			target = 1D5EE27A307E69CE0007DC0D /* StudyPlannerV2 */;
 			targetProxy = 1D5EE298307E69D00007DC0D /* PBXContainerItemProxy */;
+		};
+		1D6A89773087526800C2475A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1D6A896D3087526800C2475A /* CampusFlowShareExtension */;
+			targetProxy = 1D6A89763087526800C2475A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -395,8 +506,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = StudyPlannerV2/StudyPlannerV2.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = S965XU3ZY6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -430,8 +543,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = StudyPlannerV2/StudyPlannerV2.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = S965XU3ZY6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -548,6 +663,64 @@
 			};
 			name = Release;
 		};
+		1D6A897B3087526800C2475A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = CampusFlowShareExtension/CampusFlowShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = S965XU3ZY6;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CampusFlowShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CampusFlowShareExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.grace.StudyPlannerV2.CampusFlowShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		1D6A897C3087526800C2475A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = CampusFlowShareExtension/CampusFlowShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = S965XU3ZY6;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CampusFlowShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CampusFlowShareExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.grace.StudyPlannerV2.CampusFlowShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -583,6 +756,15 @@
 			buildConfigurations = (
 				1D5EE2A8307E69D00007DC0D /* Debug */,
 				1D5EE2A9307E69D00007DC0D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1D6A897A3087526800C2475A /* Build configuration list for PBXNativeTarget "CampusFlowShareExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1D6A897B3087526800C2475A /* Debug */,
+				1D6A897C3087526800C2475A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

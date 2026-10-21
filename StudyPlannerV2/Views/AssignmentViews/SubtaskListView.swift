@@ -5,6 +5,7 @@
 //  Created by Grace Chi Yen Chong on 14/10/2026.
 //
 
+
 import SwiftUI
 
 struct SubtaskListView: View {
@@ -13,9 +14,7 @@ struct SubtaskListView: View {
 
     let assignment: Assignment
 
-    @State private var newTaskTitle = ""
-    @State private var plannedDate = Date()
-    @State private var estimatedMinutes = 30
+    @State private var showAddTask = false
 
     @State private var editingTaskID = ""
     @State private var editingTaskTitle = ""
@@ -25,10 +24,7 @@ struct SubtaskListView: View {
 
     @State private var deletingTaskID = ""
     @State private var showDeleteConfirmation = false
-    
-    @State private var addTaskErrorMessage = ""
-    @State private var showAddTaskError = false
-    
+
     @State private var editTaskErrorMessage = ""
     @State private var showEditTaskError = false
 
@@ -57,7 +53,7 @@ struct SubtaskListView: View {
                             .font(.subheadline)
                             .fontWeight(.medium)
 
-                        Text("Add a task below to get started.")
+                        Text("Tap Add Subtask to get started.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -153,182 +149,61 @@ struct SubtaskListView: View {
                 }
             }
 
-            VStack(alignment: .leading, spacing: 14) {
+            Button {
+                showAddTask = true
+            } label: {
                 HStack(spacing: 8) {
                     Image(systemName: "plus.circle.fill")
-                        .foregroundStyle(Color.accentColor)
-
-                    Text("Add New Subtask")
-                        .font(.headline)
-                        .fontWeight(.semibold)
+                    Text("Add Subtask")
                 }
-
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Task")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-
-                    HStack(spacing: 8) {
-                        Image(systemName: "checklist")
-                            .foregroundStyle(.secondary)
-
-                        TextField("Enter subtask title", text: $newTaskTitle)
-                    }
-                    .padding(.horizontal, 12)
-                    .frame(height: 46)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(.tertiarySystemGroupedBackground))
-                    )
-                }
-
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Planned Date")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-
-                    HStack {
-                        Image(systemName: "calendar")
-                            .foregroundStyle(.secondary)
-
-                        DatePicker("", selection: $plannedDate, displayedComponents: .date)
-                            .labelsHidden()
-
-                        Spacer()
-                    }
-                    .padding(.horizontal, 12)
-                    .frame(height: 46)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(.tertiarySystemGroupedBackground))
-                    )
-                }
-
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Estimated Study Time")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-
-                    Menu {
-                        Button { estimatedMinutes = 15 } label: { Text("15 min") }
-                        Button { estimatedMinutes = 30 } label: { Text("30 min") }
-                        Button { estimatedMinutes = 45 } label: { Text("45 min") }
-                        Button { estimatedMinutes = 60 } label: { Text("1 hr") }
-                        Button { estimatedMinutes = 90 } label: { Text("1.5 hr") }
-                        Button { estimatedMinutes = 120 } label: { Text("2 hr") }
-                    } label: {
-                        HStack {
-                            Image(systemName: "clock")
-                                .foregroundStyle(.secondary)
-
-                            Text(formattedDuration(estimatedMinutes))
-                                .foregroundStyle(.primary)
-
-                            Spacer()
-
-                            Image(systemName: "chevron.down")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        .padding(.horizontal, 12)
-                        .frame(height: 46)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color(.tertiarySystemGroupedBackground))
-                        )
-                    }
-                }
-
-                Button {
-                    addTask()
-                } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: "plus")
-                        Text("Add Subtask")
-                    }
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(Theme.onAccent)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 46)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.accentColor)
-                    )
-                }
-                .disabled(cleanedTitle.isEmpty)
-                .opacity(cleanedTitle.isEmpty ? 0.5 : 1)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundStyle(Theme.onAccent)
+                .frame(maxWidth: .infinity)
+                .frame(height: 46)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.accentColor)
+                )
             }
-            .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Theme.card)
-            )
+            .buttonStyle(.plain)
+        }
+        .sheet(isPresented: $showAddTask) {
+            AddSubtaskView(assignmentID: assignment.id)
+                .environmentObject(taskViewModel)
+                .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $showEditTask) {
             NavigationStack {
-                VStack(alignment: .leading, spacing: 20) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Task")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-
-                        TextField("Subtask title", text: $editingTaskTitle)
-                            .padding(.horizontal, 12)
-                            .frame(height: 46)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color(.secondarySystemBackground))
-                            )
-                    }
-
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Planned Date")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-
-                        HStack {
-                            Image(systemName: "calendar")
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Task")
+                                .font(.caption)
                                 .foregroundStyle(.secondary)
 
-                            DatePicker("", selection: $editingPlannedDate, displayedComponents: .date)
-                                .labelsHidden()
-
-                            Spacer()
+                            TextField("Subtask title", text: $editingTaskTitle)
+                                .padding(.horizontal, 12)
+                                .frame(height: 46)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Color(.secondarySystemBackground))
+                                )
                         }
-                        .padding(.horizontal, 12)
-                        .frame(height: 46)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color(.secondarySystemBackground))
-                        )
-                    }
 
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Estimated Study Time")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Planned Date")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
 
-                        Menu {
-                            Button { editingEstimatedMinutes = 15 } label: { Text("15 min") }
-                            Button { editingEstimatedMinutes = 30 } label: { Text("30 min") }
-                            Button { editingEstimatedMinutes = 45 } label: { Text("45 min") }
-                            Button { editingEstimatedMinutes = 60 } label: { Text("1 hr") }
-                            Button { editingEstimatedMinutes = 90 } label: { Text("1.5 hr") }
-                            Button { editingEstimatedMinutes = 120 } label: { Text("2 hr") }
-                        } label: {
                             HStack {
-                                Image(systemName: "clock")
+                                Image(systemName: "calendar")
                                     .foregroundStyle(.secondary)
 
-                                Text(formattedDuration(editingEstimatedMinutes))
-                                    .foregroundStyle(.primary)
+                                DatePicker("", selection: $editingPlannedDate, displayedComponents: .date)
+                                    .labelsHidden()
 
                                 Spacer()
-
-                                Image(systemName: "chevron.down")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
                             }
                             .padding(.horizontal, 12)
                             .frame(height: 46)
@@ -337,27 +212,61 @@ struct SubtaskListView: View {
                                     .fill(Color(.secondarySystemBackground))
                             )
                         }
-                    }
 
-                    Button {
-                        saveEditedTask()
-                    } label: {
-                        Text("Save Changes")
-                            .fontWeight(.semibold)
-                            .foregroundStyle(Theme.onAccent)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 46)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.accentColor)
-                            )
-                    }
-                    .disabled(cleanedEditingTitle.isEmpty)
-                    .opacity(cleanedEditingTitle.isEmpty ? 0.5 : 1)
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Estimated Study Time")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
 
-                    Spacer()
+                            Menu {
+                                Button { editingEstimatedMinutes = 15 } label: { Text("15 min") }
+                                Button { editingEstimatedMinutes = 30 } label: { Text("30 min") }
+                                Button { editingEstimatedMinutes = 45 } label: { Text("45 min") }
+                                Button { editingEstimatedMinutes = 60 } label: { Text("1 hr") }
+                                Button { editingEstimatedMinutes = 90 } label: { Text("1.5 hr") }
+                                Button { editingEstimatedMinutes = 120 } label: { Text("2 hr") }
+                            } label: {
+                                HStack {
+                                    Image(systemName: "clock")
+                                        .foregroundStyle(.secondary)
+
+                                    Text(formattedDuration(editingEstimatedMinutes))
+                                        .foregroundStyle(.primary)
+
+                                    Spacer()
+
+                                    Image(systemName: "chevron.down")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                .padding(.horizontal, 12)
+                                .frame(height: 46)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Color(.secondarySystemBackground))
+                                )
+                            }
+                        }
+
+                        Button {
+                            saveEditedTask()
+                        } label: {
+                            Text("Save Changes")
+                                .fontWeight(.semibold)
+                                .foregroundStyle(Theme.onAccent)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 46)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Color.accentColor)
+                                )
+                        }
+                        .disabled(cleanedEditingTitle.isEmpty)
+                        .opacity(cleanedEditingTitle.isEmpty ? 0.5 : 1)
+                    }
+                    .padding(20)
                 }
-                .padding(20)
+                .background(Color(.systemGroupedBackground))
                 .navigationTitle("Edit Subtask")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
@@ -373,7 +282,7 @@ struct SubtaskListView: View {
                     Text(editTaskErrorMessage)
                 }
             }
-            .presentationDetents([.medium])
+            .presentationDetents([.medium, .large])
         }
         .alert("Delete Subtask?", isPresented: $showDeleteConfirmation) {
             Button("Delete", role: .destructive) {
@@ -384,41 +293,14 @@ struct SubtaskListView: View {
         } message: {
             Text("This subtask will be permanently removed.")
         }
-        .alert("Unable to Add Subtask", isPresented: $showAddTaskError) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(addTaskErrorMessage)
-        }
     }
 
     private var completedTaskCount: Int {
         assignment.tasks.filter { $0.isCompleted }.count
     }
 
-    private var cleanedTitle: String {
-        newTaskTitle.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
     private var cleanedEditingTitle: String {
         editingTaskTitle.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    private func addTask() {
-        do {
-            try taskViewModel.addTask(
-                title: newTaskTitle,
-                plannedDate: plannedDate,
-                estimatedMinutes: estimatedMinutes,
-                to: assignment.id
-            )
-
-            newTaskTitle = ""
-            plannedDate = Date()
-            estimatedMinutes = 30
-        } catch {
-            addTaskErrorMessage = error.localizedDescription
-            showAddTaskError = true
-        }
     }
 
     private func saveEditedTask() {
@@ -451,5 +333,4 @@ struct SubtaskListView: View {
 
         return "\(hours) hr \(remainingMinutes) min"
     }
-    
 }
