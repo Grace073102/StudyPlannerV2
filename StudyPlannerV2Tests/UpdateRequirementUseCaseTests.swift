@@ -87,6 +87,41 @@ struct UpdateRequirementUseCaseTests {
         #expect(repository.requirements.first?.dueDate == threeDaysAgo)
         #expect(repository.updateCallCount == 1)
     }
+    
+    @Test func overdueRequirementCanBeEditedWithDifferentTimeOnSameDay() throws {
+        let originalDueDate = calendar.date(
+            byAdding: .hour,
+            value: 9,
+            to: threeDaysAgo
+        )!
+
+        let submittedDueDate = calendar.date(
+            byAdding: .hour,
+            value: 15,
+            to: threeDaysAgo
+        )!
+
+        let requirement = makeRequirement(dueDate: originalDueDate)
+        let repository = MockRequirementRepository(
+            requirements: [requirement]
+        )
+        let useCase = UpdateRequirementUseCase(repository: repository)
+
+        try useCase.execute(
+            id: requirement.id,
+            name: "Updated Police Check",
+            category: .checksAndClearances,
+            dueDate: submittedDueDate,
+            expiryDate: nil,
+            today: today
+        )
+
+        let updated = try #require(repository.requirements.first)
+
+        #expect(updated.name == "Updated Police Check")
+        #expect(updated.dueDate == submittedDueDate)
+        #expect(repository.updateCallCount == 1)
+    }
 
     @Test func dueDateCanBeChangedToToday() throws {
         let requirement = makeRequirement(dueDate: nextWeek)
