@@ -8,11 +8,13 @@
 import Foundation
 import Combine
 
+@MainActor
 final class RequirementViewModel: ObservableObject {
     
     @Published private(set) var requirements: [PlacementRequirement] = []
     
     @Published private(set) var repositoryErrorMessage: String?
+    @Published private(set) var notificationErrorMessage: String?
     
     private let repository: RequirementRepository
     private let addRequirementUseCase: AddRequirementUseCase
@@ -30,8 +32,23 @@ final class RequirementViewModel: ObservableObject {
     }
     
     func loadRequirements() {
-        requirements = repository.load()
-        repositoryErrorMessage = repository.errorMessage
+        do {
+            requirements = try repository.load()
+            repositoryErrorMessage = nil
+        } catch {
+            repositoryErrorMessage = error.localizedDescription
+        }
+    }
+    
+    private func reloadRequirements() throws {
+        do {
+            requirements = try repository.load()
+            repositoryErrorMessage = nil
+        } catch {
+            let message = "Your changes were saved, but the requirements could not be refreshed. Please reopen the page to check the latest information."
+
+            throw RequirementPersistenceError(message: message)
+        }
     }
     
     func requirements(for placementID: UUID) -> [PlacementRequirement] {
@@ -56,20 +73,24 @@ final class RequirementViewModel: ObservableObject {
             dueDate: dueDate,
             expiryDate: expiryDate
         )
-        try checkRepositoryError()
-        loadRequirements()
+        try reloadRequirements()
 
-        Task {
-            do {
-                let granted = try await RequirementNotificationManager.shared.requestPermission()
-
-                if granted {
-                    try await RequirementNotificationManager.shared.scheduleNotifications(
-                        for: requirement
-                    )
+        if requirement.dueDate != nil || requirement.expiryDate != nil {
+            Task {
+                do {
+                    let granted = try await RequirementNotificationManager.shared.requestPermission()
+                    
+                    guard granted else {
+                        notificationErrorMessage = "The requirement was saved, but notifications are disabled. You can enable them in Settings to receive reminders."
+                        return
+                    }
+                    
+                    try await RequirementNotificationManager.shared.scheduleNotifications(for: requirement)
+                    notificationErrorMessage = nil
+                    
+                } catch {
+                    notificationErrorMessage = "The requirement was saved, but its reminder could not be scheduled. \(error.localizedDescription)"
                 }
-            } catch {
-                print("Notification scheduling failed: \(error.localizedDescription)")
             }
         }
     }
@@ -93,17 +114,34 @@ final class RequirementViewModel: ObservableObject {
             dueDate: dueDate,
             expiryDate: expiryDate
         )
-        try checkRepositoryError()
-        loadRequirements()
+        try reloadRequirements()
 
         if let updatedRequirement = requirements.first(where: { $0.id == id }) {
-            Task {
-                do {
-                    try await RequirementNotificationManager.shared.scheduleNotifications(
-                        for: updatedRequirement
-                    )
-                } catch {
-                    print("Failed to update notifications: \(error.localizedDescription)")
+
+            if updatedRequirement.dueDate == nil && updatedRequirement.expiryDate == nil {
+
+                RequirementNotificationManager.shared.removeNotifications(for: id)
+                notificationErrorMessage = nil
+
+            } else {
+
+                Task {
+                    do {
+                        let granted = try await RequirementNotificationManager.shared.requestPermission()
+
+                        guard granted else {
+                            RequirementNotificationManager.shared.removeNotifications(for: id)
+
+                            notificationErrorMessage = "The requirement was saved, but notifications are disabled. You can enable them in Settings to receive reminders."
+                            return
+                        }
+
+                        try await RequirementNotificationManager.shared.scheduleNotifications(for: updatedRequirement)
+                        notificationErrorMessage = nil
+
+                    } catch {
+                        notificationErrorMessage = "The requirement was saved, but its reminder could not be scheduled. \(error.localizedDescription)"
+                    }
                 }
             }
         }
@@ -113,10 +151,9 @@ final class RequirementViewModel: ObservableObject {
         let useCase = DeleteRequirementUseCase(repository: repository)
 
         try useCase.execute(id: id)
-        try checkRepositoryError()
 
         RequirementNotificationManager.shared.removeNotifications(for: id)
-        loadRequirements()
+        try reloadRequirements()
     }
 
     
@@ -142,26 +179,39 @@ final class RequirementViewModel: ObservableObject {
     
     
     func toggleCompletion(for requirement: PlacementRequirement) {
-        let updatedRequirement = requirement.copy()
+        let useCase = ToggleRequirementCompletionUseCase(repository: repository)
 
-        updatedRequirement.isCompleted.toggle()
-        repository.update(updatedRequirement)
+        do {
+            let updatedRequirement = try useCase.execute(id: requirement.id)
 
-        if let message = repository.errorMessage {
-            repositoryErrorMessage = message
-            return
-        }
+            try reloadRequirements()
 
-        loadRequirements()
+            if (updatedRequirement.isCompleted || updatedRequirement.dueDate == nil) && updatedRequirement.expiryDate == nil {
+                RequirementNotificationManager.shared.removeNotifications(for: updatedRequirement.id)
+                notificationErrorMessage = nil
+            } else {
 
-        Task {
-            do {
-                try await RequirementNotificationManager.shared.scheduleNotifications(
-                    for: updatedRequirement
-                )
-            } catch {
-                print("Failed to update notifications: \(error.localizedDescription)")
+                Task {
+                    do {
+                        let granted = try await RequirementNotificationManager.shared.requestPermission()
+
+                        guard granted else {
+                            RequirementNotificationManager.shared.removeNotifications(for: updatedRequirement.id)
+
+                            notificationErrorMessage = "The requirement was saved, but notifications are disabled. You can enable them in Settings to receive reminders."
+                            return
+                        }
+
+                        try await RequirementNotificationManager.shared.scheduleNotifications(for: updatedRequirement)
+                        notificationErrorMessage = nil
+
+                    } catch {
+                        notificationErrorMessage = "The requirement was saved, but its reminder could not be scheduled. \(error.localizedDescription)"
+                    }
+                }
             }
+        } catch {
+            repositoryErrorMessage = error.localizedDescription
         }
     }
     
@@ -169,15 +219,9 @@ final class RequirementViewModel: ObservableObject {
         repositoryErrorMessage = nil
     }
     
-    private func checkRepositoryError() throws {
-        if let message = repository.errorMessage {
-            repositoryErrorMessage = message
-            throw RequirementPersistenceError(message: message)
-        }
-
-        repositoryErrorMessage = nil
+    func clearNotificationError() {
+        notificationErrorMessage = nil
     }
-    
 }
 
 struct RequirementPersistenceError: LocalizedError {

@@ -68,11 +68,13 @@ final class RequirementNotificationManager {
 
         guard targetDay >= today else { return }
 
-        let reminderDay = calendar.date(
+        guard let reminderDay = calendar.date(
             byAdding: .day,
             value: -7,
             to: targetDay
-        )!
+        ) else {
+            return
+        }
 
         
         let notificationDay = max(reminderDay, today)
@@ -98,12 +100,16 @@ final class RequirementNotificationManager {
                 return
             }
 
-            notificationDate = calendar.date(
+            guard let nextNotificationDate = calendar.date(
                 bySettingHour: 9,
                 minute: 0,
                 second: 0,
                 of: tomorrow
-            )!
+            ) else {
+                return
+            }
+
+            notificationDate = nextNotificationDate
         }
 
         guard calendar.startOfDay(for: notificationDate) <= targetDay else {

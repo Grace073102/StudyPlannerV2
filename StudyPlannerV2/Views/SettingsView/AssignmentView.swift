@@ -249,7 +249,7 @@ struct AssignmentView: View {
     
     let _ = try? placementRepository.add(placement)
 
-        let _ = requirementRepository.add(
+        let _ = try? requirementRepository.add(
             PlacementRequirement(
                 placementID: placement.id,
                 name: "Police Check",
@@ -258,7 +258,7 @@ struct AssignmentView: View {
             )
         )
 
-        let _ = requirementRepository.add(
+        let _ = try? requirementRepository.add(
             PlacementRequirement(
                 placementID: placement.id,
                 name: "Induction form",

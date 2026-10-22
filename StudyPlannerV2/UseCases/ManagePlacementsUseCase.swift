@@ -48,7 +48,7 @@ struct ManagePlacementsUseCase {
     let repository: PlacementRepository
     let loadRequirementIDs: (UUID) throws -> [UUID]
     let cancelRequirementNotifications: (UUID) -> Void
-    
+
     init(
         repository: PlacementRepository,
         loadRequirementIDs: @escaping (UUID) throws -> [UUID] = { _ in [] },
