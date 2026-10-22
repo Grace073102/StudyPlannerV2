@@ -53,7 +53,7 @@
 		1D5EE28D307E69D00007DC0D /* StudyPlannerV2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StudyPlannerV2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D5EE297307E69D00007DC0D /* StudyPlannerV2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StudyPlannerV2UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D6A896E3087526800C2475A /* CampusFlowShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CampusFlowShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		D8619A6530862BFF009BE1CC /* StudyPlannerV2.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = file; path = StudyPlannerV2.xctestplan; sourceTree = "<group>"; };
+		D8619A6530862BFF009BE1CC /* StudyPlannerV2.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = StudyPlannerV2.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
