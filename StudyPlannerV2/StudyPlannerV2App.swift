@@ -110,12 +110,7 @@ struct StudyPlannerApp: App {
             let managePlacements = ManagePlacementsUseCase(
                 repository: placementRepository,
                 loadRequirementIDs: { placementID in
-                    let requirements = requirementRepository.load()
-
-                    // load() returns cached data on failure, so check its error.
-                    guard requirementRepository.errorMessage == nil else {
-                        throw PlacementRepositoryError.loadFailed
-                    }
+                    let requirements = try requirementRepository.load()
 
                     return requirements
                         .filter { $0.placementID == placementID }

@@ -7,6 +7,13 @@
 
 import Foundation
 
+/// Adds a new requirement to a placement.
+/// The ViewModel calls this use case to validate and save requirement details.
+///
+/// Business rules:
+/// 1. A requirement must have a name (blank/space is rejected).
+/// 2. A due date cannot be in the past.
+/// 3. The requirement is saved through the repository.
 struct AddRequirementUseCase {
 
     let repository: RequirementRepository
@@ -30,7 +37,8 @@ struct AddRequirementUseCase {
         name: String,
         category: PlacementRequirement.Category,
         dueDate: Date?,
-        expiryDate: Date?
+        expiryDate: Date?,
+        today: Date = Date()
     ) throws -> PlacementRequirement {
 
         let cleanedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -40,12 +48,12 @@ struct AddRequirementUseCase {
         }
 
         let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
+        let currentDay = calendar.startOfDay(for: today)
 
         if let dueDate {
             let selectedDueDate = calendar.startOfDay(for: dueDate)
 
-            guard selectedDueDate >= today else {
+            guard selectedDueDate >= currentDay else {
                 throw AddRequirementError.invalidDueDate
             }
         }
@@ -59,7 +67,7 @@ struct AddRequirementUseCase {
             isCompleted: false
         )
 
-        repository.add(requirement)
+        try repository.add(requirement)
 
         return requirement
     }
