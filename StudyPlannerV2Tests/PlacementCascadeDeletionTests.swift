@@ -96,7 +96,6 @@ struct PlacementCascadeDeletionTests {
     private func makePlacement(name: String) -> Placement {
         Placement(
             name: name,
-            discipline: "Education",
             startDate: .now,
             endDate: .now
         )
