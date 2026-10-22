@@ -51,4 +51,16 @@ final class SubjectViewModel: ObservableObject {
             errorMessage = error.localizedDescription
         }
     }
+    
+    func addSubjectIfNeeded(name: String) {
+        let cleanedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        for subject in subjects {
+            if subject.name.lowercased() == cleanedName.lowercased() {
+                return
+            }
+        }
+        
+        addSubject(name: cleanedName, code: "")
+    }
 }

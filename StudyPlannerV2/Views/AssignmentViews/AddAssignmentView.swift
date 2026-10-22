@@ -240,6 +240,7 @@ struct AddAssignmentView: View {
                 description: description
             )
 
+            subjectViewModel.addSubjectIfNeeded(name: course)
             dismiss()
         } catch {
             errorMessage = error.localizedDescription

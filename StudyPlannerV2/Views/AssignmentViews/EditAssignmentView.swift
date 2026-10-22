@@ -211,6 +211,7 @@ struct EditAssignmentView: View {
                 return
             }
 
+            subjectViewModel.addSubjectIfNeeded(name: course)
             dismiss()
         } catch {
             showErrorMessage(error.localizedDescription)
