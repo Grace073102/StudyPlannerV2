@@ -53,7 +53,7 @@ struct EditAssignmentView: View {
 
                     VStack(alignment: .leading, spacing: 7) {
                         HStack {
-                            Text("Course")
+                            Text("Subject")
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
 
@@ -74,7 +74,7 @@ struct EditAssignmentView: View {
                             }
                         }
 
-                        TextField("Course", text: $course)
+                        TextField("Subject", text: $course)
                             .textInputAutocapitalization(.words)
                             .padding(.horizontal, 14)
                             .frame(height: 48)

@@ -49,7 +49,7 @@ struct AddAssignmentView: View {
 
                     VStack(alignment: .leading, spacing: 7) {
                         HStack {
-                            Text("Course")
+                            Text("Subject")
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
 
