@@ -52,8 +52,8 @@
 		1D5EE27B307E69CE0007DC0D /* StudyPlannerV2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StudyPlannerV2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D5EE28D307E69D00007DC0D /* StudyPlannerV2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StudyPlannerV2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D5EE297307E69D00007DC0D /* StudyPlannerV2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StudyPlannerV2UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D8619A6530862BFF009BE1CC /* StudyPlannerV2.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = file; path = StudyPlannerV2.xctestplan; sourceTree = "<group>"; };
 		1D6A896E3087526800C2475A /* CampusFlowShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CampusFlowShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		D8619A6530862BFF009BE1CC /* StudyPlannerV2.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = StudyPlannerV2.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -635,11 +635,15 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.grace.StudyPlannerV2UITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				TEST_TARGET_NAME = StudyPlannerV2;
 			};
 			name = Debug;
@@ -654,11 +658,15 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.grace.StudyPlannerV2UITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				TEST_TARGET_NAME = StudyPlannerV2;
 			};
 			name = Release;

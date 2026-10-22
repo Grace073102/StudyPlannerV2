@@ -31,7 +31,9 @@ struct StudyPlannerApp: App {
             case .success(let repositories):
                 RootView(
                     repository: repositories.assignments,
-                    requirementRepository: repositories.requirements
+                    requirementRepository: repositories.requirements,
+                    placementRepository: repositories.placements,
+                    savedInternshipRepository: repositories.savedInternships
                 )
                 
             case .failure:

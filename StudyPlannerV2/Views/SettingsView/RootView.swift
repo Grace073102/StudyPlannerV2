@@ -14,10 +14,14 @@ struct RootView: View {
     @StateObject private var taskViewModel: TaskViewModel
     
     @StateObject private var requirementViewModel: RequirementViewModel
+    @StateObject private var placementViewModel: PlacementViewModel
+    @StateObject private var savedInternshipViewModel: SavedInternshipViewModel
 
     init(
         repository: AssignmentRepository,
-        requirementRepository: RequirementRepository
+        requirementRepository: RequirementRepository,
+        placementRepository: PlacementRepository,
+        savedInternshipRepository: SavedInternshipRepository
     ) {
         let assignmentViewModel = AssignmentViewModel(
             repository: repository
@@ -38,6 +42,16 @@ struct RootView: View {
                 repository: requirementRepository
             )
         )
+        
+        _placementViewModel = StateObject(
+            wrappedValue: PlacementViewModel(
+                repository: placementRepository)
+        )
+        
+        _savedInternshipViewModel = StateObject(
+            wrappedValue: SavedInternshipViewModel(
+                repository: savedInternshipRepository)
+        )
     }
 
     var body: some View {
@@ -51,17 +65,17 @@ struct RootView: View {
                 }
             }
 
-            Tab("Placements", systemImage: "briefcase") {
-                PlaceholderView(title: "Placements", systemImage: "briefcase")
+            
+            Tab("Career", systemImage: "briefcase") {
+                CareerView(placementViewModel: placementViewModel, savedInternshipViewModel: savedInternshipViewModel)
             }
 
-            Tab("Settings", systemImage: "gearshape") {
-                PlaceholderView(title: "Settings", systemImage: "gearshape")
-            }
         }
         .environmentObject(assignmentViewModel)
         .environmentObject(taskViewModel)
         .environmentObject(requirementViewModel)
+        .environmentObject(placementViewModel)
+        .environmentObject(savedInternshipViewModel)
         .alert(
             "Something Went Wrong",
             isPresented: Binding(
@@ -80,7 +94,9 @@ struct RootView: View {
     let schema = Schema([
         StoredAssignment.self,
         StoredAcademicTask.self,
-        StoredPlacementRequirement.self
+        StoredPlacementRequirement.self,
+        StoredPlacement.self,
+        StoredSavedInternship.self
     ])
 
     let configuration = ModelConfiguration(
@@ -99,6 +115,11 @@ struct RootView: View {
         ),
         requirementRepository: SwiftDataRequirementRepository(
             container: container
+        ),
+        placementRepository: SwiftDataPlacementRepository(
+            container: container
+        ),
+        savedInternshipRepository: SwiftDataSavedInternshipRepository(container: container
         )
     )
 }
