@@ -32,7 +32,8 @@ struct StudyPlannerApp: App {
                 RootView(
                     repository: repositories.assignments,
                     requirementRepository: repositories.requirements,
-                    placementRepository: repositories.placements,
+                    managePlacements: repositories.managePlacements,
+                    subjectRepository: repositories.subjects,
                     savedInternshipRepository: repositories.savedInternships
                 )
                 

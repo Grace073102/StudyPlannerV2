@@ -20,7 +20,8 @@ struct RootView: View {
     init(
         repository: AssignmentRepository,
         requirementRepository: RequirementRepository,
-        placementRepository: PlacementRepository,
+        managePlacements: ManagePlacementsUseCase,
+        subjectRepository: SubjectRepository,
         savedInternshipRepository: SavedInternshipRepository
     ) {
         let assignmentViewModel = AssignmentViewModel(
@@ -45,7 +46,7 @@ struct RootView: View {
         
         _placementViewModel = StateObject(
             wrappedValue: PlacementViewModel(
-                repository: placementRepository)
+                useCase: managePlacements, subjectRepository: subjectRepository)
         )
         
         _savedInternshipViewModel = StateObject(
@@ -96,6 +97,7 @@ struct RootView: View {
         StoredAcademicTask.self,
         StoredPlacementRequirement.self,
         StoredPlacement.self,
+        StoredSubject.self,
         StoredSavedInternship.self
     ])
 
@@ -116,10 +118,10 @@ struct RootView: View {
         requirementRepository: SwiftDataRequirementRepository(
             container: container
         ),
-        placementRepository: SwiftDataPlacementRepository(
-            container: container
+        managePlacements: ManagePlacementsUseCase(
+            repository: SwiftDataPlacementRepository(container: container)
         ),
-        savedInternshipRepository: SwiftDataSavedInternshipRepository(container: container
-        )
+        subjectRepository: SwiftDataSubjectRepository(container: container),
+        savedInternshipRepository: SwiftDataSavedInternshipRepository(container: container)
     )
 }
