@@ -16,7 +16,8 @@ struct RootView: View {
     @StateObject private var requirementViewModel: RequirementViewModel
     @StateObject private var placementViewModel: PlacementViewModel
     @StateObject private var savedInternshipViewModel: SavedInternshipViewModel
-
+    @StateObject private var subjectViewModel: SubjectViewModel
+    
     init(
         repository: AssignmentRepository,
         requirementRepository: RequirementRepository,
@@ -53,6 +54,10 @@ struct RootView: View {
             wrappedValue: SavedInternshipViewModel(
                 repository: savedInternshipRepository)
         )
+        
+        _subjectViewModel = StateObject(
+            wrappedValue: SubjectViewModel(repository: subjectRepository)
+        )
     }
 
     var body: some View {
@@ -77,6 +82,7 @@ struct RootView: View {
         .environmentObject(requirementViewModel)
         .environmentObject(placementViewModel)
         .environmentObject(savedInternshipViewModel)
+        .environmentObject(subjectViewModel)
         .alert(
             "Something Went Wrong",
             isPresented: Binding(

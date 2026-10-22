@@ -10,6 +10,7 @@ import SwiftUI
 struct AddAssignmentView: View {
 
     @EnvironmentObject var assignmentViewModel: AssignmentViewModel
+    @EnvironmentObject var subjectViewModel: SubjectViewModel
     @Environment(\.dismiss) private var dismiss
 
     @State private var title = ""
@@ -47,9 +48,27 @@ struct AddAssignmentView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 7) {
-                        Text("Course")
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
+                        HStack {
+                            Text("Subject")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+
+                            Spacer()
+
+                            // Only show the menu once the student has added subjects
+                            if !subjectViewModel.subjects.isEmpty {
+                                Menu {
+                                    ForEach(subjectViewModel.subjects) { subject in
+                                        Button(subject.name) {
+                                            course = subject.name
+                                        }
+                                    }
+                                } label: {
+                                    Label("Choose Subject", systemImage: "books.vertical")
+                                        .font(.subheadline)
+                                }
+                            }
+                        }
 
                         TextField(
                             "e.g. Database Systems",
@@ -221,6 +240,7 @@ struct AddAssignmentView: View {
                 description: description
             )
 
+            subjectViewModel.addSubjectIfNeeded(name: course)
             dismiss()
         } catch {
             errorMessage = error.localizedDescription
