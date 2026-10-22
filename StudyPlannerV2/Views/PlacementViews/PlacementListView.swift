@@ -9,16 +9,17 @@ import SwiftUI
 
 /// Displays the student's placements and their current statuses.
 struct PlacementListView: View {
-
+    
     @ObservedObject var viewModel: PlacementViewModel
-
+    @EnvironmentObject var requirementViewModel: RequirementViewModel
+    
     /// The placement the student chose to delete, waiting for confirmation.
     @State private var placementToDelete: Placement?
-
+    
     /// Whether the add/edit form is showing, and which placement it edits (nil = add).
     @State private var showForm = false
     @State private var formPlacement: Placement?
-
+    
     var body: some View {
         NavigationStack {
             Group {
@@ -32,9 +33,8 @@ struct PlacementListView: View {
                     ScrollView {
                         LazyVStack(spacing: 12) {
                             ForEach(viewModel.placements) { summary in
-                                Button {
-                                    formPlacement = summary.placement
-                                    showForm = true
+                                NavigationLink {
+                                    requirementsScreen(for: summary)
                                 } label: {
                                     card(for: summary)
                                 }
@@ -95,28 +95,28 @@ struct PlacementListView: View {
             }
         }
     }
-
+    
     // MARK: - Card
-
+    
     private func card(for summary: ManagePlacementsUseCase.PlacementSummary) -> some View {
         let placement = summary.placement
-
+        
         return HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 6) {
                 Text(placement.name)
                     .font(.headline)
-
+                
                 Text(placement.discipline)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-
+                
                 Text("\(placement.startDate, format: .dateTime.day().month().year()) – \(placement.endDate, format: .dateTime.day().month().year())")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-
+            
             Spacer()
-
+            
             Label(summary.status.displayName, systemImage: summary.status.icon)
                 .font(.caption2)
                 .fontWeight(.semibold)
@@ -139,6 +139,26 @@ struct PlacementListView: View {
                 placementToDelete = placement
             } label: {
                 Label("Delete", systemImage: "trash")
+            }
+        }
+    }
+    
+    // MARK: - Requirements
+    
+    private func requirementsScreen(for summary: ManagePlacementsUseCase.PlacementSummary) -> some View {
+        RequirementListView(
+            viewModel: requirementViewModel,
+            placementID: summary.placement.id
+        )
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    formPlacement = summary.placement
+                    showForm = true
+                } label: {
+                    Image(systemName: "pencil")
+                }
+                .accessibilityLabel("Edit Placement")
             }
         }
     }
