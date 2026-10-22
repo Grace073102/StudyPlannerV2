@@ -214,6 +214,26 @@ struct RequirementDetailView: View {
         } message: {
             Text(deleteErrorMessage)
         }
+        .alert(
+            "Reminder Error",
+            isPresented: Binding(
+                get: {
+                    !showingEditRequirement &&
+                    viewModel.notificationErrorMessage != nil
+                },
+                set: { isPresented in
+                    if !isPresented {
+                        viewModel.clearNotificationError()
+                    }
+                }
+            )
+        ) {
+            Button("OK", role: .cancel) {
+                viewModel.clearNotificationError()
+            }
+        } message: {
+            Text(viewModel.notificationErrorMessage ?? "")
+        }
     }
 }
 

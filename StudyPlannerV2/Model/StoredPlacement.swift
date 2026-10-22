@@ -17,11 +17,13 @@ typealias Placement = StoredPlacement
 final class StoredPlacement {
     @Attribute(.unique) var id: UUID
     var name: String
-    var discipline: String
     var startDate: Date
     var endDate: Date
     var placementDescription: String?
     var subjectID: UUID?
+
+    @Relationship(deleteRule: .cascade, inverse: \StoredPlacementRequirement.placement)
+    var requirements: [StoredPlacementRequirement] = []
 
     var description: String? {
         get { placementDescription }
@@ -35,7 +37,6 @@ final class StoredPlacement {
     init(
         id: UUID = UUID(),
         name: String,
-        discipline: String,
         startDate: Date,
         endDate: Date,
         description: String = "",
@@ -43,7 +44,6 @@ final class StoredPlacement {
     ) {
         self.id = id
         self.name = name
-        self.discipline = discipline
         self.startDate = startDate
         self.endDate = endDate
         placementDescription = description
@@ -60,7 +60,6 @@ final class StoredPlacement {
     init(placement: Placement) {
         id = placement.id
         name = placement.name
-        discipline = placement.discipline
         startDate = placement.startDate
         endDate = placement.endDate
         placementDescription = placement.description
@@ -71,7 +70,6 @@ final class StoredPlacement {
         let placement = Placement(
             id: id,
             name: name,
-            discipline: discipline,
             startDate: startDate,
             endDate: endDate,
             subjectID: subjectID

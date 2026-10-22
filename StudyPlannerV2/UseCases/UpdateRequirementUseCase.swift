@@ -7,6 +7,13 @@
 
 import Foundation
 
+/// Updates an existing placement requirement.
+/// The ViewModel calls this use case to validate and save changes.
+///
+/// Business rules:
+/// 1. A requirement must have a name (blank/space is rejected).
+/// 2. An unchanged overdue due date is allowed when editing.
+/// 3. Only an existing requirement can be updated.
 struct UpdateRequirementUseCase {
 
     let repository: RequirementRepository
@@ -16,7 +23,8 @@ struct UpdateRequirementUseCase {
         name: String,
         category: PlacementRequirement.Category,
         dueDate: Date?,
-        expiryDate: Date?
+        expiryDate: Date?,
+        today: Date = Date()
     ) throws {
 
         // Validate requirement name
@@ -28,22 +36,29 @@ struct UpdateRequirementUseCase {
             throw RequirementValidationError.emptyName
         }
 
-        // Validate due date
-        if let dueDate {
-            let calendar = Calendar.current
-            let today = calendar.startOfDay(for: Date())
-            let selectedDueDate = calendar.startOfDay(for: dueDate)
-
-            guard selectedDueDate >= today else {
-                throw RequirementValidationError.invalidDueDate
-            }
-        }
-
         // Find existing requirement
-        guard let existingRequirement = repository.load().first(
+        guard let existingRequirement = try repository.load().first(
             where: { $0.id == id }
         ) else {
             throw RequirementValidationError.notFound
+        }
+
+        // Validate due date only when the calendar day changes
+        if let dueDate {
+            let calendar = Calendar.current
+
+            let isSameDay = existingRequirement.dueDate.map {
+                calendar.isDate($0, inSameDayAs: dueDate)
+            } ?? false
+
+            if !isSameDay {
+                let currentDay = calendar.startOfDay(for: today)
+                let selectedDueDate = calendar.startOfDay(for: dueDate)
+
+                guard selectedDueDate >= currentDay else {
+                    throw RequirementValidationError.invalidDueDate
+                }
+            }
         }
 
         // Update existing requirement
@@ -54,6 +69,6 @@ struct UpdateRequirementUseCase {
         updatedRequirement.dueDate = dueDate
         updatedRequirement.expiryDate = expiryDate
 
-        repository.update(updatedRequirement)
+        try repository.update(updatedRequirement)
     }
 }

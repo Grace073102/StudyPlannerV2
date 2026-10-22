@@ -310,23 +310,37 @@ struct RequirementListView: View {
             )
         }
         .alert(
-            "Requirement Storage Error",
+            viewModel.repositoryErrorMessage != nil
+                ? "Requirement Storage Error"
+                : "Reminder Error",
             isPresented: Binding(
-                get: { viewModel.repositoryErrorMessage != nil },
+                get: {
+                    viewModel.repositoryErrorMessage != nil ||
+                    viewModel.notificationErrorMessage != nil
+                },
                 set: { isPresented in
                     if !isPresented {
-                        viewModel.clearRepositoryError()
+                        if viewModel.repositoryErrorMessage != nil {
+                            viewModel.clearRepositoryError()
+                        } else {
+                            viewModel.clearNotificationError()
+                        }
                     }
                 }
             )
         ) {
             Button("OK") {
-                viewModel.clearRepositoryError()
+                if viewModel.repositoryErrorMessage != nil {
+                    viewModel.clearRepositoryError()
+                } else {
+                    viewModel.clearNotificationError()
+                }
             }
         } message: {
             Text(
                 viewModel.repositoryErrorMessage
-                    ?? "Your requirements could not be saved or loaded."
+                    ?? viewModel.notificationErrorMessage
+                    ?? "An unexpected error occurred."
             )
         }
     }
@@ -366,7 +380,8 @@ struct RequirementListView: View {
     ]
 
     let schema = Schema([
-        StoredPlacementRequirement.self
+        StoredPlacementRequirement.self,
+        StoredPlacement.self
     ])
 
     let configuration = ModelConfiguration(
@@ -379,12 +394,24 @@ struct RequirementListView: View {
         configurations: [configuration]
     )
 
+    let placementRepository = SwiftDataPlacementRepository(container: container)
+    try! placementRepository.add(Placement(
+        id: placementID,
+        name: "Education Placement",
+        startDate: Date(),
+        endDate: Date().addingTimeInterval(86400 * 30)
+    ))
+
     let repository = SwiftDataRequirementRepository(
         container: container
     )
 
     for requirement in sampleRequirements {
-        repository.add(requirement)
+        do {
+            try repository.add(requirement)
+        } catch {
+            print("Failed to add preview requirement: \(error.localizedDescription)")
+        }
     }
 
     let viewModel = RequirementViewModel(repository: repository)

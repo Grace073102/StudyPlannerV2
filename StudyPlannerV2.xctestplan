@@ -1,0 +1,30 @@
+{
+  "configurations" : [
+    {
+      "id" : "F032E2BF-60B5-42D2-B6E7-74B76C6144A9",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false,
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:StudyPlannerV2.xcodeproj",
+      "identifier" : "1D5EE27A307E69CE0007DC0D",
+      "name" : "StudyPlannerV2"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:StudyPlannerV2.xcodeproj",
+        "identifier" : "1D5EE28C307E69D00007DC0D",
+        "name" : "StudyPlannerV2Tests"
+      }
+    }
+  ],
+  "version" : 1
+}

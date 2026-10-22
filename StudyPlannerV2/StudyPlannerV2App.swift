@@ -14,6 +14,7 @@ struct AppRepositories {
     let subjects: SwiftDataSubjectRepository
     let placements: SwiftDataPlacementRepository
     let savedInternships: SwiftDataSavedInternshipRepository
+    let managePlacements: ManagePlacementsUseCase
 }
 
 @main
@@ -30,7 +31,9 @@ struct StudyPlannerApp: App {
             case .success(let repositories):
                 RootView(
                     repository: repositories.assignments,
-                    requirementRepository: repositories.requirements
+                    requirementRepository: repositories.requirements,
+                    placementRepository: repositories.placements,
+                    savedInternshipRepository: repositories.savedInternships
                 )
                 
             case .failure:
@@ -95,7 +98,28 @@ struct StudyPlannerApp: App {
             )
 
             let placementRepository = SwiftDataPlacementRepository(
-                container: container
+                container: container,
+                onRequirementsChanged: {
+                    requirementRepository.reloadAfterPlacementDeletion()
+                }
+            )
+            try placementRepository.linkExistingRequirements()
+            requirementRepository.reloadAfterPlacementDeletion()
+
+            let managePlacements = ManagePlacementsUseCase(
+                repository: placementRepository,
+                loadRequirementIDs: { placementID in
+                    let requirements = try requirementRepository.load()
+
+                    return requirements
+                        .filter { $0.placementID == placementID }
+                        .map(\.id)
+                },
+                cancelRequirementNotifications: { requirementID in
+                    RequirementNotificationManager.shared.cancelNotifications(
+                        for: requirementID
+                    )
+                }
             )
 
             let savedInternshipRepository = SwiftDataSavedInternshipRepository(
@@ -108,7 +132,9 @@ struct StudyPlannerApp: App {
                     requirements: requirementRepository,
                     subjects: subjectRepository,
                     placements: placementRepository,
-                    savedInternships: savedInternshipRepository
+                    savedInternships: savedInternshipRepository,
+                    managePlacements: managePlacements
+
                 )
             )
         } catch {
