@@ -17,10 +17,10 @@ struct PlacementFormView: View {
     var placement: Placement?
 
     @State private var name: String
-    @State private var discipline: String
     @State private var startDate: Date
     @State private var endDate: Date
     @State private var placementDescription: String
+    @State private var selectedSubjectID: UUID?
 
     /// Creates a form for adding or editing a placement.
     init(viewModel: PlacementViewModel, placement: Placement? = nil) {
@@ -28,10 +28,10 @@ struct PlacementFormView: View {
         self.placement = placement
 
         _name = State(initialValue: placement?.name ?? "")
-        _discipline = State(initialValue: placement?.discipline ?? "")
         _startDate = State(initialValue: placement?.startDate ?? Date())
         _endDate = State(initialValue: placement?.endDate ?? Date())
         _placementDescription = State(initialValue: placement?.description ?? "")
+        _selectedSubjectID = State(initialValue: placement?.subjectID)
     }
 
     var body: some View {
@@ -41,8 +41,20 @@ struct PlacementFormView: View {
                     TextField("e.g. Teaching Professional Experience", text: $name)
                 }
 
-                Section("Discipline") {
-                    TextField("e.g. Education", text: $discipline)
+                Section("Linked Subject (Optional)") {
+                    Picker("Subject", selection: $selectedSubjectID) {
+                        Text("None")
+                            .tag(nil as UUID?)
+                        ForEach(viewModel.subjects, id: \.id) {subject in
+                            Text(subject.name)
+                                .tag(Optional(subject.id))
+                        }
+                    }
+                    if viewModel.subjects.isEmpty {
+                        Text("No subject available. Add a subject in the Assignments tab first.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
 
                 Section("Description (Optional)") {
@@ -89,6 +101,7 @@ struct PlacementFormView: View {
             }
             .onAppear {
                 viewModel.clearError()
+                viewModel.loadSubjects()
             }
             .alert(
                 "Placement Error",
@@ -109,15 +122,15 @@ struct PlacementFormView: View {
     /// Saves a new placement or updates an existing one.
     private func savePlacement() {
         if let placement {
-            // Keep the existing subject, so editing never removes it.
+            // Save the subject selected by the student
             let updatedPlacement = Placement(
                 id: placement.id,
                 name: name,
-                discipline: discipline,
                 startDate: startDate,
                 endDate: endDate,
                 description: placementDescription,
-                subjectID: placement.subjectID
+                subjectID: selectedSubjectID
+                
             )
 
             if viewModel.updatePlacement(updatedPlacement) {
@@ -126,10 +139,10 @@ struct PlacementFormView: View {
         } else {
             let newPlacement = Placement(
                 name: name,
-                discipline: discipline,
                 startDate: startDate,
                 endDate: endDate,
-                description: placementDescription
+                description: placementDescription,
+                subjectID: selectedSubjectID
             )
 
             if viewModel.addPlacement(newPlacement) {

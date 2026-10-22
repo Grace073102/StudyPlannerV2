@@ -78,7 +78,6 @@ final class MockPlacementRepository: PlacementRepository {
         return Placement(
             id: placement.id,
             name: placement.name,
-            discipline: placement.discipline,
             startDate: placement.startDate,
             endDate: placement.endDate,
             description: placement.description ?? "",
