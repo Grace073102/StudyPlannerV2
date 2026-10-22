@@ -398,7 +398,6 @@ struct RequirementListView: View {
     try! placementRepository.add(Placement(
         id: placementID,
         name: "Education Placement",
-        discipline: "Education",
         startDate: Date(),
         endDate: Date().addingTimeInterval(86400 * 30)
     ))
