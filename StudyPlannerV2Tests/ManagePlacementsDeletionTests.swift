@@ -99,7 +99,6 @@ struct ManagePlacementsDeletionTests {
     private func makePlacement() -> Placement {
         Placement(
             name: "Hospital placement",
-            discipline: "Nursing",
             startDate: .now,
             endDate: .now
         )
