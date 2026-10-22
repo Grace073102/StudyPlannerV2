@@ -65,21 +65,17 @@ struct RootView: View {
                 }
             }
 
-            Tab("Placements", systemImage: "briefcase") {
-                PlacementListView(viewModel: placementViewModel)
-            }
             
-            Tab("Placements", systemImage: "briefcase") {
-                PlacementListView(viewModel: placementViewModel)
+            Tab("Career", systemImage: "briefcase") {
+                CareerView(placementViewModel: placementViewModel, savedInternshipViewModel: savedInternshipViewModel)
             }
 
-            Tab("Settings", systemImage: "gearshape") {
-                PlaceholderView(title: "Settings", systemImage: "gearshape")
-            }
         }
         .environmentObject(assignmentViewModel)
         .environmentObject(taskViewModel)
         .environmentObject(requirementViewModel)
+        .environmentObject(placementViewModel)
+        .environmentObject(savedInternshipViewModel)
         .alert(
             "Something Went Wrong",
             isPresented: Binding(
