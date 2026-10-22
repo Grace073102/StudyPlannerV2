@@ -17,17 +17,21 @@ final class SubjectViewModel: ObservableObject {
     // Message for the last action that failed, shown in an alert.
     @Published var errorMessage: String?
 
-    private let repository: SubjectRepository
     private let manageSubjects: ManageSubjectsUseCase
+    private let fetchSubjects: FetchSubjectsUseCase
 
     init(repository: SubjectRepository) {
-        self.repository = repository
         self.manageSubjects = ManageSubjectsUseCase(repository: repository)
+        self.fetchSubjects = FetchSubjectsUseCase(repository: repository)
         loadSubjects()
     }
 
     func loadSubjects() {
-        subjects = repository.load()
+        do {
+            subjects = try fetchSubjects.execute()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 
     // Returns true if the subject was added, so the view knows whether to close the form.
