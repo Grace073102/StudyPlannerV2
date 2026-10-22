@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "2620"
+   LastUpgradeVersion = "2610"
    wasCreatedForAppExtension = "YES"
    version = "2.0">
    <BuildAction
@@ -60,7 +60,7 @@
       <RemoteRunnable
          runnableDebuggingMode = "1"
          BundleIdentifier = "com.grace.StudyPlannerV2"
-         RemotePath = "/Users/djy/Library/Developer/CoreSimulator/Devices/045A9D62-4241-42FA-80F4-8FA433F66A7F/data/Containers/Bundle/Application/E2A5613C-66E3-4BA6-9FFF-3DE2903BAFC9/StudyPlannerV2.app">
+         RemotePath = "/Users/gracechong/Library/Developer/CoreSimulator/Devices/FA0FBC6B-BBAB-4363-9943-9C4761882204/data/Containers/Bundle/Application/2B5A2B25-F114-401E-86DF-8FC5B0583404/StudyPlannerV2.app">
       </RemoteRunnable>
       <MacroExpansion>
          <BuildableReference
