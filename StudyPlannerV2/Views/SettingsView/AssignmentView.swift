@@ -242,7 +242,6 @@ struct AssignmentView: View {
         // Sample placement requirements
     let placement = Placement(
         name: "Clinical Placement",
-        discipline: "Nursing",
         startDate: days(14),
         endDate: days(70)
     )

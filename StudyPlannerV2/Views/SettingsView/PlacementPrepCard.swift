@@ -25,7 +25,7 @@ struct PlacementPrepCard: View {
                         .font(.subheadline)
                         .fontWeight(.semibold)
                     
-                    Text("\(summary.placement.discipline) - \(dateText)")
+                    Text(dateText)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -85,7 +85,6 @@ struct PlacementPrepCard: View {
             summary: ManagePlacementsUseCase.PlacementSummary(
                 placement: Placement(
                     name: "Clinical Placement",
-                    discipline: "Nursing",
                     startDate: Calendar.current.date(byAdding: .day, value: 14, to: .now)!,
                     endDate: Calendar.current.date(byAdding: .day, value: 70, to: .now)!
                 ),
@@ -100,7 +99,6 @@ struct PlacementPrepCard: View {
             summary: ManagePlacementsUseCase.PlacementSummary(
                 placement: Placement(
                     name: "Teaching Prac 1",
-                    discipline: "Education",
                     startDate: Calendar.current.date(byAdding: .day, value: -3, to: .now)!,
                     endDate: Calendar.current.date(byAdding: .day, value: 20, to: .now)!
                 ),
