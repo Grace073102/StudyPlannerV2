@@ -10,6 +10,7 @@ import SwiftUI
 struct EditAssignmentView: View {
 
     @EnvironmentObject var assignmentViewModel: AssignmentViewModel
+    @EnvironmentObject var subjectViewModel: SubjectViewModel
     @Environment(\.dismiss) private var dismiss
 
     let assignment: Assignment
@@ -51,9 +52,27 @@ struct EditAssignmentView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 7) {
-                        Text("Course")
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
+                        HStack {
+                            Text("Course")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+
+                            Spacer()
+
+                            // Only show the menu once the student has added subjects
+                            if !subjectViewModel.subjects.isEmpty {
+                                Menu {
+                                    ForEach(subjectViewModel.subjects) { subject in
+                                        Button(subject.name) {
+                                            course = subject.name
+                                        }
+                                    }
+                                } label: {
+                                    Label("Choose Subject", systemImage: "books.vertical")
+                                        .font(.subheadline)
+                                }
+                            }
+                        }
 
                         TextField("Course", text: $course)
                             .textInputAutocapitalization(.words)
