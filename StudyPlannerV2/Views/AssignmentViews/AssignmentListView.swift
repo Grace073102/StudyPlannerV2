@@ -142,6 +142,16 @@ struct AssignmentListView: View {
         .background(
             Color(.systemGroupedBackground)
         )
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink {
+                    SubjectListView()
+                } label: {
+                    Image(systemName: "books.vertical")
+                }
+                .accessibilityLabel("Subjects")
+            }
+        }
     }
 
     private var sortedAssignments: [Assignment] {

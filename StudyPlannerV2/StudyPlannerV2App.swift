@@ -22,6 +22,7 @@ struct StudyPlannerApp: App {
     @State private var startup: Result<AppRepositories, Error>
     
     init() {
+        _ = RequirementNotificationManager.shared
         _startup = State(initialValue: Self.prepareStorage())
     }
 

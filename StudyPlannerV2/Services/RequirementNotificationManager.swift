@@ -8,13 +8,14 @@
 import Foundation
 import UserNotifications
 
-final class RequirementNotificationManager {
+final class RequirementNotificationManager: NSObject, UNUserNotificationCenterDelegate {
 
     static let shared = RequirementNotificationManager()
     private var cancelledRequirementIDs: Set<UUID> = []
 
-    private init() {
-        
+    private override init() {
+        super.init()
+        UNUserNotificationCenter.current().delegate = self
     }
 
     // Request notification permission
@@ -127,8 +128,8 @@ final class RequirementNotificationManager {
         content.body = body
         content.sound = .default
 
-        let trigger = UNCalendarNotificationTrigger(
-            dateMatching: components,
+        let trigger = UNTimeIntervalNotificationTrigger(
+            timeInterval: 2,
             repeats: false
         )
 
@@ -156,5 +157,13 @@ final class RequirementNotificationManager {
                     "\(id.uuidString)-expiry"
                 ]
             )
+    }
+    
+    // Show notification banner while the app is in the foreground
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification
+    ) async -> UNNotificationPresentationOptions {
+        return [.banner, .sound, .badge]
     }
 }

@@ -10,6 +10,7 @@ import SwiftUI
 struct EditAssignmentView: View {
 
     @EnvironmentObject var assignmentViewModel: AssignmentViewModel
+    @EnvironmentObject var subjectViewModel: SubjectViewModel
     @Environment(\.dismiss) private var dismiss
 
     let assignment: Assignment
@@ -51,11 +52,29 @@ struct EditAssignmentView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 7) {
-                        Text("Course")
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
+                        HStack {
+                            Text("Subject")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
 
-                        TextField("Course", text: $course)
+                            Spacer()
+
+                            // Only show the menu once the student has added subjects
+                            if !subjectViewModel.subjects.isEmpty {
+                                Menu {
+                                    ForEach(subjectViewModel.subjects) { subject in
+                                        Button(subject.name) {
+                                            course = subject.name
+                                        }
+                                    }
+                                } label: {
+                                    Label("Choose Subject", systemImage: "books.vertical")
+                                        .font(.subheadline)
+                                }
+                            }
+                        }
+
+                        TextField("Subject", text: $course)
                             .textInputAutocapitalization(.words)
                             .padding(.horizontal, 14)
                             .frame(height: 48)
@@ -192,6 +211,7 @@ struct EditAssignmentView: View {
                 return
             }
 
+            subjectViewModel.addSubjectIfNeeded(name: course)
             dismiss()
         } catch {
             showErrorMessage(error.localizedDescription)
