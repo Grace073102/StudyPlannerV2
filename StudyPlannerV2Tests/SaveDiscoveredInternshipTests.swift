@@ -114,4 +114,64 @@ struct SaveDiscoveredInternshipTests {
             from: Data(json.utf8)
         )
     }
+    
+    @Test
+    func missingCompanyDoesNotSaveInternship() throws {
+        let container = try makeContainer()
+        let repository = SwiftDataSavedInternshipRepository(
+            container: container
+        )
+        let useCase = SaveDiscoveredInternshipUseCase(
+            savedInternships: ManageSavedInternshipsUseCase(
+                repository: repository
+            )
+        )
+
+        let json = """
+        {
+            "id": "missing-company",
+            "title": "Software Intern",
+            "company": null
+        }
+        """
+
+        let listing = try JSONDecoder().decode(
+            DiscoveredInternship.self,
+            from: Data(json.utf8)
+        )
+
+        #expect(
+            throws: ManageSavedInternshipsUseCase
+                .SavedInternshipError.missingCompany
+        ) {
+            try useCase.save(listing)
+        }
+
+        let reader = SwiftDataSavedInternshipRepository(
+            container: container
+        )
+        let saved = try reader.load()
+        #expect(saved.isEmpty)
+    }
+    
+    @Test
+    func repositoryFailureDoesNotSaveInternship() throws {
+        let repository = MockSavedInternshipRepository()
+        repository.shouldFailOnSave = true
+
+        let useCase = SaveDiscoveredInternshipUseCase(
+            savedInternships: ManageSavedInternshipsUseCase(
+                repository: repository
+            )
+        )
+        let listing = try makeListing()
+
+        #expect(
+            throws: SavedInternshipRepositoryError.saveFailed
+        ) {
+            try useCase.save(listing)
+        }
+
+        #expect(repository.internships.isEmpty)
+    }
 }
