@@ -25,7 +25,7 @@ struct AssignmentDetailView: View {
                 AssignmentProgressView(assignment: currentAssignment)
 
                 SubtaskListView(assignment: currentAssignment)
-                
+
                 AssignmentPDFSection(assignmentID: currentAssignment.id)
 
                 if let description = currentAssignment.description,

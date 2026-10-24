@@ -1,3 +1,4 @@
+
 //
 //  DeleteRequirementUseCase.swift
 //  StudyPlannerV2
@@ -7,6 +8,12 @@
 
 import Foundation
 
+/// Deletes an existing placement requirement.
+/// The ViewModel calls this use case when a requirement is deleted.
+///
+/// Business rules:
+/// 1. Only an existing requirement can be deleted.
+/// 2. The deletion is saved through the repository.
 struct DeleteRequirementUseCase {
 
     let repository: RequirementRepository
@@ -14,14 +21,13 @@ struct DeleteRequirementUseCase {
     func execute(id: UUID) throws {
 
         // Find the requirement
-        guard let requirement = repository.load().first(
+        guard let requirement = try repository.load().first(
             where: { $0.id == id }
         ) else {
             throw RequirementValidationError.notFound
         }
 
         // Delete the requirement
-        repository.delete(requirement)
+        try repository.delete(requirement)
     }
 }
-

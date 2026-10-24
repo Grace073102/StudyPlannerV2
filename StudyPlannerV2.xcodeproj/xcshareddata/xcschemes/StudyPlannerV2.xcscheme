@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
+<<<<<<< HEAD
    LastUpgradeVersion = "2660"
+=======
+   LastUpgradeVersion = "2620"
+>>>>>>> 65f786f934519ad402eb8a411ca9971e7739e488
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -34,6 +38,7 @@
             default = "YES">
          </TestPlanReference>
       </TestPlans>
+<<<<<<< HEAD
       <Testables>
          <TestableReference
             skipped = "NO"
@@ -58,6 +63,8 @@
             </BuildableReference>
          </TestableReference>
       </Testables>
+=======
+>>>>>>> 65f786f934519ad402eb8a411ca9971e7739e488
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -68,8 +75,12 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
+<<<<<<< HEAD
       allowLocationSimulation = "YES"
       queueDebuggingEnableBacktraceRecording = "Yes">
+=======
+      allowLocationSimulation = "YES">
+>>>>>>> 65f786f934519ad402eb8a411ca9971e7739e488
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
          <BuildableReference

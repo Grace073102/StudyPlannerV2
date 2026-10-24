@@ -22,6 +22,7 @@ struct StudyPlannerApp: App {
     @State private var startup: Result<AppRepositories, Error>
     
     init() {
+        _ = RequirementNotificationManager.shared
         _startup = State(initialValue: Self.prepareStorage())
     }
 
@@ -32,7 +33,8 @@ struct StudyPlannerApp: App {
                 RootView(
                     repository: repositories.assignments,
                     requirementRepository: repositories.requirements,
-                    placementRepository: repositories.placements,
+                    managePlacements: repositories.managePlacements,
+                    subjectRepository: repositories.subjects,
                     savedInternshipRepository: repositories.savedInternships
                 )
                 
@@ -109,12 +111,7 @@ struct StudyPlannerApp: App {
             let managePlacements = ManagePlacementsUseCase(
                 repository: placementRepository,
                 loadRequirementIDs: { placementID in
-                    let requirements = requirementRepository.load()
-
-                    // load() returns cached data on failure, so check its error.
-                    guard requirementRepository.errorMessage == nil else {
-                        throw PlacementRepositoryError.loadFailed
-                    }
+                    let requirements = try requirementRepository.load()
 
                     return requirements
                         .filter { $0.placementID == placementID }

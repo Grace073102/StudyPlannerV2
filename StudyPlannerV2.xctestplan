@@ -1,7 +1,7 @@
 {
   "configurations" : [
     {
-      "id" : "013A21E0-9FC9-4659-AFF4-0B0C3CDE374F",
+      "id" : "F032E2BF-60B5-42D2-B6E7-74B76C6144A9",
       "name" : "Test Scheme Action",
       "options" : {
 
@@ -9,6 +9,7 @@
     }
   ],
   "defaultOptions" : {
+    "codeCoverage" : false,
     "performanceAntipatternCheckerEnabled" : true,
     "targetForVariableExpansion" : {
       "containerPath" : "container:StudyPlannerV2.xcodeproj",

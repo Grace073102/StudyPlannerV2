@@ -8,13 +8,14 @@
 import Foundation
 import UserNotifications
 
-final class RequirementNotificationManager {
+final class RequirementNotificationManager: NSObject, UNUserNotificationCenterDelegate {
 
     static let shared = RequirementNotificationManager()
     private var cancelledRequirementIDs: Set<UUID> = []
 
-    private init() {
-        
+    private override init() {
+        super.init()
+        UNUserNotificationCenter.current().delegate = self
     }
 
     // Request notification permission
@@ -68,11 +69,13 @@ final class RequirementNotificationManager {
 
         guard targetDay >= today else { return }
 
-        let reminderDay = calendar.date(
+        guard let reminderDay = calendar.date(
             byAdding: .day,
             value: -7,
             to: targetDay
-        )!
+        ) else {
+            return
+        }
 
         
         let notificationDay = max(reminderDay, today)
@@ -98,12 +101,16 @@ final class RequirementNotificationManager {
                 return
             }
 
-            notificationDate = calendar.date(
+            guard let nextNotificationDate = calendar.date(
                 bySettingHour: 9,
                 minute: 0,
                 second: 0,
                 of: tomorrow
-            )!
+            ) else {
+                return
+            }
+
+            notificationDate = nextNotificationDate
         }
 
         guard calendar.startOfDay(for: notificationDate) <= targetDay else {
@@ -121,8 +128,8 @@ final class RequirementNotificationManager {
         content.body = body
         content.sound = .default
 
-        let trigger = UNCalendarNotificationTrigger(
-            dateMatching: components,
+        let trigger = UNTimeIntervalNotificationTrigger(
+            timeInterval: 2,
             repeats: false
         )
 
@@ -150,5 +157,13 @@ final class RequirementNotificationManager {
                     "\(id.uuidString)-expiry"
                 ]
             )
+    }
+    
+    // Show notification banner while the app is in the foreground
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification
+    ) async -> UNNotificationPresentationOptions {
+        return [.banner, .sound, .badge]
     }
 }

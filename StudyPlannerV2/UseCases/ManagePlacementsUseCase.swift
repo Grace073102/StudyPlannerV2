@@ -11,9 +11,9 @@ import Foundation
 /// The ViewModel calls this type and never touches the repository directly.
 ///
 /// Business rules
-/// 1. A placement must have a name and a discipline (blank or spaces only is rejected).
+/// 1. A placement must have a name (blank or spaces only is rejected).
 /// 2. The end date cannot be before the start date; a same-day placement is allowed.
-/// 3. Names and disciplines are trimmed before they are saved.
+/// 3. The placement name is trimmed before it is saved.
 /// 4. A placement may optionally be linked to a subject; without one it is saved as is.
 /// 5. Only an existing placement can be updated or deleted.
 /// 6. A placement's status (upcoming, in progress, completed) is derived from its dates.
@@ -24,14 +24,12 @@ struct ManagePlacementsUseCase {
 
     enum PlacementError: LocalizedError, Equatable {
         case emptyName
-        case emptyDiscipline
         case invalidDates
         case placementNotFound
 
         var errorDescription: String? {
             switch self {
             case .emptyName:         "Enter a placement name."
-            case .emptyDiscipline:   "Enter a discipline."
             case .invalidDates:      "The end date cannot be before the start date."
             case .placementNotFound: "This placement could not be found."
             }
@@ -48,7 +46,7 @@ struct ManagePlacementsUseCase {
     let repository: PlacementRepository
     let loadRequirementIDs: (UUID) throws -> [UUID]
     let cancelRequirementNotifications: (UUID) -> Void
-    
+
     init(
         repository: PlacementRepository,
         loadRequirementIDs: @escaping (UUID) throws -> [UUID] = { _ in [] },
@@ -72,8 +70,7 @@ struct ManagePlacementsUseCase {
     }
 
     /// Creates a placement after validating and trimming it.
-    /// - Throws: `PlacementError.emptyName`, `.emptyDiscipline`, `.invalidDates`,
-    ///   or `PlacementRepositoryError.saveFailed`.
+    /// - Throws: `PlacementError.emptyName`,`.invalidDates`or `PlacementRepositoryError.saveFailed`.
     func add(_ placement: Placement) throws {
         try repository.add(try validated(placement))
     }
@@ -111,15 +108,14 @@ struct ManagePlacementsUseCase {
 
     // MARK: - Rules
 
-    /// Checks the rules and returns a trimmed copy. Placement is a class, so a new object is built instead of changing the one passed in.
+    /// Checks the rules and returns a trimmed copy.
+    /// Placement is a class, so a new object is built instead of changing the one passed in.
     private func validated(_ placement: Placement) throws -> Placement {
         // Trim text
         let name = placement.name.trimmingCharacters(in: .whitespacesAndNewlines)
-        let discipline = placement.discipline.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // Rule 1: name and discipline can’t be blank
+        // Rule 1: placement name can’t be blank
         guard !name.isEmpty else { throw PlacementError.emptyName }
-        guard !discipline.isEmpty else { throw PlacementError.emptyDiscipline }
         
         // Rule 2: the end date can’t be before the start date
         guard Calendar.current.startOfDay(for: placement.endDate)
@@ -130,7 +126,6 @@ struct ManagePlacementsUseCase {
         return Placement(
             id: placement.id,
             name: name,
-            discipline: discipline,
             startDate: placement.startDate,
             endDate: placement.endDate,
             description: placement.description ?? "",

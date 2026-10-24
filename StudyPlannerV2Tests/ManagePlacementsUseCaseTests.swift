@@ -5,8 +5,6 @@
 //  Created by emily zhang on 18/10/2026.
 //
 
-
-
 import Foundation
 import Testing
 @testable import StudyPlannerV2
@@ -35,14 +33,12 @@ struct ManagePlacementsUseCaseTests {
     /// Creates a valid placement for testing.
     private func makePlacement(
         name: String = "Teaching Placement",
-        discipline: String = "Education",
         start: Date? = nil,
         end: Date? = nil,
         subjectID: UUID? = nil
     ) -> Placement {
         Placement(
             name: name,
-            discipline: discipline,
             startDate: start ?? date(2026, 11, 2),
             endDate: end ?? date(2026, 11, 27),
             subjectID: subjectID
@@ -63,25 +59,35 @@ struct ManagePlacementsUseCaseTests {
 
     }
     
-    /// A student enters extra spaces around the placement name and discipline, and the spaces are removed when saving.
+    /// A student links a university subject to a placement, and the subject ID is saved.
+    @Test func add_withLinkedSubject_savesSubjectID() throws {
+        let repository = MockPlacementRepository()
+        let useCase = ManagePlacementsUseCase(repository: repository)
+        let subjectID = UUID()
+        
+        // Execute and expect the placement to be saved.
+        try useCase.add(makePlacement(subjectID: subjectID))
+        
+        // Retrieve the saved placement and verify its subject ID
+        let saved = try #require(repository.placements.first)
+        #expect(saved.subjectID == subjectID)
+    }
+    
+    /// A student enters extra spaces around the placement name and the spaces are removed when saving.
     @Test func add_withExtraSpaces_trimsText() throws {
         let repository = MockPlacementRepository()
         let useCase = ManagePlacementsUseCase(repository: repository)
         
         // Execute and expect whitespace to be trimmed
         try useCase.add(
-            makePlacement(
-                name: "  Teaching Placement  ",
-                discipline: "  Education  "
-            )
+            makePlacement(name: "  Teaching Placement  ")
         )
         
         // Retrieve and expect the placement to be saved
         let saved = try #require(repository.placements.first)
         
-        // Expect the name and discipline to be trimmed
+        // Expect the name to be trimmed
         #expect(saved.name == "Teaching Placement")
-        #expect(saved.discipline == "Education")
     }
     
     /// A student enters only spaces for the placement name, so the placement is not saved.
@@ -94,22 +100,6 @@ struct ManagePlacementsUseCaseTests {
             throws: ManagePlacementsUseCase.PlacementError.emptyName
         ) {
             try useCase.add(makePlacement(name: "   "))
-        }
-        
-        // Expect no placements to be saved
-        #expect(repository.placements.isEmpty)
-    }
-    
-    /// A student leaves the discipline empty, so the placement is not saved.
-    @Test func add_withEmptyDiscipline_throwsError() {
-        let repository = MockPlacementRepository()
-        let useCase = ManagePlacementsUseCase(repository: repository)
-        
-        // Expect an emptyDiscipline error while executing
-        #expect(
-            throws: ManagePlacementsUseCase.PlacementError.emptyDiscipline
-        ) {
-            try useCase.add(makePlacement(discipline: ""))
         }
         
         // Expect no placements to be saved
@@ -169,7 +159,6 @@ struct ManagePlacementsUseCaseTests {
         let updated = Placement(
             id: existing.id,
             name: "Updated Teaching Placement",
-            discipline: existing.discipline,
             startDate: existing.startDate,
             endDate: existing.endDate,
             subjectID: existing.subjectID
@@ -200,7 +189,6 @@ struct ManagePlacementsUseCaseTests {
         let invalid = Placement(
             id: existing.id,
             name: "Changed",
-            discipline: existing.discipline,
             startDate: date(2026, 11, 10),
             endDate: date(2026, 11, 1),
             subjectID: existing.subjectID

@@ -20,6 +20,20 @@ struct PlacementListView: View {
     @State private var showForm = false
     @State private var formPlacement: Placement?
     
+    private var showDeleteDialog: Binding<Bool> {
+        Binding(
+            get: { placementToDelete != nil },
+            set: { if !$0 { placementToDelete = nil } }
+        )
+    }
+    
+    private var showErrorAlert: Binding<Bool> {
+        Binding(
+            get: { viewModel.errorMessage != nil && !showForm },
+            set: { if !$0 { viewModel.clearError() } }
+        )
+    }
+    
     var body: some View {
         NavigationStack {
             Group {
@@ -60,16 +74,14 @@ struct PlacementListView: View {
             }
             .onAppear {
                 viewModel.loadPlacements()
+                viewModel.loadSubjects()
             }
             .sheet(isPresented: $showForm) {
                 PlacementFormView(viewModel: viewModel, placement: formPlacement)
             }
             .confirmationDialog(
                 "Delete Placement?",
-                isPresented: Binding(
-                    get: { placementToDelete != nil },
-                    set: { if !$0 { placementToDelete = nil } }
-                ),
+                isPresented: showDeleteDialog,
                 titleVisibility: .visible,
                 presenting: placementToDelete
             ) { placement in
@@ -81,11 +93,7 @@ struct PlacementListView: View {
             }
             .alert(
                 "Placement Error",
-                isPresented: Binding(
-                    // Not while the form is open, because the form shows its own alert.
-                    get: { viewModel.errorMessage != nil && !showForm },
-                    set: { if !$0 { viewModel.clearError() } }
-                )
+                isPresented: showErrorAlert
             ) {
                 Button("OK") {
                     viewModel.clearError()
@@ -106,13 +114,22 @@ struct PlacementListView: View {
                 Text(placement.name)
                     .font(.headline)
                 
-                Text(placement.discipline)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                if let subjectID = placement.subjectID,
+                   let subject = viewModel.subjects.first(where: { $0.id == subjectID}) {
+                    Label(subject.name, systemImage: "book.closed")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
                 
-                Text("\(placement.startDate, format: .dateTime.day().month().year()) – \(placement.endDate, format: .dateTime.day().month().year())")
+                Text(dateRangeText(for: placement))
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                
+                if let description = placement.description, !description.isEmpty {
+                    Text(description)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
             
             Spacer()
@@ -142,6 +159,13 @@ struct PlacementListView: View {
             }
         }
     }
+    
+    // MARK: Helper for the date range text
+        private func dateRangeText(for placement: Placement) -> String {
+            let start = placement.startDate.formatted(.dateTime.day().month().year())
+            let end = placement.endDate.formatted(.dateTime.day().month().year())
+            return "\(start) – \(end)"
+        }
     
     // MARK: - Requirements
     

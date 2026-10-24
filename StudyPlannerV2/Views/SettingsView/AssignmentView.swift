@@ -242,14 +242,13 @@ struct AssignmentView: View {
         // Sample placement requirements
     let placement = Placement(
         name: "Clinical Placement",
-        discipline: "Nursing",
         startDate: days(14),
         endDate: days(70)
     )
     
     let _ = try? placementRepository.add(placement)
 
-        let _ = requirementRepository.add(
+        let _ = try? requirementRepository.add(
             PlacementRequirement(
                 placementID: placement.id,
                 name: "Police Check",
@@ -258,7 +257,7 @@ struct AssignmentView: View {
             )
         )
 
-        let _ = requirementRepository.add(
+        let _ = try? requirementRepository.add(
             PlacementRequirement(
                 placementID: placement.id,
                 name: "Induction form",
