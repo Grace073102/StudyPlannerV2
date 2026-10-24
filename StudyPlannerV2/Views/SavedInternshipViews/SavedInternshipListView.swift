@@ -17,58 +17,56 @@ struct SavedInternshipListView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
-                if viewModel.internships.isEmpty {
-                    ContentUnavailableView(
-                        "No Saved Internships",
-                        systemImage: "bookmark",
-                        description: Text("Internships you save will appear here.")
-                    )
-                } else {
-                    ScrollView {
-                        LazyVStack(spacing: 12) {
+            VStack(spacing: 0) {
+                HStack {
+                    Text("Saved Internships")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .accessibilityAddTraits(.isHeader)
+                    Spacer()
+                }
+                .padding(.horizontal, Theme.padding)
+                .padding(.vertical, 8)
+                
+                // Internship List
+                Group {
+                    if viewModel.internships.isEmpty {
+                        ContentUnavailableView(
+                            "No Saved Internships",
+                            systemImage: "bookmark",
+                            description: Text("Internships you save will appear here.")
+                        )
+                    } else {
+                        List {
                             ForEach(viewModel.internships, id: \.id) { internship in
-                                NavigationLink {
-                                    SavedInternshipDetailView(
-                                        viewModel: viewModel,
-                                        internship: internship
-                                    )
-                                } label: {
-                                    internshipCard(for: internship)
-                                }
-                                .buttonStyle(.plain)
-                                .contextMenu {
-                                    Button(role: .destructive) {
-                                        internshipToDelete = internship
-                                    } label: {
-                                        Label("Delete", systemImage: "trash")
-                                    }
-                                }
+                                internshipRow(for: internship)
                             }
                         }
-                        .padding(Theme.padding)
+                        .listStyle(.plain)
+                        .scrollContentBackground(.hidden)
                     }
                 }
             }
-            .background(Theme.background.ignoresSafeArea())
-            .navigationTitle("Saved Internships")
-            .onAppear {
-                viewModel.loadInternships()
-            }
-            .confirmationDialog(
+            .alert(
                 "Delete Saved Internship?",
                 isPresented: Binding(
                     get: { internshipToDelete != nil },
                     set: { if !$0 { internshipToDelete = nil } }
                 ),
-                titleVisibility: .visible,
                 presenting: internshipToDelete
             ) { internship in
                 Button("Delete", role: .destructive) {
                     viewModel.deleteInternship(id: internship.id)
                 }
+                Button("Cancel", role: .cancel) { }
             } message: { internship in
                 Text("Are you sure you want to delete \(internship.title)?")
+            }
+            .background(Theme.background.ignoresSafeArea())
+            .navigationTitle("Saved Internships")
+            .toolbar(.hidden, for: .navigationBar)
+            .onAppear {
+                viewModel.loadInternships()
             }
             .alert(
                 "Internship Error",
@@ -85,7 +83,36 @@ struct SavedInternshipListView: View {
             }
         }
     }
-
+    
+    // MARK: - Internship Row
+    
+    /// Displays a saved internship row with navigation and delete actions.
+    private func internshipRow(for internship: SavedInternship) -> some View {
+        NavigationLink {
+            SavedInternshipDetailView(
+                viewModel: viewModel,
+                internship: internship
+            )
+        } label: {
+            internshipCard(for: internship)
+        }
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
+        .listRowInsets(EdgeInsets(
+            top: 6,
+            leading: Theme.padding,
+            bottom: 6,
+            trailing: Theme.padding
+        ))
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            Button(role: .destructive) {
+                internshipToDelete = internship
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        }
+    }
+    
     // MARK: - Card
 
     /// Displays a summary of a saved internship.

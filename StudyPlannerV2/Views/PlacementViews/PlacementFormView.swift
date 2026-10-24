@@ -79,6 +79,18 @@ struct PlacementFormView: View {
                         displayedComponents: .date
                     )
                 }
+                Section {
+                    Button {
+                        savePlacement()
+                    } label: {
+                        Text(placement == nil ? "Add Placement" : "Save Changes")
+                            .fontWeight(.semibold)
+                            .foregroundStyle(Theme.onAccent)
+                            .frame(maxWidth: .infinity)
+                            .frame(minHeight: 50)
+                    }
+                    .listRowBackground(Color.accentColor)
+                }
             }
             .scrollDismissesKeyboard(.interactively)
             .scrollContentBackground(.hidden)
@@ -92,16 +104,16 @@ struct PlacementFormView: View {
                         dismiss()
                     }
                 }
-
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        savePlacement()
-                    }
-                }
             }
             .onAppear {
                 viewModel.clearError()
                 viewModel.loadSubjects()
+
+                // If the linked subject was deleted, go back to "None".
+                if let id = selectedSubjectID,
+                   !viewModel.subjects.contains(where: { $0.id == id }) {
+                    selectedSubjectID = nil
+                }
             }
             .alert(
                 "Placement Error",

@@ -50,17 +50,17 @@ final class PlacementViewModel: ObservableObject {
     }
     
     /// Loads the subjects for the form's picker.
-        func loadSubjects() {
-            guard let fetchSubjects else {
-                subjects = []
-                return
-            }
-            do { subjects = try fetchSubjects.execute()
-            errorMessage = nil
-            } catch {
-                errorMessage = error.localizedDescription
-            }
+    func loadSubjects() {
+        guard let fetchSubjects else {
+            subjects = []
+            return
         }
+        do {
+            subjects = try fetchSubjects.execute()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
     
     /// Adds a placement and refreshes the list. Returns true if it was saved.
     @discardableResult

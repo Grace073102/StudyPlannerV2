@@ -36,60 +36,87 @@ struct PlacementListView: View {
     
     var body: some View {
         NavigationStack {
-            Group {
-                if viewModel.placements.isEmpty {
-                    ContentUnavailableView(
-                        "No Placements",
-                        systemImage: "calendar.badge.plus",
-                        description: Text("Add a placement to keep track of your schedule.")
-                    )
-                } else {
-                    ScrollView {
-                        LazyVStack(spacing: 12) {
+            VStack(spacing: 0) {
+                HStack {
+                    Text("My Placements")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .accessibilityAddTraits(.isHeader)
+                    Spacer()
+                    Button {
+                        formPlacement = nil
+                        showForm = true
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.title3.weight(.semibold))
+                            .foregroundStyle(Theme.onAccent)
+                            .frame(width: 44, height: 44)
+                            .background(Color.accentColor, in: Circle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Add Placement")
+                }
+                .padding(.horizontal, Theme.padding)
+                .padding(.vertical, 8)
+                // Placement List
+                Group {
+                    if viewModel.placements.isEmpty {
+                        ContentUnavailableView(
+                            "No Placements",
+                            systemImage: "calendar.badge.plus",
+                            description: Text("Add a placement to keep track of your schedule.")
+                        )
+                    } else {
+                        List {
                             ForEach(viewModel.placements) { summary in
                                 NavigationLink {
                                     requirementsScreen(for: summary)
                                 } label: {
                                     card(for: summary)
                                 }
-                                .buttonStyle(.plain)
+                                .listRowBackground(Color.clear)
+                                .listRowSeparator(.hidden)
+                                .listRowInsets(EdgeInsets(
+                                    top: 6,
+                                    leading: Theme.padding,
+                                    bottom: 6,
+                                    trailing: Theme.padding
+                                ))
+                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                    Button(role: .destructive) {
+                                        placementToDelete = summary.placement
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
+                                }
                             }
                         }
-                        .padding(Theme.padding)
+                        .listStyle(.plain)
+                        .scrollContentBackground(.hidden)
                     }
                 }
+            }
+            .alert(
+                "Delete Placement?",
+                isPresented: showDeleteDialog,
+                presenting: placementToDelete
+            ) { placement in
+                Button("Delete", role: .destructive) {
+                    viewModel.deletePlacement(id: placement.id)
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: { placement in
+                Text("Are you sure you want to delete \(placement.name)? Its requirements will also be deleted.")
             }
             .background(Theme.background.ignoresSafeArea())
             .navigationTitle("My Placements")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        formPlacement = nil
-                        showForm = true
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                    .accessibilityLabel("Add Placement")
-                }
-            }
+            .toolbar(.hidden, for: .navigationBar)
             .onAppear {
                 viewModel.loadPlacements()
                 viewModel.loadSubjects()
             }
             .sheet(isPresented: $showForm) {
                 PlacementFormView(viewModel: viewModel, placement: formPlacement)
-            }
-            .confirmationDialog(
-                "Delete Placement?",
-                isPresented: showDeleteDialog,
-                titleVisibility: .visible,
-                presenting: placementToDelete
-            ) { placement in
-                Button("Delete", role: .destructive) {
-                    viewModel.deletePlacement(id: placement.id)
-                }
-            } message: { placement in
-                Text("Are you sure you want to delete \(placement.name)?")
             }
             .alert(
                 "Placement Error",
@@ -116,9 +143,14 @@ struct PlacementListView: View {
                 
                 if let subjectID = placement.subjectID,
                    let subject = viewModel.subjects.first(where: { $0.id == subjectID}) {
-                    Label(subject.name, systemImage: "book.closed")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    Label {
+                        Text(subject.name)
+                            .foregroundStyle(.secondary)
+                    } icon: {
+                        Image(systemName: "book.closed")
+                            .foregroundStyle(Color.accentColor)
+                    }
+                    .font(.caption)
                 }
                 
                 Text(dateRangeText(for: placement))
