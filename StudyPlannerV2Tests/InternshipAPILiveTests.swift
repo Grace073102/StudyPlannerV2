@@ -12,7 +12,7 @@ import Testing
 @MainActor
 struct InternshipAPILiveTests {
 
-    @Test
+    @Test(.disabled("Manual API check; uses a personal key and request allowance"))
     func fetchAustralianInternships() async throws {
         let repository = try RemoteInternshipRepository(
             apiKey: Env.cleanJobDataAPIKey()
