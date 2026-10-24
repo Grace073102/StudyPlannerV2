@@ -21,6 +21,9 @@ struct SavedInternshipDetailView: View {
     /// Whether the deletion confirmation is showing.
     @State private var showDeleteConfirmation = false
 
+    /// An error from this screen, shown inside the form instead of an alert.
+    @State private var errorText: String?
+
     init(viewModel: SavedInternshipViewModel, internship: SavedInternship) {
         self.viewModel = viewModel
         self.internship = internship
@@ -51,9 +54,18 @@ struct SavedInternshipDetailView: View {
                     }
                 }
 
-                Button("Update Status") {
+                Button {
                     updateStatus()
+                } label: {
+                    Text("Update Status")
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Theme.onAccent)
+                        .frame(maxWidth: .infinity)
+                        .frame(minHeight: 44)
                 }
+                .listRowBackground(
+                    Color.accentColor.opacity(selectedStatus == internship.applicationStatus ? 0.5 : 1)
+                )
                 .disabled(selectedStatus == internship.applicationStatus)
             }
 
@@ -72,6 +84,14 @@ struct SavedInternshipDetailView: View {
                 }
             }
 
+            // Errors from this screen are shown here, not in an alert, so the list screen's alert does not show them a second time.
+            if let errorText {
+                Section {
+                    Label(errorText, systemImage: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.red)
+                }
+            }
+
             Section {
                 Button("Delete Saved Internship", role: .destructive) {
                     showDeleteConfirmation = true
@@ -85,45 +105,44 @@ struct SavedInternshipDetailView: View {
         .onAppear {
             viewModel.clearError()
         }
-        .confirmationDialog(
+        .alert(
             "Delete Saved Internship?",
-            isPresented: $showDeleteConfirmation,
-            titleVisibility: .visible
+            isPresented: $showDeleteConfirmation
         ) {
             Button("Delete", role: .destructive) {
                 deleteInternship()
             }
+            Button("Cancel", role: .cancel) { }
         } message: {
             Text("Are you sure you want to delete \(internship.title)?")
         }
-        .alert(
-            "Internship Error",
-            isPresented: Binding(
-                get: { viewModel.errorMessage != nil },
-                set: { if !$0 { viewModel.clearError() } }
-            )
-        ) {
-            Button("OK") {
-                viewModel.clearError()
-            }
-        } message: {
-            Text(viewModel.errorMessage ?? "")
-        }
     }
-
+    
     // MARK: - Actions
 
     /// Updates the internship's application status.
     private func updateStatus() {
+        errorText = nil
         if viewModel.updateApplicationStatus(id: internship.id, to: selectedStatus) {
             dismiss()
+        } else {
+            showError()
         }
     }
 
     /// Deletes the saved internship.
     private func deleteInternship() {
+        errorText = nil
         if viewModel.deleteInternship(id: internship.id) {
             dismiss()
+        } else {
+            showError()
         }
+    }
+
+    /// Takes the error from the ViewModel, so only this screen shows it.
+    private func showError() {
+        errorText = viewModel.errorMessage
+        viewModel.clearError()
     }
 }
