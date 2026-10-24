@@ -17,7 +17,7 @@ protocol InternshipDiscoveryRepository {
     ) async throws -> InternshipPage
 }
 
-enum InternshipDiscoveryError: LocalizedError {
+enum InternshipDiscoveryError: LocalizedError, Equatable {
     case invalidEndpoint
     case invalidResponse
     case serviceUnavailable(Int)
@@ -160,9 +160,13 @@ final class RemoteInternshipRepository:
             )
         }
 
-        return try JSONDecoder().decode(
-            InternshipPage.self,
-            from: data
-        )
+        do {
+            return try JSONDecoder().decode(
+                InternshipPage.self,
+                from: data
+            )
+        } catch {
+            throw InternshipDiscoveryError.invalidData
+        }
     }
 }
