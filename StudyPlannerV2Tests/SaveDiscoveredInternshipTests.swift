@@ -116,7 +116,7 @@ struct SaveDiscoveredInternshipTests {
     }
     
     @Test
-    func missingCompanyDoesNotSaveInternship() throws {
+    func missingCompanySavesWithFallback() throws {
         let container = try makeContainer()
         let repository = SwiftDataSavedInternshipRepository(
             container: container
@@ -140,18 +140,15 @@ struct SaveDiscoveredInternshipTests {
             from: Data(json.utf8)
         )
 
-        #expect(
-            throws: ManageSavedInternshipsUseCase
-                .SavedInternshipError.missingCompany
-        ) {
-            try useCase.save(listing)
-        }
+        try useCase.save(listing)
 
         let reader = SwiftDataSavedInternshipRepository(
             container: container
         )
         let saved = try reader.load()
-        #expect(saved.isEmpty)
+
+        #expect(saved.count == 1)
+        #expect(saved.first?.company == "Company not provided")
     }
     
     @Test

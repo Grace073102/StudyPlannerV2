@@ -33,7 +33,14 @@ struct DiscoveredInternship: Decodable, Identifiable {
     }
 
     var companyDisplayName: String {
-        company?.name ?? "Company not provided"
+        guard let name = company?.name?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+            !name.isEmpty
+        else {
+            return "Company not provided"
+        }
+
+        return name
     }
 
     /// Identifies this provider's listings separately from manual entries.

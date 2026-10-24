@@ -15,7 +15,7 @@ struct SaveDiscoveredInternshipUseCase {
         let internship = SavedInternship(
             jobID: listing.savedJobID,
             title: listing.title,
-            company: listing.company?.name ?? "",
+            company: listing.companyDisplayName,
             location: listing.location,
             applicationURL: listing.applicationURL,
             applicationDeadline: nil,
