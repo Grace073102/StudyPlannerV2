@@ -17,6 +17,7 @@ struct DiscoveredInternship: Decodable, Identifiable {
     let published: String?
     let salaryText: String?
     let remoteType: String?
+    let employmentType: String?
 
     struct Company: Decodable {
         let name: String?
@@ -28,6 +29,7 @@ struct DiscoveredInternship: Decodable, Identifiable {
         case descriptionHTML = "description"
         case salaryText = "salary_text"
         case remoteType = "remote_type"
+        case employmentType = "employment_type"
     }
 
     var companyDisplayName: String {

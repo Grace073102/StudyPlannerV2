@@ -19,15 +19,19 @@ struct InternshipAPILiveTests {
         )
 
         let page = try await repository.search(
-            InternshipSearch()
+            InternshipSearch(title: "intern")
         )
 
         print("Internships received: \(page.data.count)")
         print("Another page available: \(page.pagination.nextPage != nil)")
+       
 
-        for internship in page.data.prefix(3) {
+        for internship in page.data.prefix(5) {
             print(
-                "\(internship.title) — \(internship.companyDisplayName)"
+                "\(internship.title)"
+                + " — \(internship.companyDisplayName)"
+                + " — location: \(internship.location ?? "not provided")"
+                + " — type: \(internship.employmentType ?? "not provided")"
             )
         }
 
