@@ -5,3 +5,6 @@ xcuserdata/
 xcschemes/xcschememanagement.plist
 
 **/.DS_Store
+
+# Local API credentials
+**/Development.xcconfig

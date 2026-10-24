@@ -19,10 +19,19 @@
   },
   "testTargets" : [
     {
+      "parallelizable" : false,
       "target" : {
         "containerPath" : "container:StudyPlannerV2.xcodeproj",
         "identifier" : "1D5EE28C307E69D00007DC0D",
         "name" : "StudyPlannerV2Tests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:StudyPlannerV2.xcodeproj",
+        "identifier" : "1D5EE296307E69D00007DC0D",
+        "name" : "StudyPlannerV2UITests"
       }
     }
   ],

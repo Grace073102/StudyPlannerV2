@@ -15,6 +15,25 @@ struct AppRepositories {
     let placements: SwiftDataPlacementRepository
     let savedInternships: SwiftDataSavedInternshipRepository
     let managePlacements: ManagePlacementsUseCase
+    
+    /// Reports API configuration errors without blocking local planner data.
+    var internshipDiscovery:
+        Result<RemoteInternshipRepository, Error> {
+        Result {
+            try RemoteInternshipRepository(
+                apiKey: Env.cleanJobDataAPIKey()
+            )
+        }
+    }
+
+    /// Uses the same saved-internship storage as the existing screen.
+    var saveDiscoveredInternship: SaveDiscoveredInternshipUseCase {
+        SaveDiscoveredInternshipUseCase(
+            savedInternships: ManageSavedInternshipsUseCase(
+                repository: savedInternships
+            )
+        )
+    }
 }
 
 @main
