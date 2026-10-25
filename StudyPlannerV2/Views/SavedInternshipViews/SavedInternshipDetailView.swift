@@ -32,7 +32,7 @@ struct SavedInternshipDetailView: View {
 
     var body: some View {
         Form {
-            Section("Your Saved Internship") {
+            Section("Internship Details") {
                 LabeledContent("Title", value: internship.title)
                 LabeledContent("Company", value: internship.company)
 
@@ -100,7 +100,7 @@ struct SavedInternshipDetailView: View {
         }
         .scrollContentBackground(.hidden)
         .background(Theme.background)
-        .navigationTitle("Internship Details")
+        .navigationTitle("Your Saved Internship")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             viewModel.clearError()
