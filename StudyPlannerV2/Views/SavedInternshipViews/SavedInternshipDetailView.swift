@@ -32,7 +32,7 @@ struct SavedInternshipDetailView: View {
 
     var body: some View {
         Form {
-            Section("Internship Details") {
+            Section("Your Saved Internship") {
                 LabeledContent("Title", value: internship.title)
                 LabeledContent("Company", value: internship.company)
 

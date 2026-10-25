@@ -48,7 +48,7 @@ struct InternshipDiscoveryView: View {
     /// Displays the search bar, remote filter, and title for the internship discovery screen.
     private var header: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Discover Internships")
+            Text("Discovery")
                 .font(.title2.bold())
                 .accessibilityAddTraits(.isHeader)
 
@@ -107,6 +107,7 @@ struct InternshipDiscoveryView: View {
                 description: Text(viewModel.searchErrorMessage ?? "Try another search or turn off the remote filter.")
             )
             Button("Try Again") { Task { await viewModel.search() } }
+                .font(.system(.body, weight: .semibold))
                 .buttonStyle(.borderedProminent)
             Spacer()
         } else {
@@ -131,6 +132,7 @@ struct InternshipDiscoveryView: View {
                                 ProgressView()
                             } else {
                                 Text("Load More Internships")
+                                    .font(.system(.body, weight: .semibold))
                             }
                         }
                         .buttonStyle(.bordered)
@@ -199,6 +201,7 @@ struct InternshipDiscoveryView: View {
                     .accessibilityLabel("View job posting for \(internship.title)")
                 }
             }
+            .font(.system(.body, weight: .semibold))
         }
         .padding(Theme.padding)
         .frame(maxWidth: .infinity, alignment: .leading)
