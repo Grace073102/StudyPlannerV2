@@ -17,13 +17,16 @@ struct RootView: View {
     @StateObject private var placementViewModel: PlacementViewModel
     @StateObject private var savedInternshipViewModel: SavedInternshipViewModel
     @StateObject private var subjectViewModel: SubjectViewModel
+    @StateObject private var discoveryViewModel: InternshipDiscoveryViewModel
     
     init(
         repository: AssignmentRepository,
         requirementRepository: RequirementRepository,
         managePlacements: ManagePlacementsUseCase,
         subjectRepository: SubjectRepository,
-        savedInternshipRepository: SavedInternshipRepository
+        savedInternshipRepository: SavedInternshipRepository,
+        discovery: Result<RemoteInternshipRepository, Error>,
+        saveDiscoveredInternship: SaveDiscoveredInternshipUseCase
     ) {
         let assignmentViewModel = AssignmentViewModel(
             repository: repository
@@ -58,6 +61,26 @@ struct RootView: View {
         _subjectViewModel = StateObject(
             wrappedValue: SubjectViewModel(repository: subjectRepository)
         )
+        
+        let discoveryRepository: (any InternshipDiscoveryRepository)?
+        var unavailableMessage = "Internship search isn't available right now."
+        
+        switch discovery {
+        case .success(let remote):
+            discoveryRepository = remote
+        case .failure(let error):
+            discoveryRepository = nil
+            #if DEBUG
+            unavailableMessage = error.localizedDescription
+            #endif
+            }
+        _discoveryViewModel = StateObject(
+            wrappedValue: InternshipDiscoveryViewModel(
+                repository: discoveryRepository,
+                saveUseCase: saveDiscoveredInternship,
+                unavailableMessage: unavailableMessage
+            )
+        )
     }
 
     var body: some View {
@@ -70,10 +93,13 @@ struct RootView: View {
                     AssignmentListView()
                 }
             }
-
-            
             Tab("Career", systemImage: "briefcase") {
-                CareerView(placementViewModel: placementViewModel, savedInternshipViewModel: savedInternshipViewModel)
+                CareerView(
+                    placementViewModel: placementViewModel,
+                    savedInternshipViewModel: savedInternshipViewModel)
+            }
+            Tab("Discovery", systemImage: "magnifyingglass") {
+                InternshipDiscoveryView( viewModel: discoveryViewModel)
             }
 
         }
@@ -97,37 +123,37 @@ struct RootView: View {
     }
 }
 
-#Preview {
-    let schema = Schema([
-        StoredAssignment.self,
-        StoredAcademicTask.self,
-        StoredPlacementRequirement.self,
-        StoredPlacement.self,
-        StoredSubject.self,
-        StoredSavedInternship.self
-    ])
-
-    let configuration = ModelConfiguration(
-        schema: schema,
-        isStoredInMemoryOnly: true
-    )
-
-    let container = try! ModelContainer(
-        for: schema,
-        configurations: [configuration]
-    )
-
-    RootView(
-        repository: SwiftDataAssignmentRepository(
-            container: container
-        ),
-        requirementRepository: SwiftDataRequirementRepository(
-            container: container
-        ),
-        managePlacements: ManagePlacementsUseCase(
-            repository: SwiftDataPlacementRepository(container: container)
-        ),
-        subjectRepository: SwiftDataSubjectRepository(container: container),
-        savedInternshipRepository: SwiftDataSavedInternshipRepository(container: container)
-    )
-}
+//#Preview {
+//    let schema = Schema([
+//        StoredAssignment.self,
+//        StoredAcademicTask.self,
+//        StoredPlacementRequirement.self,
+//        StoredPlacement.self,
+//        StoredSubject.self,
+//        StoredSavedInternship.self
+//    ])
+//
+//    let configuration = ModelConfiguration(
+//        schema: schema,
+//        isStoredInMemoryOnly: true
+//    )
+//
+//    let container = try! ModelContainer(
+//        for: schema,
+//        configurations: [configuration]
+//    )
+//
+//    RootView(
+//        repository: SwiftDataAssignmentRepository(
+//            container: container
+//        ),
+//        requirementRepository: SwiftDataRequirementRepository(
+//            container: container
+//        ),
+//        managePlacements: ManagePlacementsUseCase(
+//            repository: SwiftDataPlacementRepository(container: container)
+//        ),
+//        subjectRepository: SwiftDataSubjectRepository(container: container),
+//        savedInternshipRepository: SwiftDataSavedInternshipRepository(container: container)
+//    )
+//}

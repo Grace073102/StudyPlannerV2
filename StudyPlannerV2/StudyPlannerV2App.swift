@@ -54,7 +54,9 @@ struct StudyPlannerApp: App {
                     requirementRepository: repositories.requirements,
                     managePlacements: repositories.managePlacements,
                     subjectRepository: repositories.subjects,
-                    savedInternshipRepository: repositories.savedInternships
+                    savedInternshipRepository: repositories.savedInternships,
+                    discovery: repositories.internshipDiscovery,
+                    saveDiscoveredInternship: repositories.saveDiscoveredInternship
                 )
                 
             case .failure:

@@ -59,6 +59,6 @@ struct CareerView: View {
         configurations: [configuration]
     )
     
-    CareerView(placementViewModel: PlacementViewModel(repository: SwiftDataPlacementRepository(container: container)), savedInternshipViewModel: SavedInternshipViewModel(repository: SwiftDataSavedInternshipRepository(container: container)))
+    CareerView(placementViewModel: PlacementViewModel(repository: SwiftDataPlacementRepository(container: container)),savedInternshipViewModel: SavedInternshipViewModel(repository: SwiftDataSavedInternshipRepository(container: container)))
         .environmentObject(RequirementViewModel(repository: SwiftDataRequirementRepository(container: container)))
 }
