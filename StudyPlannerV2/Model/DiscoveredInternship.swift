@@ -21,6 +21,12 @@ struct DiscoveredInternship: Decodable, Identifiable {
 
     struct Company: Decodable {
         let name: String?
+        let websiteURLText: String?
+
+        enum CodingKeys: String, CodingKey {
+            case name
+            case websiteURLText = "website_url"
+        }
     }
 
     enum CodingKeys: String, CodingKey {
@@ -41,6 +47,26 @@ struct DiscoveredInternship: Decodable, Identifiable {
         }
 
         return name
+    }
+    
+    var companyWebsiteURL: URL? {
+        guard let value = company?.websiteURLText else {
+            return nil
+        }
+
+        let text = value.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
+
+        guard let url = URL(string: text),
+              let scheme = url.scheme?.lowercased(),
+              ["https", "http"].contains(scheme),
+              url.host != nil
+        else {
+            return nil
+        }
+
+        return url
     }
 
     /// Identifies this provider's listings separately from manual entries.

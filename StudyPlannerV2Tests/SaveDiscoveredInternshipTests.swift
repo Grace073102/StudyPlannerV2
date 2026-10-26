@@ -101,7 +101,8 @@ struct SaveDiscoveredInternshipTests {
             "id": "test-123",
             "title": "Software Engineering Intern",
             "company": {
-                "name": "Example Company"
+                "name": "Example Company",
+                "website_url": "https://example.com"
             },
             "location": "Sydney, Australia",
             "application_url": "https://example.com/jobs/test-123",
@@ -170,5 +171,15 @@ struct SaveDiscoveredInternshipTests {
         }
 
         #expect(repository.internships.isEmpty)
+    }
+    
+    @Test
+    func listingDecodesCompanyWebsite() throws {
+        let listing = try makeListing()
+
+        #expect(
+            listing.companyWebsiteURL?.absoluteString
+                == "https://example.com"
+        )
     }
 }
