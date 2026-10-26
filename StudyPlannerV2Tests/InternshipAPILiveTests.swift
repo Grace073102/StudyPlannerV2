@@ -12,8 +12,7 @@ import Testing
 @MainActor
 struct InternshipAPILiveTests {
 
-    @Test
-    //(.disabled("Manual API check; uses a personal key and request allowance"))
+    @Test(.disabled("Manual API check; uses a personal key and request allowance"))
     func fetchAustralianInternships() async throws {
         let repository = try RemoteInternshipRepository(
             apiKey: Env.cleanJobDataAPIKey()
@@ -28,15 +27,10 @@ struct InternshipAPILiveTests {
        
 
         for internship in page.data.prefix(5) {
-            print(
-                "\(internship.title)"
-                + " — \(internship.companyDisplayName)"
-                + " — location: \(internship.location ?? "not provided")"
-                + " — type: \(internship.employmentType ?? "not provided")"
-            )
-            print("Job ID: \(internship.id)")
-            print("API link: \(internship.applicationURLText ?? "missing")")
-            print("App link: \(internship.applicationURL?.absoluteString ?? "invalid")")
+            print("Company: \(internship.companyDisplayName)")
+            print("API website: \(internship.company?.websiteURLText ?? "missing")")
+            print("App website: \(internship.companyWebsiteURL?.absoluteString ?? "invalid or missing")")
+            
         }
 
         // An empty page is valid; returned listings need usable IDs/titles.

@@ -61,6 +61,7 @@ final class SwiftDataSavedInternshipRepository:
             record.company = internship.company
             record.location = internship.location
             record.applicationURL = internship.applicationURL
+            record.companyWebsiteURL = internship.companyWebsiteURL
             record.applicationDeadline = internship.applicationDeadline
             record.savedDate = internship.savedDate
             record.applicationStatusRawValue =

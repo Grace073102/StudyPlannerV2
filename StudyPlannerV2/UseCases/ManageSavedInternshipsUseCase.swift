@@ -101,6 +101,7 @@ struct ManageSavedInternshipsUseCase {
             company: company,
             location: internship.location,
             applicationURL: internship.applicationURL,
+            companyWebsiteURL: internship.companyWebsiteURL,
             applicationDeadline: internship.applicationDeadline,
             savedDate: internship.savedDate,
             applicationStatus: internship.applicationStatus

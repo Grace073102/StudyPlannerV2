@@ -21,6 +21,7 @@ final class StoredSavedInternship {
     var company: String
     var location: String?
     var applicationURL: URL?
+    var companyWebsiteURL: URL? = nil
     var applicationDeadline: Date?
     var savedDate: Date
     var applicationStatusRawValue: String
@@ -37,6 +38,7 @@ final class StoredSavedInternship {
         company: String,
         location: String? = nil,
         applicationURL: URL? = nil,
+        companyWebsiteURL: URL? = nil,
         applicationDeadline: Date? = nil,
         savedDate: Date = Date(),
         applicationStatus: ApplicationStatus = .saved
@@ -47,6 +49,7 @@ final class StoredSavedInternship {
         self.company = company
         self.location = location
         self.applicationURL = applicationURL
+        self.companyWebsiteURL = companyWebsiteURL
         self.applicationDeadline = applicationDeadline
         self.savedDate = savedDate
         applicationStatusRawValue = applicationStatus.rawValue
@@ -59,6 +62,7 @@ final class StoredSavedInternship {
         company = internship.company
         location = internship.location
         applicationURL = internship.applicationURL
+        companyWebsiteURL = internship.companyWebsiteURL
         applicationDeadline = internship.applicationDeadline
         savedDate = internship.savedDate
         applicationStatusRawValue = internship.applicationStatus.rawValue
@@ -78,6 +82,7 @@ final class StoredSavedInternship {
             company: company,
             location: location,
             applicationURL: applicationURL,
+            companyWebsiteURL: companyWebsiteURL,
             applicationDeadline: applicationDeadline,
             savedDate: savedDate,
             applicationStatus: status

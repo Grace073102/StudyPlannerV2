@@ -47,6 +47,10 @@ struct SaveDiscoveredInternshipTests {
         )
         #expect(saved.applicationStatus == .saved)
         #expect(saved.applicationDeadline == nil)
+        #expect(
+            saved.companyWebsiteURL?.absoluteString
+                == "https://example.com"
+        )
     }
 
     @Test
@@ -171,6 +175,8 @@ struct SaveDiscoveredInternshipTests {
         }
 
         #expect(repository.internships.isEmpty)
+        
+        
     }
     
     @Test
