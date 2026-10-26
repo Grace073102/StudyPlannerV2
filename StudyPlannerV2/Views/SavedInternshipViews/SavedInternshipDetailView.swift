@@ -100,7 +100,7 @@ struct SavedInternshipDetailView: View {
         }
         .scrollContentBackground(.hidden)
         .background(Theme.background)
-        .navigationTitle("Internship Details")
+        .navigationTitle("Your Saved Internship")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             viewModel.clearError()

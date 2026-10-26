@@ -21,7 +21,7 @@ struct FetchSubjectsUseCase {
     }
 }
 
-enum FetchSubjectsError: LocalizedError {
+enum FetchSubjectsError: LocalizedError, Equatable {
     case loadFailed(String)
     var errorDescription: String? {
         switch self {
