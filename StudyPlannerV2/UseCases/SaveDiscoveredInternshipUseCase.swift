@@ -18,6 +18,7 @@ struct SaveDiscoveredInternshipUseCase {
             company: listing.companyDisplayName,
             location: listing.location,
             applicationURL: listing.applicationURL,
+            companyWebsiteURL: listing.companyWebsiteURL,
             applicationDeadline: nil,
             applicationStatus: .saved
         )
