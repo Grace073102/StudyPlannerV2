@@ -108,7 +108,7 @@ struct ManagePlacementsUseCaseTests {
     
     // MARK: - Date Validation
     /// A student creates a placement that starts and ends on the same day, and it is saved.
-    @Test func add_withSameStartAndEndDate_savesIt() throws {
+    @Test func addWithSameStartAndEndDateSavesIt() throws {
         let repository = MockPlacementRepository()
         let useCase = ManagePlacementsUseCase(repository: repository)
         
@@ -125,7 +125,7 @@ struct ManagePlacementsUseCaseTests {
     }
     
     /// A student enters an end date before the start date so placement is rejected.
-    @Test func addWithSameStartAndEndDateSavesIt() {
+    @Test func addWithEndBeforeStartThrowsError() {
         let repository = MockPlacementRepository()
         let useCase = ManagePlacementsUseCase(repository: repository)
         
