@@ -46,7 +46,8 @@ struct RemoteInternshipRepositoryTests {
                 ) == "Bearer test-key"
             )
 
-            #expect(value("location") == "AU")
+            #expect(value("country_id") == "14")
+            #expect(value("location") == nil)
             #expect(value("employment_type") == "INTERN")
             #expect(value("title") == "software & design")
             #expect(value("remote") == "true")

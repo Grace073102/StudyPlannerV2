@@ -89,7 +89,7 @@ final class RemoteInternshipRepository:
         }
 
         var items = [
-            URLQueryItem(name: "location", value: "AU"),
+            URLQueryItem(name: "country_id", value: "14"),
             URLQueryItem(
                 name: "employment_type",
                 value: "INTERN"
