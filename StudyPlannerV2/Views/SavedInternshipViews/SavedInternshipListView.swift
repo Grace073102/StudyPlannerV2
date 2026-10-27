@@ -9,78 +9,76 @@ import SwiftUI
 
 /// Displays internship opportunities saved by the student.
 struct SavedInternshipListView: View {
-
+    
     @ObservedObject var viewModel: SavedInternshipViewModel
-
+    
     /// The internship selected for deletion.
     @State private var internshipToDelete: SavedInternship?
-
+    
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                HStack {
-                    Text("Saved Internships")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .accessibilityAddTraits(.isHeader)
-                    Spacer()
-                }
-                .padding(.horizontal, Theme.padding)
-                .padding(.vertical, 8)
-                
-                // Internship List
-                Group {
-                    if viewModel.internships.isEmpty {
-                        ContentUnavailableView(
-                            "No Saved Internships",
-                            systemImage: "bookmark",
-                            description: Text("Internships you save will appear here.")
-                        )
-                    } else {
-                        List {
-                            ForEach(viewModel.internships, id: \.id) { internship in
-                                internshipRow(for: internship)
-                            }
+        VStack(spacing: 0) {
+            HStack {
+                Text("Saved Internships")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .accessibilityAddTraits(.isHeader)
+                Spacer()
+            }
+            .padding(.horizontal, Theme.padding)
+            .padding(.vertical, 8)
+            
+            // Internship List
+            Group {
+                if viewModel.internships.isEmpty {
+                    ContentUnavailableView(
+                        "No Saved Internships",
+                        systemImage: "bookmark",
+                        description: Text("Internships you save will appear here.")
+                    )
+                } else {
+                    List {
+                        ForEach(viewModel.internships, id: \.id) { internship in
+                            internshipRow(for: internship)
                         }
-                        .listStyle(.plain)
-                        .scrollContentBackground(.hidden)
                     }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
                 }
             }
-            .alert(
-                "Delete Saved Internship?",
-                isPresented: Binding(
-                    get: { internshipToDelete != nil },
-                    set: { if !$0 { internshipToDelete = nil } }
-                ),
-                presenting: internshipToDelete
-            ) { internship in
-                Button("Delete", role: .destructive) {
-                    viewModel.deleteInternship(id: internship.id)
-                }
-                Button("Cancel", role: .cancel) { }
-            } message: { internship in
-                Text("Are you sure you want to delete \(internship.title)?")
+        }
+        .alert(
+            "Delete Saved Internship?",
+            isPresented: Binding(
+                get: { internshipToDelete != nil },
+                set: { if !$0 { internshipToDelete = nil } }
+            ),
+            presenting: internshipToDelete
+        ) { internship in
+            Button("Delete", role: .destructive) {
+                viewModel.deleteInternship(id: internship.id)
             }
-            .background(Theme.background.ignoresSafeArea())
-            .navigationTitle("Saved Internships")
-            .toolbar(.hidden, for: .navigationBar)
-            .onAppear {
-                viewModel.loadInternships()
+            Button("Cancel", role: .cancel) { }
+        } message: { internship in
+            Text("Are you sure you want to delete \(internship.title)?")
+        }
+        .background(Theme.background.ignoresSafeArea())
+        .navigationTitle("Saved Internships")
+        .toolbar(.hidden, for: .navigationBar)
+        .onAppear {
+            viewModel.loadInternships()
+        }
+        .alert(
+            "Internship Error",
+            isPresented: Binding(
+                get: { viewModel.errorMessage != nil },
+                set: { if !$0 { viewModel.clearError() } }
+            )
+        ) {
+            Button("OK") {
+                viewModel.clearError()
             }
-            .alert(
-                "Internship Error",
-                isPresented: Binding(
-                    get: { viewModel.errorMessage != nil },
-                    set: { if !$0 { viewModel.clearError() } }
-                )
-            ) {
-                Button("OK") {
-                    viewModel.clearError()
-                }
-            } message: {
-                Text(viewModel.errorMessage ?? "")
-            }
+        } message: {
+            Text(viewModel.errorMessage ?? "")
         }
     }
     
@@ -114,23 +112,23 @@ struct SavedInternshipListView: View {
     }
     
     // MARK: - Card
-
+    
     /// Displays a summary of a saved internship.
     private func internshipCard(for internship: SavedInternship) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(internship.title)
                 .font(.headline)
-
+            
             Text(internship.company)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
-
+            
             if let location = internship.location {
                 Label(location, systemImage: "mappin")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-
+            
             if let deadline = internship.applicationDeadline {
                 Label {
                     Text(deadline, format: .dateTime.day().month().year())
@@ -140,7 +138,7 @@ struct SavedInternshipListView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
             }
-
+            
             Label(
                 internship.applicationStatus.displayName,
                 systemImage: internship.applicationStatus.icon
