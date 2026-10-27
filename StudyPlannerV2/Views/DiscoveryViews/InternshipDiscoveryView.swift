@@ -7,13 +7,12 @@
 
 import SwiftUI
 
+/// Displays internship search results and allows users to search, filter, save, and view internship opportunities.
 struct InternshipDiscoveryView: View {
-
-    /// Displays internship search results and allows users to search, filter, save, and view internship opportunities.
     @ObservedObject var viewModel: InternshipDiscoveryViewModel
 
     var body: some View {
-        NavigationStack{
+        NavigationStack {
             VStack(spacing: 0) {
                 header
                 results
@@ -148,7 +147,7 @@ struct InternshipDiscoveryView: View {
     }
 
     // MARK: - Card
-    /// Creates a card displaying internship details, with options to save the internship or view the job posting.
+    /// Creates a card displaying internship details, with options to save the internship or open the company's website.
     private func card(_ internship: DiscoveredInternship) -> some View {
         let saved = viewModel.isSaved(internship)
 
@@ -193,7 +192,7 @@ struct InternshipDiscoveryView: View {
 
                 Spacer()
 
-                if let url = internship.applicationURL {
+                if let url = internship.companyWebsiteURL {
                     Link(destination: url) {
                         Label("Company Website", systemImage: "globe")
                     }

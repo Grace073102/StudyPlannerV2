@@ -70,7 +70,7 @@ struct SavedInternshipDetailView: View {
             }
 
             // Only open web links (http or https) that have a host.
-            if let url = internship.applicationURL,
+            if let url = internship.companyWebsiteURL,
                let scheme = url.scheme?.lowercased(),
                ["http", "https"].contains(scheme),
                url.host != nil {
