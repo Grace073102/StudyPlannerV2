@@ -47,7 +47,7 @@ struct ManagePlacementsUseCaseTests {
     
     // MARK: - Add
     /// A student adds a placement with valid dates annd it is stored.
-    @Test func add_withValidDetails_savesIt() throws {
+    @Test func addWithValidDetailsSavesIt() throws {
         let repository = MockPlacementRepository()
         let useCase = ManagePlacementsUseCase(repository: repository)
         let placement = makePlacement()
@@ -60,7 +60,7 @@ struct ManagePlacementsUseCaseTests {
     }
     
     /// A student links a university subject to a placement, and the subject ID is saved.
-    @Test func add_withLinkedSubject_savesSubjectID() throws {
+    @Test func addWithLinkedSubjectSavesSubjectID() throws {
         let repository = MockPlacementRepository()
         let useCase = ManagePlacementsUseCase(repository: repository)
         let subjectID = UUID()
@@ -74,7 +74,7 @@ struct ManagePlacementsUseCaseTests {
     }
     
     /// A student enters extra spaces around the placement name and the spaces are removed when saving.
-    @Test func add_withExtraSpaces_trimsText() throws {
+    @Test func addWithExtraSpacesTrimsText() throws {
         let repository = MockPlacementRepository()
         let useCase = ManagePlacementsUseCase(repository: repository)
         
@@ -91,7 +91,7 @@ struct ManagePlacementsUseCaseTests {
     }
     
     /// A student enters only spaces for the placement name, so the placement is not saved.
-    @Test func add_withBlankName_throwsError() {
+    @Test func addWithBlankNameThrowsError() {
         let repository = MockPlacementRepository()
         let useCase = ManagePlacementsUseCase(repository: repository)
         
@@ -125,7 +125,7 @@ struct ManagePlacementsUseCaseTests {
     }
     
     /// A student enters an end date before the start date so placement is rejected.
-    @Test func add_withEndBeforeStart_throwsError() {
+    @Test func addWithSameStartAndEndDateSavesIt() {
         let repository = MockPlacementRepository()
         let useCase = ManagePlacementsUseCase(repository: repository)
         
@@ -148,7 +148,7 @@ struct ManagePlacementsUseCaseTests {
     
     // MARK: - Update
     /// A student updates an existing placement, and the changes are saved.
-    @Test func update_withValidDetails_savesChanges() throws {
+    @Test func updateWithValidDetailsSavesChanges() throws {
         let existing = makePlacement()
         let repository = MockPlacementRepository(
             placements: [existing]
@@ -178,7 +178,7 @@ struct ManagePlacementsUseCaseTests {
     }
     
     /// A student updates a placement with invalide dates so the original placement remains unchanged.
-    @Test func update_withInvalidDates_keepsOriginal() {
+    @Test func updateWithInvalidDatesKeepsOriginal() {
         let existing = makePlacement(name: "Original")
         let repository = MockPlacementRepository(
             placements: [existing]
@@ -206,7 +206,7 @@ struct ManagePlacementsUseCaseTests {
     }
     
     /// A student tries to update a placement that does not exist.
-    @Test func update_withUnknownID_throwsError() {
+    @Test func updateWithUnknownIDThrowsError() {
         let repository = MockPlacementRepository()
         let useCase = ManagePlacementsUseCase(repository: repository)
         
@@ -220,7 +220,7 @@ struct ManagePlacementsUseCaseTests {
  
     // MARK: - Delete
     /// A student deletes an existing placement and it is removed from the saved placements.
-    @Test func delete_withExistingID_removesPlacement() throws {
+    @Test func deleteWithExistingIDRemovesPlacement() throws {
         let existing = makePlacement()
         let repository = MockPlacementRepository(
             placements: [existing]
@@ -236,7 +236,7 @@ struct ManagePlacementsUseCaseTests {
  
     // MARK: - Fetch and Sorting
     /// A student views their placements and they are listed in order of earliest start date first.
-    @Test func fetchAll_sortsByStartDate() throws {
+    @Test func fetchAllSortsByStartDate() throws {
         let later = makePlacement(
             name: "Later",
             start: date(2027, 2, 1),
@@ -265,7 +265,7 @@ struct ManagePlacementsUseCaseTests {
  
     // MARK: - Placement Status
     /// A student views a placement before its start date and its status is upcoming.
-    @Test func fetchAll_beforeStartDate_isUpcoming() throws {
+    @Test func fetchAllBeforeStartDateIsUpcoming() throws {
         let placement = makePlacement(
             start: date(2027, 3, 10),
             end: date(2027, 3, 14)
@@ -286,7 +286,7 @@ struct ManagePlacementsUseCaseTests {
     }
     
     /// A student views a placement during its scheduled dates and its status is in progress.
-    @Test func fetchAll_duringPlacement_isInProgress() throws {
+    @Test func fetchAllDuringPlacementIsInProgress() throws {
         
         // Create a placement with a defined start and end date
         let placement = makePlacement(
@@ -309,7 +309,7 @@ struct ManagePlacementsUseCaseTests {
     }
     
     ///A student views a placement after its end date and its status is completed.
-    @Test func fetchAll_afterEndDate_isCompleted() throws {
+    @Test func fetchAllAfterEndDateIsCompleted() throws {
         
         // Create a placement with a defined start and end date
         let placement = makePlacement(
@@ -332,7 +332,7 @@ struct ManagePlacementsUseCaseTests {
  
     // MARK: - Repository Errors
     /// Saving a placement fails because of a repository error so the error is returned and nothing is saved.
-    @Test func add_whenRepositoryFails_propagatesError() {
+    @Test func addWhenRepositoryFailsPropagatesError() {
         let repository = MockPlacementRepository()
         
         // Simulate a save failure

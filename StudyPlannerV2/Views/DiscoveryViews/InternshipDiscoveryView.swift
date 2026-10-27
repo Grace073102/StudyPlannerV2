@@ -195,10 +195,10 @@ struct InternshipDiscoveryView: View {
 
                 if let url = internship.applicationURL {
                     Link(destination: url) {
-                        Label("View Job", systemImage: "arrow.up.right")
+                        Label("Company Website", systemImage: "globe")
                     }
                     .buttonStyle(.borderedProminent)
-                    .accessibilityLabel("View job posting for \(internship.title)")
+                    .accessibilityLabel("Open \(internship.companyDisplayName) website")
                 }
             }
             .font(.system(.body, weight: .semibold))

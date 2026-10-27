@@ -74,12 +74,9 @@ struct SavedInternshipDetailView: View {
                let scheme = url.scheme?.lowercased(),
                ["http", "https"].contains(scheme),
                url.host != nil {
-                Section("Job Posting") {
+                Section("Company") {
                     Link(destination: url) {
-                        Label(
-                            "View Original Job Posting",
-                            systemImage: "arrow.up.right.square"
-                        )
+                        Label("Visit Company Website", systemImage: "globe")
                     }
                 }
             }
