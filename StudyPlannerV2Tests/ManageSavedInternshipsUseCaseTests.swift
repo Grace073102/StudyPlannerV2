@@ -34,7 +34,7 @@ struct ManageSavedInternshipsUseCaseTests {
     
     // MARK: - Save
     /// A student saves an internship with valid details and it is added to their saved internships.
-    @Test func save_withValidDetails_savesIt() throws {
+    @Test func saveWithValidDetailsSavesIt() throws {
         let repository = MockSavedInternshipRepository()
         let useCase = ManageSavedInternshipsUseCase(repository: repository)
         let internship = makeInternship()
@@ -48,7 +48,7 @@ struct ManageSavedInternshipsUseCaseTests {
     }
     
     /// A student saves an internship with extra spaces in its details and the spaces are removed when saving.
-    @Test func save_withExtraSpaces_trimsText() throws {
+    @Test func saveWithExtraSpacesTrimsText() throws {
         let repository = MockSavedInternshipRepository()
         let useCase = ManageSavedInternshipsUseCase(repository: repository)
         
@@ -69,10 +69,23 @@ struct ManageSavedInternshipsUseCaseTests {
         #expect(saved.title == "Intern")
         #expect(saved.company == "Acme")
     }
- 
+    
+    /// A student saves an internship with a company website URL.
+    @Test func saveWithCompanyWebsiteKeepsIt() throws {
+        let repository = MockSavedInternshipRepository()
+        let useCase = ManageSavedInternshipsUseCase(repository: repository)
+        let website = URL(string: "https://example.com")
+        
+        // Execute and verify the company website URL is retained
+        try useCase.save(
+            SavedInternship(jobID: "job-1", title: "Intern", company: "Acme", companyWebsiteURL: website)
+        )
+        #expect(repository.internships.first?.companyWebsiteURL == website)
+    }
+    
     // MARK: - Required Fields
     /// An internship has no job ID so it cannot be saved.
-    @Test func save_withEmptyJobID_throwsError() {
+    @Test func saveWithEmptyJobIDThrowsError() {
         let repository = MockSavedInternshipRepository()
         let useCase = ManageSavedInternshipsUseCase(repository: repository)
         
@@ -88,7 +101,7 @@ struct ManageSavedInternshipsUseCaseTests {
     }
     
     /// An internship has no title so it cannot be saved.
-    @Test func save_withEmptyTitle_throwsError() {
+    @Test func saveWithEmptyTitleThrowsError() {
         let repository = MockSavedInternshipRepository()
         let useCase = ManageSavedInternshipsUseCase(repository: repository)
         
@@ -104,7 +117,7 @@ struct ManageSavedInternshipsUseCaseTests {
     }
     
     /// An internship has no company name, so it cannot be saved.
-    @Test func save_withEmptyCompany_throwsError() {
+    @Test func saveWithEmptyCompanyThrowsError() {
         let repository = MockSavedInternshipRepository()
         let useCase = ManageSavedInternshipsUseCase(repository: repository)
         
@@ -121,7 +134,7 @@ struct ManageSavedInternshipsUseCaseTests {
     
     // MARK: - Duplicate Jobs
     /// A student tries to save the same internship twice so the second save is rejected.
-    @Test func save_sameJobIDTwice_throwsAlreadySaved() throws {
+    @Test func saveSameJobIDTwiceThrowsAlreadySaved() throws {
         let repository = MockSavedInternshipRepository()
         let useCase = ManageSavedInternshipsUseCase(repository: repository)
 
@@ -141,7 +154,7 @@ struct ManageSavedInternshipsUseCaseTests {
     
     // MARK: - Update Application Status
     /// A student changes an internship's application status from saved to applied and the change is stored.
-    @Test func updateApplicationStatus_withExistingID_changesStatus() throws {
+    @Test func updateApplicationStatusWithExistingIDChangesStatus() throws {
         let existing = makeInternship(status: .saved)
         let repository = MockSavedInternshipRepository(
             internships: [existing]
@@ -161,7 +174,7 @@ struct ManageSavedInternshipsUseCaseTests {
     }
     
     /// A student tries to update an internship that does not exist so an internshipNotFound error is returned.
-    @Test func updateApplicationStatus_withUnknownID_throwsError() {
+    @Test func updateApplicationStatusWithUnknownIDThrowsError() {
         let repository = MockSavedInternshipRepository()
         let useCase = ManageSavedInternshipsUseCase(repository: repository)
         
@@ -177,7 +190,7 @@ struct ManageSavedInternshipsUseCaseTests {
     }
     
     /// Updating an internship's application status fails so the original status remains unchanged.
-    @Test func updateApplicationStatus_whenSaveFails_keepsOriginalStatus() {
+    @Test func updateApplicationStatusWhenSaveFailsKeepsOriginalStatus() {
         let existing = makeInternship(status: .saved)
         let repository = MockSavedInternshipRepository(
             internships: [existing]
@@ -202,7 +215,7 @@ struct ManageSavedInternshipsUseCaseTests {
     
     // MARK: - Delete
     /// A student removes a saved internship and it is deleted from their saved internships.
-    @Test func delete_withExistingID_removesInternship() throws {
+    @Test func deleteWithExistingIDRemovesInternship() throws {
         let existing = makeInternship()
         let repository = MockSavedInternshipRepository(
             internships: [existing]
@@ -218,7 +231,7 @@ struct ManageSavedInternshipsUseCaseTests {
     
     // MARK: - Fetch and Sorting
     /// A student views their saved internships and the most recently saved internship appears first.
-    @Test func fetchAll_sortsByMostRecentlySaved() throws {
+    @Test func fetchAllSortsByMostRecentlySaved() throws {
         let older = makeInternship(
             jobID: "job-1",
             savedDate: Date(timeIntervalSince1970: 1_000_000)
@@ -245,7 +258,7 @@ struct ManageSavedInternshipsUseCaseTests {
     
     // MARK: - Repository Errors
     /// Saving an internship fails because of a repository error so the error is returned and nothing is saved.
-    @Test func save_whenRepositoryFails_propagatesError() {
+    @Test func saveWhenRepositoryFailsPropagatesError() {
         let repository = MockSavedInternshipRepository()
         
         // Simulate a save failure
