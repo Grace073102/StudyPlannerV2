@@ -76,6 +76,9 @@ struct PlacementListView: View {
                                     onEdit: { placement in
                                         formPlacement = placement
                                         showForm = true
+                                    },
+                                    onDelete: {placementID in
+                                        viewModel.deletePlacement(id: placementID)
                                     }
                                 )
                             } label: {
