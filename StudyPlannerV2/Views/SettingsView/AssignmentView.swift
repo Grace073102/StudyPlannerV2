@@ -36,7 +36,7 @@ struct AssignmentView: View {
                                 .frame(width: 44, height: 44)
                                 .background(
                                     Circle()
-                                        .fill(Color.accentColor)
+                                        .fill(Theme.accentFill)
                                 )
                         }
                         .buttonStyle(.plain)
@@ -60,7 +60,7 @@ struct AssignmentView: View {
                         .foregroundStyle(Theme.onAccent)
                         .padding(Theme.padding)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                        .background(Color.accentColor, in: .rect(cornerRadius: Theme.corner))
+                        .background(Theme.accentFill, in: .rect(cornerRadius: Theme.corner))
                         
                         ProgressOverviewView(
                             progress: assignmentViewModel.overallProgress,

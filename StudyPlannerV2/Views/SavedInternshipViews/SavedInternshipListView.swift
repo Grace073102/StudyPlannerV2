@@ -145,7 +145,7 @@ struct SavedInternshipListView: View {
             )
             .font(.caption2)
             .fontWeight(.semibold)
-            .foregroundStyle(internship.applicationStatus.color)
+            .foregroundStyle(.primary)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
             .background(internship.applicationStatus.color.opacity(0.25))

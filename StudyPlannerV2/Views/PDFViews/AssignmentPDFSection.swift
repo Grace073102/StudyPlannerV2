@@ -53,9 +53,16 @@ struct AssignmentPDFSection: View {
                     "Attach PDF",
                     systemImage: "plus.circle.fill"
                 )
-                .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
+                .fontWeight(.semibold)
+                        .foregroundStyle(Theme.onAccent)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Theme.accentFill)
+                        )
+                }
+                .buttonStyle(.plain)
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)

@@ -153,6 +153,7 @@ struct EditAssignmentView: View {
                                 RoundedRectangle(cornerRadius: 10)
                                     .stroke(Color.gray.opacity(0.4), lineWidth: 1)
                             )
+                            .accessibilityLabel("Description, optional")
                     }
 
                     Button {
@@ -165,7 +166,7 @@ struct EditAssignmentView: View {
                             .frame(height: 50)
                             .background(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.accentColor)
+                                    .fill(Theme.accentFill)
                             )
                     }
                     .disabled(!isValid)

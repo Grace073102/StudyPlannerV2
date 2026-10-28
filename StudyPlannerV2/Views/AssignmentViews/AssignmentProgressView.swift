@@ -52,9 +52,7 @@ struct AssignmentProgressView: View {
                 Text(assignment.priority.rawValue)
                     .font(.caption)
                     .fontWeight(.semibold)
-                    .foregroundStyle(
-                        assignment.priority.color
-                    )
+                    .foregroundStyle(.primary)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 5)
                     .background(

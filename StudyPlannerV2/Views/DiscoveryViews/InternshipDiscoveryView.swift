@@ -108,6 +108,7 @@ struct InternshipDiscoveryView: View {
             Button("Try Again") { Task { await viewModel.search() } }
                 .font(.system(.body, weight: .semibold))
                 .buttonStyle(.borderedProminent)
+                .tint(Theme.accentFill)
             Spacer()
         } else {
             ScrollView {
@@ -185,8 +186,10 @@ struct InternshipDiscoveryView: View {
                 } label: {
                     Label(saved ? "Saved" : "Save",
                           systemImage: saved ? "bookmark.fill" : "bookmark")
+                    .fontWeight(.semibold)
                 }
                 .buttonStyle(.bordered)
+                .tint(Color.primary)
                 .disabled(saved)
                 .accessibilityLabel(saved ? "Saved \(internship.title)" : "Save \(internship.title)")
 
@@ -197,6 +200,7 @@ struct InternshipDiscoveryView: View {
                         Label("Company Website", systemImage: "globe")
                     }
                     .buttonStyle(.borderedProminent)
+                    .tint(Theme.accentFill)
                     .accessibilityLabel("Open \(internship.companyDisplayName) website")
                 }
             }

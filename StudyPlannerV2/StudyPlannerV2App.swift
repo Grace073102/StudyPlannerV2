@@ -76,6 +76,7 @@ struct StudyPlannerApp: App {
                         startup = Self.prepareStorage()
                     }
                     .buttonStyle(.borderedProminent)
+                    .tint(Theme.accentFill)
                 }
                 .padding()
             }

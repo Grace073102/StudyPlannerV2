@@ -50,7 +50,7 @@ struct PlacementListView: View {
                         .font(.title3.weight(.semibold))
                         .foregroundStyle(Theme.onAccent)
                         .frame(width: 44, height: 44)
-                        .background(Color.accentColor, in: Circle())
+                        .background(Theme.accentFill, in: Circle())
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Add Placement")
@@ -167,7 +167,7 @@ struct PlacementListView: View {
             Label(summary.status.displayName, systemImage: summary.status.icon)
                 .font(.caption2)
                 .fontWeight(.semibold)
-                .foregroundStyle(summary.status.color)
+                .foregroundStyle(.primary)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
                 .background(summary.status.color.opacity(0.25))
@@ -211,6 +211,7 @@ struct PlacementListView: View {
                     showForm = true
                 } label: {
                     Image(systemName: "pencil")
+                        .foregroundStyle(Color.accentColor)
                 }
                 .accessibilityLabel("Edit Placement")
             }
