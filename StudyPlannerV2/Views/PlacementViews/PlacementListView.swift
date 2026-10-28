@@ -35,99 +35,97 @@ struct PlacementListView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                HStack {
-                    Text("My Placements")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .accessibilityAddTraits(.isHeader)
-                    Spacer()
-                    Button {
-                        formPlacement = nil
-                        showForm = true
-                    } label: {
-                        Image(systemName: "plus")
-                            .font(.title3.weight(.semibold))
-                            .foregroundStyle(Theme.onAccent)
-                            .frame(width: 44, height: 44)
-                            .background(Color.accentColor, in: Circle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Add Placement")
+        VStack(spacing: 0) {
+            HStack {
+                Text("My Placements")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .accessibilityAddTraits(.isHeader)
+                Spacer()
+                Button {
+                    formPlacement = nil
+                    showForm = true
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(Theme.onAccent)
+                        .frame(width: 44, height: 44)
+                        .background(Color.accentColor, in: Circle())
                 }
-                .padding(.horizontal, Theme.padding)
-                .padding(.vertical, 8)
-                // Placement List
-                Group {
-                    if viewModel.placements.isEmpty {
-                        ContentUnavailableView(
-                            "No Placements",
-                            systemImage: "calendar.badge.plus",
-                            description: Text("Add a placement to keep track of your schedule.")
-                        )
-                    } else {
-                        List {
-                            ForEach(viewModel.placements) { summary in
-                                NavigationLink {
-                                    requirementsScreen(for: summary)
+                .buttonStyle(.plain)
+                .accessibilityLabel("Add Placement")
+            }
+            .padding(.horizontal, Theme.padding)
+            .padding(.vertical, 8)
+            // Placement List
+            Group {
+                if viewModel.placements.isEmpty {
+                    ContentUnavailableView(
+                        "No Placements",
+                        systemImage: "calendar.badge.plus",
+                        description: Text("Add a placement to keep track of your schedule.")
+                    )
+                } else {
+                    List {
+                        ForEach(viewModel.placements) { summary in
+                            NavigationLink {
+                                requirementsScreen(for: summary)
+                            } label: {
+                                card(for: summary)
+                            }
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
+                            .listRowInsets(EdgeInsets(
+                                top: 6,
+                                leading: Theme.padding,
+                                bottom: 6,
+                                trailing: Theme.padding
+                            ))
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                Button(role: .destructive) {
+                                    placementToDelete = summary.placement
                                 } label: {
-                                    card(for: summary)
-                                }
-                                .listRowBackground(Color.clear)
-                                .listRowSeparator(.hidden)
-                                .listRowInsets(EdgeInsets(
-                                    top: 6,
-                                    leading: Theme.padding,
-                                    bottom: 6,
-                                    trailing: Theme.padding
-                                ))
-                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                    Button(role: .destructive) {
-                                        placementToDelete = summary.placement
-                                    } label: {
-                                        Label("Delete", systemImage: "trash")
-                                    }
+                                    Label("Delete", systemImage: "trash")
                                 }
                             }
                         }
-                        .listStyle(.plain)
-                        .scrollContentBackground(.hidden)
                     }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
                 }
             }
-            .alert(
-                "Delete Placement?",
-                isPresented: showDeleteDialog,
-                presenting: placementToDelete
-            ) { placement in
-                Button("Delete", role: .destructive) {
-                    viewModel.deletePlacement(id: placement.id)
-                }
-                Button("Cancel", role: .cancel) { }
-            } message: { placement in
-                Text("Are you sure you want to delete \(placement.name)? Its requirements will also be deleted.")
+        }
+        .alert(
+            "Delete Placement?",
+            isPresented: showDeleteDialog,
+            presenting: placementToDelete
+        ) { placement in
+            Button("Delete", role: .destructive) {
+                viewModel.deletePlacement(id: placement.id)
             }
-            .background(Theme.background.ignoresSafeArea())
-            .navigationTitle("My Placements")
-            .toolbar(.hidden, for: .navigationBar)
-            .onAppear {
-                viewModel.loadPlacements()
-                viewModel.loadSubjects()
+            Button("Cancel", role: .cancel) { }
+        } message: { placement in
+            Text("Are you sure you want to delete \(placement.name)? Its requirements will also be deleted.")
+        }
+        .background(Theme.background.ignoresSafeArea())
+        .navigationTitle("My Placements")
+        .toolbar(.hidden, for: .navigationBar)
+        .onAppear {
+            viewModel.loadPlacements()
+            viewModel.loadSubjects()
+        }
+        .sheet(isPresented: $showForm) {
+            PlacementFormView(viewModel: viewModel, placement: formPlacement)
+        }
+        .alert(
+            "Placement Error",
+            isPresented: showErrorAlert
+        ) {
+            Button("OK") {
+                viewModel.clearError()
             }
-            .sheet(isPresented: $showForm) {
-                PlacementFormView(viewModel: viewModel, placement: formPlacement)
-            }
-            .alert(
-                "Placement Error",
-                isPresented: showErrorAlert
-            ) {
-                Button("OK") {
-                    viewModel.clearError()
-                }
-            } message: {
-                Text(viewModel.errorMessage ?? "")
-            }
+        } message: {
+            Text(viewModel.errorMessage ?? "")
         }
     }
     
@@ -193,11 +191,11 @@ struct PlacementListView: View {
     }
     
     // MARK: Helper for the date range text
-        private func dateRangeText(for placement: Placement) -> String {
-            let start = placement.startDate.formatted(.dateTime.day().month().year())
-            let end = placement.endDate.formatted(.dateTime.day().month().year())
-            return "\(start) – \(end)"
-        }
+    private func dateRangeText(for placement: Placement) -> String {
+        let start = placement.startDate.formatted(.dateTime.day().month().year())
+        let end = placement.endDate.formatted(.dateTime.day().month().year())
+        return "\(start) – \(end)"
+    }
     
     // MARK: - Requirements
     

@@ -22,21 +22,24 @@ struct CareerView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            Picker("Career section", selection: $selection) {
-                ForEach(CareerSection.allCases) { section in
-                    Text(section.rawValue).tag(section)
+        NavigationStack{
+            Group{
+                switch selection {
+                case .placements:
+                    PlacementListView(viewModel: placementViewModel)
+                case .internships:
+                    SavedInternshipListView(viewModel: savedInternshipViewModel)
                 }
             }
-            .pickerStyle(.segmented)
-            .padding(.horizontal, Theme.padding)
-            .padding(.vertical, 8)
-            
-            switch selection {
-            case .placements:
-                PlacementListView(viewModel: placementViewModel)
-            case .internships:
-                SavedInternshipListView(viewModel: savedInternshipViewModel)
+            .safeAreaInset(edge: .top) {
+                Picker("Career section", selection: $selection) {
+                    ForEach(CareerSection.allCases) { section in
+                        Text(section.rawValue).tag(section)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal, Theme.padding)
+                .padding(.vertical, 8)
             }
         }
         .background(Theme.background)
