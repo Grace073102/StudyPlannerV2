@@ -27,7 +27,13 @@ final class InternshipRequirementViewModel: ObservableObject {
         loadRequirements()
 
         repositoryChanges = repository.changes.sink { [weak self] in
-            self?.loadRequirements()
+            guard let self else { return }
+
+            if let errorMessage = self.repository.errorMessage {
+                self.repositoryErrorMessage = errorMessage
+            } else {
+                self.loadRequirements()
+            }
         }
     }
 

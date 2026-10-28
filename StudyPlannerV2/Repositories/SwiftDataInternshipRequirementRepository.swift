@@ -13,6 +13,7 @@ final class SwiftDataInternshipRequirementRepository:
     InternshipRequirementRepository {
 
     private(set) var requirements: [InternshipRequirement] = []
+    private(set) var errorMessage: String?
 
     private let context: ModelContext
     private let changesSubject = PassthroughSubject<Void, Never>()
@@ -28,7 +29,13 @@ final class SwiftDataInternshipRequirementRepository:
 
     /// Refreshes checklist data after a saved internship is deleted.
     func reloadAfterInternshipDeletion() {
-        _ = try? load()
+        do {
+            _ = try load()
+            errorMessage = nil
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+
         changesSubject.send()
     }
 
@@ -42,6 +49,7 @@ final class SwiftDataInternshipRequirementRepository:
         }
 
         requirements = loadedRequirements
+        errorMessage = nil
 
         return loadedRequirements
     }
@@ -92,7 +100,7 @@ final class SwiftDataInternshipRequirementRepository:
         let internshipID = id
         var descriptor = FetchDescriptor<StoredSavedInternship>(predicate: #Predicate { record in
             record.id == internshipID
-            }
+        }
         )
 
         descriptor.fetchLimit = 1
@@ -107,8 +115,8 @@ final class SwiftDataInternshipRequirementRepository:
     private func findRequirement(id: UUID) throws -> StoredInternshipRequirement? {
         let requirementID = id
         var descriptor = FetchDescriptor<StoredInternshipRequirement>(predicate: #Predicate { record in
-                record.id == requirementID
-            }
+            record.id == requirementID
+        }
         )
 
         descriptor.fetchLimit = 1
