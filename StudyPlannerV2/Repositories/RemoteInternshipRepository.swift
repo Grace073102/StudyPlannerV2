@@ -177,9 +177,16 @@ final class RemoteInternshipRepository:
         }
         #endif
         do {
-            return try JSONDecoder().decode(
+            let page = try JSONDecoder().decode(
                 InternshipPage.self,
                 from: data
+            )
+
+            return InternshipPage(
+                data: page.data.filter {
+                    !$0.hasCompanyOnlyAustralianMatch
+                },
+                pagination: page.pagination
             )
         } catch {
             throw InternshipDiscoveryError.invalidData
