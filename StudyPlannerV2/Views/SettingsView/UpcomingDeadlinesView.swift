@@ -109,6 +109,6 @@ struct UpcomingDeadlinesView: View {
     }
     
     private func iconColour(for item: UpcomingItem) -> Color {
-        item.kind == .assignment ? .accentColor : .yellow
+        item.kind == .assignment ? .accentColor : .orange
     }
 }
