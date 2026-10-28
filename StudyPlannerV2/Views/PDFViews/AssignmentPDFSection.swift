@@ -11,13 +11,18 @@ import UniformTypeIdentifiers
 struct AssignmentPDFSection: View {
 
     let assignmentID: String
+    let attachmentDescription: String
 
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var viewModel: DocumentViewModel
     @State private var showPDFPicker = false
 
-    init(assignmentID: String) {
+    init(
+        assignmentID: String,
+        attachmentDescription: String = "Attach PDFs related to this assignment."
+    ) {
         self.assignmentID = assignmentID
+        self.attachmentDescription = attachmentDescription
 
         _viewModel = StateObject(
             wrappedValue: DocumentViewModel(assignmentID: assignmentID)
@@ -30,7 +35,7 @@ struct AssignmentPDFSection: View {
             Text("PDF Attachments")
                 .font(.headline)
 
-            Text("Attach PDFs related to this assignment.")
+            Text(attachmentDescription)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 

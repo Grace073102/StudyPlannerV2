@@ -11,6 +11,7 @@ import SwiftData
 struct AppRepositories {
     let assignments: SwiftDataAssignmentRepository
     let requirements: SwiftDataRequirementRepository
+    let internshipRequirements: SwiftDataInternshipRequirementRepository
     let subjects: SwiftDataSubjectRepository
     let placements: SwiftDataPlacementRepository
     let savedInternships: SwiftDataSavedInternshipRepository
@@ -52,6 +53,7 @@ struct StudyPlannerApp: App {
                 RootView(
                     repository: repositories.assignments,
                     requirementRepository: repositories.requirements,
+                    internshipRequirementRepository: repositories.internshipRequirements,
                     managePlacements: repositories.managePlacements,
                     subjectRepository: repositories.subjects,
                     savedInternshipRepository: repositories.savedInternships,
@@ -116,6 +118,10 @@ struct StudyPlannerApp: App {
             let requirementRepository = SwiftDataRequirementRepository(
                 container: container
             )
+            
+            let internshipRequirementRepository = SwiftDataInternshipRequirementRepository(
+                    container: container
+            )
 
             let subjectRepository = SwiftDataSubjectRepository(
                 container: container
@@ -147,13 +153,22 @@ struct StudyPlannerApp: App {
             )
 
             let savedInternshipRepository = SwiftDataSavedInternshipRepository(
-                container: container
+                container: container,
+                onRequirementsDeleted: { requirementIDs in
+                    for requirementID in requirementIDs {
+                        InternshipRequirementNotificationManager.shared
+                            .cancelNotifications(for: requirementID)
+                    }
+
+                    internshipRequirementRepository.reloadAfterInternshipDeletion()
+                }
             )
 
             return .success(
                 AppRepositories(
                     assignments: repository,
                     requirements: requirementRepository,
+                    internshipRequirements: internshipRequirementRepository,
                     subjects: subjectRepository,
                     placements: placementRepository,
                     savedInternships: savedInternshipRepository,

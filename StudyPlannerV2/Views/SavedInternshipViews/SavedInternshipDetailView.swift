@@ -11,6 +11,7 @@ import SwiftUI
 struct SavedInternshipDetailView: View {
 
     @ObservedObject var viewModel: SavedInternshipViewModel
+    @EnvironmentObject private var requirementViewModel:InternshipRequirementViewModel
     @Environment(\.dismiss) private var dismiss
 
     let internship: SavedInternship
@@ -38,6 +39,18 @@ struct SavedInternshipDetailView: View {
 
                 if let location = internship.location {
                     LabeledContent("Location", value: location)
+                }
+            }
+            
+            // Internship Requirement Checklist
+            Section("Requirement Checklist") {
+                NavigationLink {
+                    InternshipRequirementListView(
+                        viewModel: requirementViewModel,
+                        internshipID: internship.id
+                    )
+                } label: {
+                    Label("View Checklist", systemImage: "checklist")
                 }
             }
 

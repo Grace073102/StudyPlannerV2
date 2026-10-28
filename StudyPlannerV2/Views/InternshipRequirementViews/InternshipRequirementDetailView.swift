@@ -116,7 +116,10 @@ struct InternshipRequirementDetailView: View {
                     .clipShape(RoundedRectangle(cornerRadius: Theme.corner))
 
                     // PDF Attachments
-                    AssignmentPDFSection(assignmentID: "internship-requirement-\(requirement.id.uuidString)")
+                    AssignmentPDFSection(
+                        assignmentID: "internship-requirement-\(requirement.id.uuidString)",
+                        attachmentDescription: "Attach PDFs related to this internship requirement."
+                    )
                     .id(requirement.id)
 
                 } else {

@@ -11,10 +11,15 @@ import SwiftData
 final class SwiftDataSavedInternshipRepository:
     SavedInternshipRepository {
     private let context: ModelContext
+    private let onRequirementsDeleted: ([UUID]) -> Void
 
-    init(container: ModelContainer) {
+    init(
+        container: ModelContainer,
+        onRequirementsDeleted: @escaping ([UUID]) -> Void = { _ in }
+    ) {
         context = ModelContext(container)
         context.autosaveEnabled = false
+        self.onRequirementsDeleted = onRequirementsDeleted
     }
 
     func load() throws -> [SavedInternship] {
@@ -70,6 +75,8 @@ final class SwiftDataSavedInternshipRepository:
     }
 
     func delete(_ internship: SavedInternship) throws {
+        var requirementIDs: [UUID] = []
+
         try saveChanges {
             guard let record = try findInternship(
                 id: internship.id
@@ -77,8 +84,25 @@ final class SwiftDataSavedInternshipRepository:
                 throw SavedInternshipRepositoryError.notFound
             }
 
+            // Collect requirement IDs before cascade deletion.
+            let internshipID = record.id
+
+            let descriptor = FetchDescriptor<StoredInternshipRequirement>(
+                predicate: #Predicate { requirement in
+                    requirement.internshipID == internshipID
+                }
+            )
+
+            requirementIDs = try context.fetch(descriptor).map {
+                $0.id
+            }
+
+            // Related requirements are deleted by the cascade relationship.
             context.delete(record)
         }
+
+        // Only notify after the deletion has been saved successfully.
+        onRequirementsDeleted(requirementIDs)
     }
 
     private func findInternship(
