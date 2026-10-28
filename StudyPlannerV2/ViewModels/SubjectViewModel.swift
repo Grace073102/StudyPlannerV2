@@ -46,6 +46,19 @@ final class SubjectViewModel: ObservableObject {
             return false
         }
     }
+    
+    // Returns true if the subject was updated, so the view knows whether to close the form.
+    @discardableResult
+    func updateSubject(id: UUID, name: String, code: String) -> Bool {
+        do {
+            try manageSubjects.update(id: id, name: name, code: code)
+            loadSubjects()
+            return true
+        } catch {
+            errorMessage = error.localizedDescription
+            return false
+        }
+    }
 
     func deleteSubject(id: UUID) {
         do {
