@@ -20,8 +20,11 @@ final class SubjectViewModel: ObservableObject {
     private let manageSubjects: ManageSubjectsUseCase
     private let fetchSubjects: FetchSubjectsUseCase
 
-    init(repository: SubjectRepository) {
-        self.manageSubjects = ManageSubjectsUseCase(repository: repository)
+    init(repository: SubjectRepository, assignmentRepository: AssignmentRepository? = nil) {
+        self.manageSubjects = ManageSubjectsUseCase(
+            repository: repository,
+            assignmentRepository: assignmentRepository
+        )
         self.fetchSubjects = FetchSubjectsUseCase(repository: repository)
         loadSubjects()
     }

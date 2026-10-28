@@ -56,7 +56,9 @@ struct SubjectListView: View {
             SubjectFormView(subject: nil)
                 .environmentObject(subjectViewModel)
         }
-        .sheet(item: $editingSubject) { subject in
+        .sheet(item: $editingSubject, onDismiss: {
+            assignmentViewModel.load()
+        }) { subject in
             SubjectFormView(subject: subject)
                 .environmentObject(subjectViewModel)
         }

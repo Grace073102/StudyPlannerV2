@@ -16,8 +16,10 @@ import Foundation
 /// 3. Two subjects can't have the same name or the same code.
 /// 4. Only an existing subject can be deleted.
 /// 5. Editing follows the same rules, ignoring the subject being edited when checking duplicates.
+/// 6. Renaming a subject also renames it on its assignments, so they stay linked.
 struct ManageSubjectsUseCase {
     let repository: SubjectRepository
+    var assignmentRepository: AssignmentRepository? = nil
     
     enum SubjectError: LocalizedError, Equatable {
         case missingName
@@ -72,6 +74,9 @@ struct ManageSubjectsUseCase {
         let found = try findSubject(id: id)
 
         let (cleanedName, cleanedCode) = try validate(name: name, code: code, editingID: id)
+        
+        // Remember the old name before saving, so we can find its assignments
+        let oldName = found.name
 
         // New copy with the same ID, instead of editing the stored one directly
         let updated = Subject(id: found.id, name: cleanedName, code: cleanedCode)
@@ -79,6 +84,20 @@ struct ManageSubjectsUseCase {
 
         if repository.errorMessage != nil {
             throw SubjectError.saveFailed
+        }
+
+        // Rule 6: rename the subject on its assignments too
+        guard let assignmentRepository, oldName != cleanedName else { return }
+
+        for assignment in assignmentRepository.assignments
+        where assignment.course.lowercased() == oldName.lowercased() {
+            let renamed = assignment.copy()
+            renamed.course = cleanedName
+            do {
+                try assignmentRepository.update(renamed)
+            } catch {
+                throw SubjectError.saveFailed
+            }
         }
     }
 

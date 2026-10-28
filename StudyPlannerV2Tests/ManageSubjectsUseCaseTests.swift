@@ -176,6 +176,21 @@ struct ManageSubjectsUseCaseTests {
 
         #expect(repository.subjects.first?.name == "Database")
     }
+    
+    @Test func renamingSubjectRenamesItsAssignments() throws {
+        let subject = Subject(name: "Database", code: nil)
+        let repository = MockSubjectRepository(subjects: [subject])
+        let assignmentRepository = MockAssignmentRepository(assignments: [
+            Assignment(title: "Report", course: "Database", dueDate: .now, priority: .high, tasks: []),
+            Assignment(title: "Essay", course: "Ethics of AI", dueDate: .now, priority: .low, tasks: [])
+        ])
+        let useCase = ManageSubjectsUseCase(repository: repository, assignmentRepository: assignmentRepository)
+
+        try useCase.update(id: subject.id, name: "Database Systems", code: nil)
+
+        #expect(assignmentRepository.assignments[0].course == "Database Systems")
+        #expect(assignmentRepository.assignments[1].course == "Ethics of AI")
+    }
 
     // MARK: - Delete
     
