@@ -66,7 +66,7 @@ struct AssignmentListView: View {
                                     )
                                     .font(.caption2)
                                     .fontWeight(.semibold)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(.primary.opacity(0.75))
                                     .textCase(.uppercase)
                                 }
                                 .frame(width: 52, height: 56)
