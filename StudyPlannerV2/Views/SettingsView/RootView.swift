@@ -67,7 +67,7 @@ struct RootView: View {
         )
         
         _subjectViewModel = StateObject(
-            wrappedValue: SubjectViewModel(repository: subjectRepository)
+            wrappedValue: SubjectViewModel(repository: subjectRepository, assignmentRepository: repository)
         )
         
         let discoveryRepository: (any InternshipDiscoveryRepository)?

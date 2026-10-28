@@ -20,8 +20,11 @@ final class SubjectViewModel: ObservableObject {
     private let manageSubjects: ManageSubjectsUseCase
     private let fetchSubjects: FetchSubjectsUseCase
 
-    init(repository: SubjectRepository) {
-        self.manageSubjects = ManageSubjectsUseCase(repository: repository)
+    init(repository: SubjectRepository, assignmentRepository: AssignmentRepository? = nil) {
+        self.manageSubjects = ManageSubjectsUseCase(
+            repository: repository,
+            assignmentRepository: assignmentRepository
+        )
         self.fetchSubjects = FetchSubjectsUseCase(repository: repository)
         loadSubjects()
     }
@@ -39,6 +42,19 @@ final class SubjectViewModel: ObservableObject {
     func addSubject(name: String, code: String) -> Bool {
         do {
             try manageSubjects.add(name: name, code: code)
+            loadSubjects()
+            return true
+        } catch {
+            errorMessage = error.localizedDescription
+            return false
+        }
+    }
+    
+    // Returns true if the subject was updated, so the view knows whether to close the form.
+    @discardableResult
+    func updateSubject(id: UUID, name: String, code: String) -> Bool {
+        do {
+            try manageSubjects.update(id: id, name: name, code: code)
             loadSubjects()
             return true
         } catch {
