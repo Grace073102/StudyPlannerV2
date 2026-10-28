@@ -51,6 +51,7 @@ final class MockSubjectRepository: SubjectRepository {
     }
 
     /// Replaces the stored subject that has the same ID.
+    /// Ignores shouldFailOnSave because no use case updates subjects yet
     func update(_ subject: Subject) {
         guard let index = stored.firstIndex(where: {
             $0.id == subject.id
