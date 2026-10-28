@@ -106,6 +106,77 @@ struct ManageSubjectsUseCaseTests {
         #expect(repository.subjects.isEmpty)
     }
     
+    // MARK: - Update
+
+    @Test func updatesNameAndCodeWithTrimming() throws {
+        let subject = Subject(name: "Database", code: nil)
+        let repository = MockSubjectRepository(subjects: [subject])
+        let useCase = ManageSubjectsUseCase(repository: repository)
+
+        try useCase.update(id: subject.id, name: "  Advanced iOS ", code: " 40005 ")
+
+        #expect(repository.subjects.first?.name == "Advanced iOS")
+        #expect(repository.subjects.first?.code == "40005")
+        #expect(repository.subjects.first?.id == subject.id)
+    }
+
+    @Test func savingWithSameNameIsNotADuplicate() throws {
+        let subject = Subject(name: "Advanced iOS", code: "40005")
+        let repository = MockSubjectRepository(subjects: [subject])
+        let useCase = ManageSubjectsUseCase(repository: repository)
+
+        try useCase.update(id: subject.id, name: "Advanced iOS", code: "40005")
+
+        #expect(repository.subjects.count == 1)
+    }
+
+    @Test func renamingToAnotherSubjectsNameThrowsDuplicateName() {
+        let ios = Subject(name: "Advanced iOS", code: "40005")
+        let imageProcessing = Subject(name: "Image Processing", code: "31256")
+        let repository = MockSubjectRepository(subjects: [ios, imageProcessing])
+        let useCase = ManageSubjectsUseCase(repository: repository)
+
+        #expect(throws: ManageSubjectsUseCase.SubjectError.duplicateName) {
+            try useCase.update(id: imageProcessing.id, name: "advanced ios", code: nil)
+        }
+
+        #expect(repository.subjects.last?.name == "Image Processing")
+    }
+
+    @Test func updatingWithBlankNameThrowsMissingName() {
+        let subject = Subject(name: "Advanced iOS", code: nil)
+        let repository = MockSubjectRepository(subjects: [subject])
+        let useCase = ManageSubjectsUseCase(repository: repository)
+
+        #expect(throws: ManageSubjectsUseCase.SubjectError.missingName) {
+            try useCase.update(id: subject.id, name: "   ", code: nil)
+        }
+
+        #expect(repository.subjects.first?.name == "Advanced iOS")
+    }
+
+    @Test func updatingUnknownSubjectThrowsSubjectNotFound() {
+        let repository = MockSubjectRepository()
+        let useCase = ManageSubjectsUseCase(repository: repository)
+
+        #expect(throws: ManageSubjectsUseCase.SubjectError.subjectNotFound) {
+            try useCase.update(id: UUID(), name: "Advanced iOS", code: nil)
+        }
+    }
+
+    @Test func updateSaveFailureThrowsSaveFailed() {
+        let subject = Subject(name: "Database", code: nil)
+        let repository = MockSubjectRepository(subjects: [subject])
+        repository.shouldFailOnSave = true
+        let useCase = ManageSubjectsUseCase(repository: repository)
+
+        #expect(throws: ManageSubjectsUseCase.SubjectError.saveFailed) {
+            try useCase.update(id: subject.id, name: "Advanced iOS", code: nil)
+        }
+
+        #expect(repository.subjects.first?.name == "Database")
+    }
+
     // MARK: - Delete
     
     @Test func deletesExistingSubject() throws {
