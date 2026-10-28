@@ -89,7 +89,7 @@ final class RemoteInternshipRepository:
         }
 
         var items = [
-            URLQueryItem(name: "location", value: "AU"),
+            URLQueryItem(name: "country_id", value: "14"),
             URLQueryItem(
                 name: "employment_type",
                 value: "INTERN"
@@ -109,11 +109,12 @@ final class RemoteInternshipRepository:
             in: .whitespacesAndNewlines
         )
 
-        if !title.isEmpty {
-            items.append(
-                URLQueryItem(name: "title", value: title)
+        items.append(
+            URLQueryItem(
+                name: "title",
+                value: title.isEmpty ? "intern" : title
             )
-        }
+        )
 
         if query.remoteOnly {
             items.append(
@@ -160,10 +161,18 @@ final class RemoteInternshipRepository:
             )
         }
 
+    
         do {
-            return try JSONDecoder().decode(
+            let page = try JSONDecoder().decode(
                 InternshipPage.self,
                 from: data
+            )
+
+            return InternshipPage(
+                data: page.data.filter {
+                    !$0.hasCompanyOnlyAustralianMatch
+                },
+                pagination: page.pagination
             )
         } catch {
             throw InternshipDiscoveryError.invalidData

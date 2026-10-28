@@ -46,7 +46,8 @@ struct RemoteInternshipRepositoryTests {
                 ) == "Bearer test-key"
             )
 
-            #expect(value("location") == "AU")
+            #expect(value("country_id") == "14")
+            #expect(value("location") == nil)
             #expect(value("employment_type") == "INTERN")
             #expect(value("title") == "software & design")
             #expect(value("remote") == "true")
@@ -95,6 +96,73 @@ struct RemoteInternshipRepositoryTests {
         #expect(page.pagination.nextPage == "another-cursor")
     }
 
+    @Test
+    func searchExcludesCompanyOnlyAustralianLocationMatches() async throws {
+        let session = makeSession()
+        defer {
+            session.invalidateAndCancel()
+            InternshipURLProtocol.handler = nil
+        }
+
+        InternshipURLProtocol.handler = { _ in
+            let json = """
+            {
+                "data": [
+                    {
+                        "id": "incorrect-match",
+                        "title": "Intern",
+                        "location": "New York",
+                        "company": {
+                            "name": "Success Academy Charter Schools"
+                        },
+                        "locations": [
+                            {
+                                "country_code": "AU",
+                                "raw_location": "Success Academy Charter Schools"
+                            },
+                            {
+                                "country_code": "US",
+                                "raw_location": "New York"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "valid-perth",
+                        "title": "Engineering Intern",
+                        "location": "Perth",
+                        "company": {
+                            "name": "Example Company"
+                        },
+                        "locations": [
+                            {
+                                "country_code": "AU",
+                                "raw_location": "Perth"
+                            }
+                        ]
+                    }
+                ],
+                "pagination": {
+                    "next_page": "next-cursor"
+                }
+            }
+            """
+
+            return (200, Data(json.utf8))
+        }
+
+        let repository = try RemoteInternshipRepository(
+            apiKey: "test-key",
+            session: session
+        )
+
+        let page = try await repository.search(
+            InternshipSearch()
+        )
+
+        #expect(page.data.map(\.id) == ["valid-perth"])
+        #expect(page.pagination.nextPage == "next-cursor")
+    }
+    
     @Test
     func rateLimitResponseThrowsExpectedError() async throws {
         let session = makeSession()
