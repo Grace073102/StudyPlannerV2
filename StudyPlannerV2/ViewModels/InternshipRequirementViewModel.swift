@@ -19,6 +19,7 @@ final class InternshipRequirementViewModel: ObservableObject {
     private let repository: InternshipRequirementRepository
     private let addRequirementUseCase: AddInternshipRequirementUseCase
     private var repositoryChanges: AnyCancellable?
+    private var reminderTasks: [UUID: Task<Void, Never>] = [:]
 
     init(repository: InternshipRequirementRepository) {
         self.repository = repository
@@ -80,8 +81,8 @@ final class InternshipRequirementViewModel: ObservableObject {
             expiryDate: expiryDate
         )
 
-        try reloadRequirements()
         updateReminders(for: requirement)
+        try reloadRequirements()
     }
 
     // Update a requirement
@@ -94,7 +95,7 @@ final class InternshipRequirementViewModel: ObservableObject {
     ) throws {
         let useCase = UpdateInternshipRequirementUseCase(repository: repository)
 
-        try useCase.execute(
+        let updatedRequirement = try useCase.execute(
             id: id,
             name: name,
             category: category,
@@ -102,11 +103,8 @@ final class InternshipRequirementViewModel: ObservableObject {
             expiryDate: expiryDate
         )
 
+        updateReminders(for: updatedRequirement)
         try reloadRequirements()
-
-        if let requirement = requirements.first(where: { $0.id == id }) {
-            updateReminders(for: requirement)
-        }
     }
 
     // Delete a requirement
@@ -114,6 +112,9 @@ final class InternshipRequirementViewModel: ObservableObject {
         let useCase = DeleteInternshipRequirementUseCase(repository: repository)
 
         try useCase.execute(id: id)
+
+        reminderTasks[id]?.cancel()
+        reminderTasks[id] = nil
 
         InternshipRequirementNotificationManager.shared
             .cancelNotifications(for: id)
@@ -150,73 +151,80 @@ final class InternshipRequirementViewModel: ObservableObject {
         do {
             let updatedRequirement = try useCase.execute(id: requirement.id)
 
-            try reloadRequirements()
             updateReminders(for: updatedRequirement)
+            try reloadRequirements()
         } catch {
             repositoryErrorMessage = error.localizedDescription
         }
     }
 
-    // Update reminders using the latest saved requirement
-    private func updateReminders(for requirement: InternshipRequirement) {
+    // Update reminders in save order for each requirement.
+    private func updateReminders(
+        for requirement: InternshipRequirement
+    ) {
         let id = requirement.id
+        let previousTask = reminderTasks[id]
         let manager = InternshipRequirementNotificationManager.shared
 
-        manager.removeNotifications(for: id)
+        // Each new task waits for the previous update to finish.
+        // This prevents an older edit from scheduling a reminder
+        // after a newer edit has already scheduled one.
+        let task = Task { [weak self] in
+            await previousTask?.value
 
-        let needsDueReminder = !requirement.isCompleted && requirement.dueDate != nil
-
-        let needsExpiryReminder = requirement.expiryDate != nil
-
-        guard needsDueReminder || needsExpiryReminder else {
-            notificationErrorMessage = nil
-            return
-        }
-
-        Task { [weak self] in
             guard let self else {
+                return
+            }
+
+            // An edit might have been replaced while this task waited.
+            guard !Task.isCancelled else {
+                return
+            }
+
+            manager.removeNotifications(for: id)
+
+            let needsDueReminder = !requirement.isCompleted && requirement.dueDate != nil
+            let needsExpiryReminder = requirement.expiryDate != nil
+
+            guard needsDueReminder || needsExpiryReminder else {
+                notificationErrorMessage = nil
                 return
             }
 
             do {
                 let granted = try await manager.requestPermission()
 
-                // Reload after waiting for permission, because the
-                // requirement may have been edited or deleted.
-                let latestRequirement = try repository.load().first {
-                    $0.id == id
-                }
-
-                guard let latestRequirement else {
-                    manager.cancelNotifications(for: id)
-                    return
-                }
-
-                let stillNeedsReminder = (!latestRequirement.isCompleted && latestRequirement.dueDate != nil) || latestRequirement.expiryDate != nil
-
-                guard stillNeedsReminder else {
-                    manager.removeNotifications(for: id)
-                    notificationErrorMessage = nil
+                guard !Task.isCancelled else {
                     return
                 }
 
                 guard granted else {
-                    manager.removeNotifications(for: id)
-
                     notificationErrorMessage = "The requirement was saved, but notifications are disabled. You can enable them in Settings to receive reminders."
-
                     return
                 }
 
-                try await manager.scheduleNotifications(
-                    for: latestRequirement
-                )
+                try await manager.scheduleNotifications(for: requirement)
+
+                // If this task was superseded during scheduling, the
+                // next task will remove its reminders before scheduling
+                // the latest version.
+                guard !Task.isCancelled else {
+                    return
+                }
 
                 notificationErrorMessage = nil
             } catch {
+                guard !Task.isCancelled else {
+                    return
+                }
+
                 notificationErrorMessage = "The requirement was saved, but its reminder could not be scheduled. \(error.localizedDescription)"
             }
         }
+
+        // Cancel the older task, then keep the new task as the latest.
+        previousTask?.cancel()
+        reminderTasks[id] = task
     }
 
     func clearRepositoryError() {

@@ -8,6 +8,7 @@
 import Foundation
 import UserNotifications
 
+@MainActor
 final class InternshipRequirementNotificationManager {
 
     static let shared = InternshipRequirementNotificationManager()

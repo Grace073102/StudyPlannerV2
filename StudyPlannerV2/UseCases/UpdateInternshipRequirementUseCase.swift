@@ -25,7 +25,7 @@ struct UpdateInternshipRequirementUseCase {
         dueDate: Date?,
         expiryDate: Date?,
         today: Date = Date()
-    ) throws {
+    ) throws -> InternshipRequirement {
 
         // Validate requirement name
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -66,5 +66,6 @@ struct UpdateInternshipRequirementUseCase {
         updatedRequirement.expiryDate = expiryDate
 
         try repository.update(updatedRequirement)
+        return updatedRequirement
     }
 }
