@@ -109,11 +109,12 @@ final class RemoteInternshipRepository:
             in: .whitespacesAndNewlines
         )
 
-        if !title.isEmpty {
-            items.append(
-                URLQueryItem(name: "title", value: title)
+        items.append(
+            URLQueryItem(
+                name: "title",
+                value: title.isEmpty ? "intern" : title
             )
-        }
+        )
 
         if query.remoteOnly {
             items.append(
@@ -133,6 +134,7 @@ final class RemoteInternshipRepository:
             throw InternshipDiscoveryError.invalidEndpoint
         }
 
+        print("Internship request: \(url.absoluteString)")
         var request = URLRequest(url: url)
         request.timeoutInterval = 30
         request.setValue(
@@ -160,6 +162,20 @@ final class RemoteInternshipRepository:
             )
         }
 
+        #if DEBUG
+        if let object = (try? JSONSerialization.jsonObject(with: data))
+            as? [String: Any] {
+            print("API filter metadata:", object["meta"] ?? "missing")
+
+            if let listings = object["data"] as? [[String: Any]] {
+                for listing in listings {
+                    print("Title:", listing["title"] ?? "missing")
+                    print("Location:", listing["location"] ?? "missing")
+                    print("Structured locations:", listing["locations"] ?? "missing")
+                }
+            }
+        }
+        #endif
         do {
             return try JSONDecoder().decode(
                 InternshipPage.self,
