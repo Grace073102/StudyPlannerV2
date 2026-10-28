@@ -56,12 +56,7 @@ final class RequirementNotificationManager: NSObject, UNUserNotificationCenterDe
     }
 
     // Schedule one notification
-    private func scheduleReminder(
-        id: String,
-        title: String,
-        body: String,
-        targetDate: Date
-    ) async throws {
+    private func scheduleReminder(id: String, title: String, body: String, targetDate: Date) async throws {
 
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
@@ -69,21 +64,14 @@ final class RequirementNotificationManager: NSObject, UNUserNotificationCenterDe
 
         guard targetDay >= today else { return }
 
-        guard let reminderDay = calendar.date(
-            byAdding: .day,
-            value: -7,
-            to: targetDay
-        ) else {
+        guard let reminderDay = calendar.date(byAdding: .day, value: -7, to: targetDay) else {
             return
         }
 
         
         let notificationDay = max(reminderDay, today)
 
-        var components = calendar.dateComponents(
-            [.year, .month, .day],
-            from: notificationDay
-        )
+        var components = calendar.dateComponents([.year, .month, .day], from: notificationDay)
 
         components.hour = 9
         components.minute = 0
@@ -93,20 +81,11 @@ final class RequirementNotificationManager: NSObject, UNUserNotificationCenterDe
         }
 
         if notificationDate <= Date() {
-            guard let tomorrow = calendar.date(
-                byAdding: .day,
-                value: 1,
-                to: today
-            ) else {
+            guard let tomorrow = calendar.date(byAdding: .day, value: 1, to: today) else {
                 return
             }
 
-            guard let nextNotificationDate = calendar.date(
-                bySettingHour: 9,
-                minute: 0,
-                second: 0,
-                of: tomorrow
-            ) else {
+            guard let nextNotificationDate = calendar.date(bySettingHour: 9, minute: 0, second: 0, of: tomorrow) else {
                 return
             }
 
@@ -117,10 +96,7 @@ final class RequirementNotificationManager: NSObject, UNUserNotificationCenterDe
             return
         }
 
-        components = calendar.dateComponents(
-            [.year, .month, .day, .hour, .minute],
-            from: notificationDate
-        )
+        components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: notificationDate)
 
 
         let content = UNMutableNotificationContent()
@@ -128,16 +104,9 @@ final class RequirementNotificationManager: NSObject, UNUserNotificationCenterDe
         content.body = body
         content.sound = .default
 
-        let trigger = UNTimeIntervalNotificationTrigger(
-            timeInterval: 2,
-            repeats: false
-        )
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
 
-        let request = UNNotificationRequest(
-            identifier: id,
-            content: content,
-            trigger: trigger
-        )
+        let request = UNNotificationRequest(identifier: id, content: content, trigger: trigger)
 
         try await UNUserNotificationCenter.current().add(request)
     }
@@ -160,10 +129,7 @@ final class RequirementNotificationManager: NSObject, UNUserNotificationCenterDe
     }
     
     // Show notification banner while the app is in the foreground
-    func userNotificationCenter(
-        _ center: UNUserNotificationCenter,
-        willPresent notification: UNNotification
-    ) async -> UNNotificationPresentationOptions {
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
         return [.banner, .sound, .badge]
     }
 }

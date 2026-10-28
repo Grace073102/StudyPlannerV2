@@ -118,8 +118,11 @@ struct RequirementDetailView: View {
                     .background(Theme.card)
                     .clipShape(RoundedRectangle(cornerRadius: Theme.corner))
 
-                    AssignmentPDFSection(assignmentID: "requirement-\(requirement.id.uuidString)")
-                        .id(requirement.id)
+                    AssignmentPDFSection(
+                        assignmentID: "requirement-\(requirement.id.uuidString)",
+                        attachmentDescription: "Attach PDFs related to this placement requirement."
+                    )
+                    .id(requirement.id)
                 } else {
                     ContentUnavailableView(
                         "Requirement Not Found",

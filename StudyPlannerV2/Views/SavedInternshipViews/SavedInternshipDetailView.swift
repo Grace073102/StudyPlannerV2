@@ -11,6 +11,7 @@ import SwiftUI
 struct SavedInternshipDetailView: View {
 
     @ObservedObject var viewModel: SavedInternshipViewModel
+    @EnvironmentObject private var requirementViewModel:InternshipRequirementViewModel
     @Environment(\.dismiss) private var dismiss
 
     let internship: SavedInternship
@@ -40,6 +41,26 @@ struct SavedInternshipDetailView: View {
                     LabeledContent("Location", value: location)
                 }
             }
+            
+            // Internship Requirement Checklist
+            Section("Requirements") {
+                let requirements = requirementViewModel.requirements(for: internship.id)
+                let completed = requirementViewModel.completedCount(for: internship.id)
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("\(completed) of \(requirements.count) completed")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+
+                    ProgressView(value: requirementViewModel.progress(for: internship.id))
+
+                    NavigationLink {
+                        InternshipRequirementListView(viewModel: requirementViewModel, internshipID: internship.id)
+                    } label: {
+                        Text("Manage Requirements")
+                    }
+                }
+            }
 
             Section("Application") {
                 if let deadline = internship.applicationDeadline {
@@ -64,7 +85,9 @@ struct SavedInternshipDetailView: View {
                         .frame(minHeight: 44)
                 }
                 .listRowBackground(
-                    Theme.accentFill.opacity(selectedStatus == internship.applicationStatus ? 0.5 : 1)
+                    Theme.accentFill.opacity(
+                        selectedStatus == internship.applicationStatus ? 0.5 : 1
+                    )
                 )
                 .disabled(selectedStatus == internship.applicationStatus)
             }

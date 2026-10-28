@@ -14,6 +14,7 @@ struct RootView: View {
     @StateObject private var taskViewModel: TaskViewModel
     
     @StateObject private var requirementViewModel: RequirementViewModel
+    @StateObject private var internshipRequirementViewModel: InternshipRequirementViewModel
     @StateObject private var placementViewModel: PlacementViewModel
     @StateObject private var savedInternshipViewModel: SavedInternshipViewModel
     @StateObject private var subjectViewModel: SubjectViewModel
@@ -22,6 +23,7 @@ struct RootView: View {
     init(
         repository: AssignmentRepository,
         requirementRepository: RequirementRepository,
+        internshipRequirementRepository: InternshipRequirementRepository,
         managePlacements: ManagePlacementsUseCase,
         subjectRepository: SubjectRepository,
         savedInternshipRepository: SavedInternshipRepository,
@@ -45,6 +47,12 @@ struct RootView: View {
         _requirementViewModel = StateObject(
             wrappedValue: RequirementViewModel(
                 repository: requirementRepository
+            )
+        )
+        
+        _internshipRequirementViewModel = StateObject(
+            wrappedValue: InternshipRequirementViewModel(
+                repository: internshipRequirementRepository
             )
         )
         
@@ -106,6 +114,7 @@ struct RootView: View {
         .environmentObject(assignmentViewModel)
         .environmentObject(taskViewModel)
         .environmentObject(requirementViewModel)
+        .environmentObject(internshipRequirementViewModel)
         .environmentObject(placementViewModel)
         .environmentObject(savedInternshipViewModel)
         .environmentObject(subjectViewModel)

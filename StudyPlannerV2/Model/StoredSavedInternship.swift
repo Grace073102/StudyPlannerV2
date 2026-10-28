@@ -15,7 +15,10 @@ typealias SavedInternship = StoredSavedInternship
 
 @Model
 final class StoredSavedInternship {
-    @Attribute(.unique) var id: UUID
+
+    @Attribute(.unique)
+    var id: UUID
+
     var jobID: String
     var title: String
     var company: String
@@ -26,9 +29,17 @@ final class StoredSavedInternship {
     var savedDate: Date
     var applicationStatusRawValue: String
 
+    @Relationship(deleteRule: .cascade, inverse: \StoredInternshipRequirement.internship)
+    
+    var requirements: [StoredInternshipRequirement] = []
+
     var applicationStatus: ApplicationStatus {
-        get { ApplicationStatus(rawValue: applicationStatusRawValue) ?? .saved }
-        set { applicationStatusRawValue = newValue.rawValue }
+        get {
+            ApplicationStatus(rawValue: applicationStatusRawValue) ?? .saved
+        }
+        set {
+            applicationStatusRawValue = newValue.rawValue
+        }
     }
 
     init(
@@ -52,7 +63,7 @@ final class StoredSavedInternship {
         self.companyWebsiteURL = companyWebsiteURL
         self.applicationDeadline = applicationDeadline
         self.savedDate = savedDate
-        applicationStatusRawValue = applicationStatus.rawValue
+        self.applicationStatusRawValue = applicationStatus.rawValue
     }
 
     init(internship: SavedInternship) {
@@ -65,7 +76,7 @@ final class StoredSavedInternship {
         companyWebsiteURL = internship.companyWebsiteURL
         applicationDeadline = internship.applicationDeadline
         savedDate = internship.savedDate
-        applicationStatusRawValue = internship.applicationStatus.rawValue
+        applicationStatusRawValue = internship.applicationStatusRawValue
     }
 
     func toSavedInternship() throws -> SavedInternship {
