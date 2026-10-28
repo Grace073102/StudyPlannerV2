@@ -45,6 +45,7 @@ struct PDFPreviewView: View {
                         loadPDF()
                     }
                     .buttonStyle(.borderedProminent)
+                    .tint(Theme.accentFill)
                 }
                 .padding(24)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

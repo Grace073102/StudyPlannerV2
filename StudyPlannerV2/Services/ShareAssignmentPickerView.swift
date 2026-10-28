@@ -109,6 +109,7 @@ struct ShareAssignmentPickerView: View {
                         .padding(14)
                 }
                 .buttonStyle(.borderedProminent)
+                .tint(Theme.accentFill)
                 .disabled(selectedAssignmentID == nil)
             }
             .padding(20)

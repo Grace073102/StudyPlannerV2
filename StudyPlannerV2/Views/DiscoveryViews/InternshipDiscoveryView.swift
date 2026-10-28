@@ -108,6 +108,7 @@ struct InternshipDiscoveryView: View {
             Button("Try Again") { Task { await viewModel.search() } }
                 .font(.system(.body, weight: .semibold))
                 .buttonStyle(.borderedProminent)
+                .tint(Theme.accentFill)
             Spacer()
         } else {
             ScrollView {
@@ -197,6 +198,7 @@ struct InternshipDiscoveryView: View {
                         Label("Company Website", systemImage: "globe")
                     }
                     .buttonStyle(.borderedProminent)
+                    .tint(Theme.accentFill)
                     .accessibilityLabel("Open \(internship.companyDisplayName) website")
                 }
             }
