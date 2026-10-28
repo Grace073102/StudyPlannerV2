@@ -79,10 +79,10 @@ struct UpcomingDeadlinesView: View {
                             Text(priority.rawValue)
                                 .font(.caption2)
                                 .fontWeight(.semibold)
-                                .foregroundStyle(priority.color)
+                                .foregroundStyle(.primary)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
-                                .background(priority.color.opacity(0.12))
+                                .background(priority.color.opacity(0.25))
                                 .clipShape(Capsule())
                         }
                     }

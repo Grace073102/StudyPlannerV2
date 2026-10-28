@@ -116,7 +116,7 @@ struct AddSubtaskView: View {
                         .frame(height: 46)
                         .background(
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.accentColor)
+                                .fill(Theme.accentFill)
                         )
                     }
                     .disabled(cleanedTitle.isEmpty)

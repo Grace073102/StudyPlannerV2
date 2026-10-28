@@ -102,11 +102,17 @@ struct AddSubjectView: View {
                     Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Add") {
+                    Button {
                         if subjectViewModel.addSubject(name: name, code: code) {
                             dismiss()
                         }
+                    } label: {
+                        Text("Add")
+                            .fontWeight(.semibold)
+                            .foregroundStyle(Theme.onAccent)
                     }
+                    .buttonStyle(.borderedProminent)
+                    .tint(Theme.accentFill)
                 }
             }
             .alert(

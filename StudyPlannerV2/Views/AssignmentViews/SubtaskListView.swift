@@ -163,7 +163,7 @@ struct SubtaskListView: View {
                 .frame(height: 46)
                 .background(
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.accentColor)
+                        .fill(Theme.accentFill)
                 )
             }
             .buttonStyle(.plain)
@@ -258,7 +258,7 @@ struct SubtaskListView: View {
                                 .frame(height: 46)
                                 .background(
                                     RoundedRectangle(cornerRadius: 12)
-                                        .fill(Color.accentColor)
+                                        .fill(Theme.accentFill)
                                 )
                         }
                         .disabled(cleanedEditingTitle.isEmpty)

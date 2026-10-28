@@ -179,6 +179,7 @@ struct AddAssignmentView: View {
                                 .scrollContentBackground(.hidden)
                                 .background(Color.clear)
                         }
+                        .accessibilityLabel("Description, optional")
                         .frame(height: 120)
                     }
 
@@ -192,7 +193,7 @@ struct AddAssignmentView: View {
                             .frame(height: 50)
                             .background(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.accentColor)
+                                    .fill(Theme.accentFill)
                             )
                     }
                     .disabled(!isValid)
