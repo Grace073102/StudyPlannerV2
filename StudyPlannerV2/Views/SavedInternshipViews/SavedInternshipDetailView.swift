@@ -43,14 +43,22 @@ struct SavedInternshipDetailView: View {
             }
             
             // Internship Requirement Checklist
-            Section("Requirement Checklist") {
-                NavigationLink {
-                    InternshipRequirementListView(
-                        viewModel: requirementViewModel,
-                        internshipID: internship.id
-                    )
-                } label: {
-                    Label("View Checklist", systemImage: "checklist")
+            Section("Requirements") {
+                let requirements = requirementViewModel.requirements(for: internship.id)
+                let completed = requirementViewModel.completedCount(for: internship.id)
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("\(completed) of \(requirements.count) completed")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+
+                    ProgressView(value: requirementViewModel.progress(for: internship.id))
+
+                    NavigationLink {
+                        InternshipRequirementListView(viewModel: requirementViewModel, internshipID: internship.id)
+                    } label: {
+                        Text("Manage Requirements")
+                    }
                 }
             }
 
@@ -76,9 +84,7 @@ struct SavedInternshipDetailView: View {
                         .frame(maxWidth: .infinity)
                         .frame(minHeight: 44)
                 }
-                .listRowBackground(
-                    Color.accentColor.opacity(selectedStatus == internship.applicationStatus ? 0.5 : 1)
-                )
+                .listRowBackground(Color.accentColor.opacity(selectedStatus == internship.applicationStatus ? 0.5 : 1))
                 .disabled(selectedStatus == internship.applicationStatus)
             }
 
