@@ -111,9 +111,7 @@ struct AssignmentListView: View {
                                     )
                                     .font(.caption2)
                                     .fontWeight(.semibold)
-                                    .foregroundStyle(
-                                        assignment.priority.color
-                                    )
+                                    .foregroundStyle(.primary)
                                     .padding(.horizontal, 8)
                                     .padding(.vertical, 4)
                                     .background(

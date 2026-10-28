@@ -36,7 +36,7 @@ struct AssignmentView: View {
                                 .frame(width: 44, height: 44)
                                 .background(
                                     Circle()
-                                        .fill(Color.accentColor)
+                                        .fill(Theme.accentFill)
                                 )
                         }
                         .buttonStyle(.plain)

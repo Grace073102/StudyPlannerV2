@@ -50,7 +50,7 @@ struct PlacementListView: View {
                         .font(.title3.weight(.semibold))
                         .foregroundStyle(Theme.onAccent)
                         .frame(width: 44, height: 44)
-                        .background(Color.accentColor, in: Circle())
+                        .background(Theme.accentFill, in: Circle())
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Add Placement")
