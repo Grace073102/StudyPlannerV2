@@ -60,7 +60,7 @@ struct AssignmentView: View {
                         .foregroundStyle(Theme.onAccent)
                         .padding(Theme.padding)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                        .background(Color.accentColor, in: .rect(cornerRadius: Theme.corner))
+                        .background(Theme.accentFill, in: .rect(cornerRadius: Theme.corner))
                         
                         ProgressOverviewView(
                             progress: assignmentViewModel.overallProgress,
