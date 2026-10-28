@@ -90,7 +90,8 @@ struct StudyPlannerApp: App {
                 StoredPlacementRequirement.self,
                 StoredSubject.self,
                 StoredPlacement.self,
-                StoredSavedInternship.self
+                StoredSavedInternship.self,
+                StoredInternshipRequirement.self
             ])
 
             let configuration = ModelConfiguration(
