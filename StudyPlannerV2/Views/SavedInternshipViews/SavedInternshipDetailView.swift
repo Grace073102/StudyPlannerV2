@@ -64,7 +64,7 @@ struct SavedInternshipDetailView: View {
                         .frame(minHeight: 44)
                 }
                 .listRowBackground(
-                    Theme.onAccent.opacity(selectedStatus == internship.applicationStatus ? 0.5 : 1)
+                    Theme.accentFill.opacity(selectedStatus == internship.applicationStatus ? 0.5 : 1)
                 )
                 .disabled(selectedStatus == internship.applicationStatus)
             }

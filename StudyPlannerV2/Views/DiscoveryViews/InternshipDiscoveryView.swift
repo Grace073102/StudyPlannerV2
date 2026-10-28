@@ -186,8 +186,10 @@ struct InternshipDiscoveryView: View {
                 } label: {
                     Label(saved ? "Saved" : "Save",
                           systemImage: saved ? "bookmark.fill" : "bookmark")
+                    .fontWeight(.semibold)
                 }
                 .buttonStyle(.bordered)
+                .tint(Color.primary)
                 .disabled(saved)
                 .accessibilityLabel(saved ? "Saved \(internship.title)" : "Save \(internship.title)")
 
