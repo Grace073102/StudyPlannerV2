@@ -69,7 +69,7 @@ struct AddRequirementView: View {
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+                    Button {
                         do {
                             try viewModel.add(
                                 placementID: placementID,
@@ -85,9 +85,15 @@ struct AddRequirementView: View {
                             errorMessage = error.localizedDescription
                             showingError = true
                         }
+                    } label: {
+                        Text("Save")
+                            .fontWeight(.semibold)
+                            .foregroundStyle(Theme.onAccent)
                     }
                     .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     .fontWeight(.semibold)
+                    .buttonStyle(.borderedProminent)
+                    .tint(Theme.accentFill)
                 }
             }
             .alert("Unable to Save", isPresented: $showingError) {

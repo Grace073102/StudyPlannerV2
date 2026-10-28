@@ -94,7 +94,7 @@ struct PlacementFormView: View {
                         .frame(minHeight: 50)
                         .background(
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.accentColor)
+                                .fill(Theme.accentFill)
                         )
                 }
                 .padding(.horizontal, 20)

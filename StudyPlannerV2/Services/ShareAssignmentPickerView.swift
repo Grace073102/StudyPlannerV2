@@ -109,6 +109,8 @@ struct ShareAssignmentPickerView: View {
                         .padding(14)
                 }
                 .buttonStyle(.borderedProminent)
+                // colour is same as Theme.accentFill (share extension can't see Theme)
+                .tint(Color(red: 88 / 255, green: 86 / 255, blue: 214 / 255))
                 .disabled(selectedAssignmentID == nil)
             }
             .padding(20)
