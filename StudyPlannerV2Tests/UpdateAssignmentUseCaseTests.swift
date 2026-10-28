@@ -19,6 +19,9 @@ struct UpdateAssignmentUseCaseTests {
     private var threeDaysAgo: Date {
         Calendar.current.date(byAdding: .day, value: -3, to: today)!
     }
+    private var yesterday: Date {
+        Calendar.current.date(byAdding: .day, value: -1, to: today)!
+    }
     private var nextWeek: Date {
         Calendar.current.date(byAdding: .day, value: 7, to: today)!
     }
@@ -86,6 +89,46 @@ struct UpdateAssignmentUseCaseTests {
                 title: "Old title",
                 course: "40005 Advanced iOS",
                 dueDate: threeDaysAgo,
+                priority: .low,
+                description: "",
+                today: today
+            )
+        }
+
+        #expect(repository.updateCallCount == 0)
+    }
+    
+    // Boundary Test: changing the due date to today is allowed.
+    @Test func changingDueDateToTodayIsValid() throws {
+        let assignment = makeAssignment(dueDate: nextWeek)
+        let repository = MockAssignmentRepository(assignments: [assignment])
+        let useCase = UpdateAssignmentUseCase(repository: repository)
+
+        try useCase.execute(
+            assignmentID: assignment.id,
+            title: "Old title",
+            course: "40005 Advanced iOS",
+            dueDate: today,
+            priority: .low,
+            description: "",
+            today: today
+        )
+
+        #expect(repository.assignments.first?.dueDate == today)
+    }
+
+    // Boundary Test: changing the due date to yesterday is rejected.
+    @Test func changingDueDateToYesterdayThrowsDueDateInPast() {
+        let assignment = makeAssignment(dueDate: nextWeek)
+        let repository = MockAssignmentRepository(assignments: [assignment])
+        let useCase = UpdateAssignmentUseCase(repository: repository)
+
+        #expect(throws: UpdateAssignmentUseCase.UpdateAssignmentError.dueDateInPast) {
+            try useCase.execute(
+                assignmentID: assignment.id,
+                title: "Old title",
+                course: "40005 Advanced iOS",
+                dueDate: yesterday,
                 priority: .low,
                 description: "",
                 today: today

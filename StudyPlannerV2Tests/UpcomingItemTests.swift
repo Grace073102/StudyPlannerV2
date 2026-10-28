@@ -99,4 +99,17 @@ struct UpcomingItemTests {
         #expect(items.count == 5)
         #expect(items.last?.title == "Assignment 5")
     }
+    
+    // Boundary Test: exactly five items are all kept.
+    @Test func exactlyFiveAreAllKept() {
+        var assignments: [Assignment] = []
+        for n in 1...5 {
+            assignments.append(makeAssignment(title: "Assignment \(n)", dueIn: n))
+        }
+
+        let items = UpcomingItem.make(assignments: assignments, requirements: [])
+
+        #expect(items.count == 5)
+        #expect(items.last?.title == "Assignment 5")
+    }
 }

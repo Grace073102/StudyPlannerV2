@@ -18,6 +18,7 @@ final class MockSubjectRepository: SubjectRepository {
     /// The message from the last failed operation, or nil if it succeeded.
     var errorMessage: String?
     var shouldFailOnLoad = false
+    var shouldFailOnSave = false
     var subjects: [Subject] {
         stored.map { copyOf($0) }
     }
@@ -39,12 +40,18 @@ final class MockSubjectRepository: SubjectRepository {
         return subjects
     }
     
-    /// Stores a copy of the subject.
+    /// Stores a copy of the subject, or sets errorMessage if saving fails.
     func add(_ subject: Subject) {
+        if shouldFailOnSave {
+            errorMessage = "Failed to save subject."
+            return
+        }
+        errorMessage = nil
         stored.append(copyOf(subject))
     }
 
     /// Replaces the stored subject that has the same ID.
+    /// Ignores shouldFailOnSave because no use case updates subjects yet
     func update(_ subject: Subject) {
         guard let index = stored.firstIndex(where: {
             $0.id == subject.id
@@ -54,8 +61,13 @@ final class MockSubjectRepository: SubjectRepository {
         stored[index] = copyOf(subject)
     }
 
-    /// Removes the stored subject that has the same ID.
+    /// Removes the stored subject that has the same ID, or sets errorMessage if saving fails.
     func delete(_ subject: Subject) {
+        if shouldFailOnSave {
+            errorMessage = "Failed to delete subject."
+            return
+        }
+        errorMessage = nil
         stored.removeAll { $0.id == subject.id }
     }
 
