@@ -158,6 +158,7 @@ struct PlacementDetailView: View {
                     }
                 } label: {
                     Image(systemName: "pencil")
+                        .foregroundStyle(Color.accentColor)
                 }
                 .disabled(summary == nil)
                 .accessibilityLabel("Edit Placement")
@@ -191,7 +192,7 @@ struct PlacementStatusBadge: View {
         Label(status.displayName, systemImage: status.icon)
             .font(.caption2)
             .fontWeight(.semibold)
-            .foregroundStyle(status.color)
+            .foregroundStyle(.primary)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
             .background(status.color.opacity(0.25))
