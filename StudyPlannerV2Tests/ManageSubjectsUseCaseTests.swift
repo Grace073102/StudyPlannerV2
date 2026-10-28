@@ -191,6 +191,23 @@ struct ManageSubjectsUseCaseTests {
         #expect(assignmentRepository.assignments[0].course == "Database Systems")
         #expect(assignmentRepository.assignments[1].course == "Ethics of AI")
     }
+    
+    @Test func failedAssignmentRenameRestoresSubject() {
+        let subject = Subject(name: "Database", code: "31271")
+        let repository = MockSubjectRepository(subjects: [subject])
+        let assignmentRepository = MockAssignmentRepository(assignments: [
+            Assignment(title: "Report", course: "Database", dueDate: .now, priority: .high, tasks: [])
+        ])
+        assignmentRepository.shouldFailOnSave = true
+        let useCase = ManageSubjectsUseCase(repository: repository, assignmentRepository: assignmentRepository)
+
+        #expect(throws: ManageSubjectsUseCase.SubjectError.saveFailed) {
+            try useCase.update(id: subject.id, name: "Database Systems", code: "31271")
+        }
+
+        #expect(repository.subjects.first?.name == "Database")
+        #expect(assignmentRepository.assignments.first?.course == "Database")
+    }
 
     // MARK: - Delete
     
