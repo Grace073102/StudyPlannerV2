@@ -11,6 +11,7 @@ struct DiscoveredInternship: Decodable, Identifiable {
     let id: String
     let title: String
     let location: String?
+    let locations: [JobLocation]?
     let company: Company?
     let applicationURLText: String?
     let descriptionHTML: String?
@@ -19,6 +20,16 @@ struct DiscoveredInternship: Decodable, Identifiable {
     let remoteType: String?
     let employmentType: String?
 
+    struct JobLocation: Decodable {
+        let countryCode: String?
+        let rawLocation: String?
+
+        enum CodingKeys: String, CodingKey {
+            case countryCode = "country_code"
+            case rawLocation = "raw_location"
+        }
+    }
+    
     struct Company: Decodable {
         let name: String?
         let websiteURLText: String?
@@ -30,7 +41,7 @@ struct DiscoveredInternship: Decodable, Identifiable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, title, location, company, published
+        case id, title, location, locations, company, published
         case applicationURLText = "application_url"
         case descriptionHTML = "description"
         case salaryText = "salary_text"
@@ -38,6 +49,46 @@ struct DiscoveredInternship: Decodable, Identifiable {
         case employmentType = "employment_type"
     }
 
+    /// Flags Australian matches derived only from the company name.
+    var hasCompanyOnlyAustralianMatch: Bool {
+        guard let locations,
+              let companyName = company?.name?
+                .trimmingCharacters(in: .whitespacesAndNewlines),
+              !companyName.isEmpty
+        else {
+            return false
+        }
+
+        let australianMatches = locations.filter {
+            $0.countryCode?.uppercased() == "AU"
+        }
+
+        guard !australianMatches.isEmpty else {
+            return false
+        }
+
+        return australianMatches.allSatisfy { match in
+            guard let raw = match.rawLocation?
+                .trimmingCharacters(in: .whitespacesAndNewlines),
+                  !raw.isEmpty
+            else {
+                return false
+            }
+
+            let matchesCompany =
+                raw.caseInsensitiveCompare(companyName) == .orderedSame
+
+            let matchesJobLocation =
+                raw.caseInsensitiveCompare(
+                    location?.trimmingCharacters(
+                        in: .whitespacesAndNewlines
+                    ) ?? ""
+                ) == .orderedSame
+
+            return matchesCompany && !matchesJobLocation
+        }
+    }
+    
     var companyDisplayName: String {
         guard let name = company?.name?
             .trimmingCharacters(in: .whitespacesAndNewlines),

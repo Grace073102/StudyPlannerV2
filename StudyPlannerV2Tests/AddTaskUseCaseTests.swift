@@ -74,6 +74,23 @@ struct AddTaskUseCaseTests {
 
         #expect(repository.updateCallCount == 0)
     }
+    
+    // Boundary Test: 1 minute is the smallest valid estimate.
+    @Test func oneMinuteIsValid() throws {
+        let assignment = makeAssignment()
+        let repository = MockAssignmentRepository(assignments: [assignment])
+        let useCase = AddTaskUseCase(repository: repository)
+
+        let task = try useCase.execute(
+            title: "Quick review",
+            plannedDate: nil,
+            estimatedMinutes: 1,
+            assignmentID: assignment.id
+        )
+
+        #expect(task.estimatedMinutes == 1)
+        #expect(repository.assignments.first?.tasks.count == 1)
+    }
 
     @Test func unknownAssignmentThrowsAssignmentNotFound() {
         let repository = MockAssignmentRepository(assignments: [])
