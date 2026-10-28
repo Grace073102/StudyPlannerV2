@@ -69,7 +69,18 @@ struct PlacementListView: View {
                     List {
                         ForEach(viewModel.placements) { summary in
                             NavigationLink {
-                                requirementsScreen(for: summary)
+                                PlacementDetailView(
+                                    placementID: summary.placement.id,
+                                    placementViewModel: viewModel,
+                                    requirementViewModel: requirementViewModel,
+                                    onEdit: { placement in
+                                        formPlacement = placement
+                                        showForm = true
+                                    },
+                                    onDelete: {placementID in
+                                        viewModel.deletePlacement(id: placementID)
+                                    }
+                                )
                             } label: {
                                 card(for: summary)
                             }
@@ -114,8 +125,11 @@ struct PlacementListView: View {
             viewModel.loadPlacements()
             viewModel.loadSubjects()
         }
-        .sheet(isPresented: $showForm) {
+        .sheet(isPresented: $showForm, onDismiss: {
+            formPlacement = nil
+        }) {
             PlacementFormView(viewModel: viewModel, placement: formPlacement)
+                .id(formPlacement?.id)
         }
         .alert(
             "Placement Error",
@@ -140,7 +154,7 @@ struct PlacementListView: View {
                     .font(.headline)
                 
                 if let subjectID = placement.subjectID,
-                   let subject = viewModel.subjects.first(where: { $0.id == subjectID}) {
+                   let subject = viewModel.subjects.first(where: { $0.id == subjectID }) {
                     Label {
                         Text(subject.name)
                             .foregroundStyle(.secondary)
@@ -164,20 +178,17 @@ struct PlacementListView: View {
             
             Spacer()
             
-            Label(summary.status.displayName, systemImage: summary.status.icon)
-                .font(.caption2)
-                .fontWeight(.semibold)
-                .foregroundStyle(.primary)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(summary.status.color.opacity(0.25))
-                .clipShape(Capsule())
+            PlacementStatusBadge(status: summary.status)
         }
         .padding(Theme.padding)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Theme.card)
         .clipShape(RoundedRectangle(cornerRadius: Theme.corner))
         .accessibilityElement(children: .combine)
+        .accessibilityAction(named: "Edit") {
+            formPlacement = placement
+            showForm = true
+        }
         .accessibilityAction(named: "Delete") {
             placementToDelete = placement
         }
@@ -195,26 +206,5 @@ struct PlacementListView: View {
         let start = placement.startDate.formatted(.dateTime.day().month().year())
         let end = placement.endDate.formatted(.dateTime.day().month().year())
         return "\(start) – \(end)"
-    }
-    
-    // MARK: - Requirements
-    
-    private func requirementsScreen(for summary: ManagePlacementsUseCase.PlacementSummary) -> some View {
-        RequirementListView(
-            viewModel: requirementViewModel,
-            placementID: summary.placement.id
-        )
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    formPlacement = summary.placement
-                    showForm = true
-                } label: {
-                    Image(systemName: "pencil")
-                        .foregroundStyle(Color.accentColor)
-                }
-                .accessibilityLabel("Edit Placement")
-            }
-        }
     }
 }
