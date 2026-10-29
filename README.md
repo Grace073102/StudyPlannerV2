@@ -1,93 +1,214 @@
-# CampusFlow [work-in-progress]
+# CampusFlow
 
-CampusFlow helps students organise academic tasks, placement
-requirements, and saved internship opportunities.
+CampusFlow is an iOS student planning application that brings academic organisation, personal placement preparation, and internship discovery together. Students can manage assignments and tasks, track placement requirements, organise supporting documents, and save internship opportunities within one application.
 
-## Running locally
+CampusFlow is independently developed and is not affiliated with or officially connected to any university or university system. It supports personal organisation; official university systems remain responsible for placement allocation, approval, and compliance.
 
-1. Clone the repository.
+## Features
+
+### Academic Planning
+
+- Create, edit, and delete assignments.
+- Organise assignments by subject.
+- Break assignments into smaller tasks and track completion.
+- View assignment progress and upcoming deadlines.
+- Import, preview, and delete assignment PDFs.
+
+### Placement Preparation
+
+- Create and manage personal placement records.
+- Track placement dates and preparation requirements.
+- Record requirement deadlines and completion.
+- Receive local reminders for placement requirements.
+- View upcoming placement preparation tasks.
+
+### Internship Discovery and Tracking
+
+- Discover internship opportunities through the CleanJobData API.
+- Search by title and filter for remote opportunities.
+- Load additional results using cursor pagination.
+- Open available company websites.
+- Save discovered opportunities to Career → Internships.
+- Add and manage saved internships manually.
+- Track application status and prevent duplicate saves.
+
+### PDF Sharing
+
+- Share a PDF from another application to CampusFlow.
+- Select an existing assignment to attach the PDF to.
+- Access the imported PDF from the assignment’s detail screen.
+
+## Architecture
+
+CampusFlow uses SwiftUI for its interface and SwiftData for local persistence. ViewModels manage interface state and actions, use cases contain application-specific business rules, and repository protocols separate business logic from storage and API access.
+
+```text
+┌────────────────────────┐
+│     SwiftUI Views      │
+└───────────┬────────────┘
+            ▼
+┌────────────────────────┐
+│       ViewModels       │
+│   UI state + actions   │
+└───────────┬────────────┘
+            ▼
+┌────────────────────────┐
+│       Use Cases        │
+│     Business rules     │
+└───────────┬────────────┘
+            ▼
+┌────────────────────────┐
+│  Repository Protocols  │
+└───────────┬────────────┘
+            │
+      ┌─────┴─────┐
+      ▼           ▼
+┌───────────┐ ┌─────────────────┐
+│ SwiftData │ │ CleanJobData   │
+│   Local   │ │ Internship API │
+└───────────┘ └─────────────────┘
+```
+
+Internship searches use the discovery repository directly from the ViewModel. Saving an opportunity passes through a use case before reaching the SwiftData repository.
+
+Academic records, placement information, and saved internships are stored locally. Live internship discovery requires an internet connection and API configuration.
+
+## Domain Use Cases
+
+| Use Case | Responsibility |
+| --- | --- |
+| `AddAssignmentUseCase` | Validates and creates assignments. |
+| `UpdateAssignmentUseCase` | Validates changes to existing assignments. |
+| `AddTaskUseCase` | Adds tasks to assignments. |
+| `EditTaskUseCase` | Validates and updates task details. |
+| `ManagePlacementsUseCase` | Manages placement records and coordinates reminder cancellation after deletion. |
+| `AddRequirementUseCase` | Validates and creates placement requirements. |
+| `ToggleRequirementCompletionUseCase` | Updates requirement completion status. |
+| `ManageSavedInternshipsUseCase` | Validates saved internship details and rejects duplicate job IDs. |
+| `SaveDiscoveredInternshipUseCase` | Converts an API listing into a locally saved internship. |
+| `DocumentUseCase` | Manages assignment PDF documents. |
+
+Validation and repository errors are passed back to the interface for display.
+
+## System Extension and Services
+
+| Component | Purpose |
+| --- | --- |
+| **Share Extension** | Imports PDFs shared from other applications and attaches them to an existing assignment. |
+| **App Group storage** | Shares assignment summaries and PDF files between the main application and Share Extension. |
+| **Local notification service** | Schedules and cancels placement requirement reminders. |
+
+The main application and Share Extension use the App Group identifier `group.com.campusflow.shared`.
+
+## Project Structure
+
+```text
+StudyPlannerV2/
+├── StudyPlannerV2.xcodeproj
+├── StudyPlannerV2/
+│   ├── Configuration/
+│   │   ├── Env.swift
+│   │   └── Development.xcconfig.example
+│   ├── Model/
+│   ├── Views/
+│   ├── ViewModels/
+│   ├── UseCases/
+│   ├── Repositories/
+│   ├── Services/
+│   └── Extension/
+├── CampusFlowShareExtension/
+├── StudyPlannerV2Tests/
+│   └── MockRepositories/
+└── StudyPlannerV2UITests/
+```
+
+## Requirements
+
+- macOS with Xcode and an iOS 26.1 SDK or later.
+- An iOS 26.1 or later simulator or compatible device.
+- Internet access and a personal CleanJobData API key for live internship discovery.
+
+For physical-device testing, configure signing for both the application and Share Extension. Both targets must have access to the same App Group.
+
+## Running the Project
+
+1. Clone the repository:
+
+   ```sh
+   git clone https://github.com/Grace073102/StudyPlannerV2.git
+   ```
+
 2. Open `StudyPlannerV2.xcodeproj` in Xcode.
-3. Follow the API configuration steps below to enable internship discovery.
-4. Select the StudyPlannerV2 scheme and an iPhone simulator.
-5. Build and run with ⌘R.
+3. Complete the API configuration below to enable internship discovery.
+4. Select the **StudyPlannerV2** scheme.
+5. Select a compatible iPhone simulator or connected device.
+6. Build and run using **⌘R**.
+7. Allow notifications when prompted if you want placement reminders.
 
-## Internship API configuration
+Missing API configuration affects Discovery; locally stored planner data remains accessible.
 
-Internship discovery uses CleanJobData. Each developer supplies
-their own API key for local development.
+## Internship API Configuration
 
-1. Create an account and obtain an API key:
-   https://cleanjobdata.com/feeds/australia
+Each developer supplies their own CleanJobData API key for local development.
 
-2. Copy this file:
+1. Create a [CleanJobData account](https://cleanjobdata.com/) and obtain an API key.
 
-   `StudyPlannerV2/Configuration/Development.xcconfig.example`
+2. Copy:
 
-   and name the copy:
+   ```text
+   StudyPlannerV2/Configuration/Development.xcconfig.example
+   ```
 
-   `StudyPlannerV2/Configuration/Development.xcconfig`
+   Name the copy:
 
-3. Replace the placeholder `YOUR_API_KEY_HERE` in your local copy:
+   ```text
+   StudyPlannerV2/Configuration/Development.xcconfig
+   ```
+
+3. Replace the placeholder in your local copy with your key:
 
    ```text
    CLEANJOBDATA_API_KEY = YOUR_API_KEY_HERE
    ```
 
-4. In Xcode, confirm that the StudyPlannerV2 app target's Debug
-   configuration uses `Development.xcconfig`.
+4. In Xcode, select the project, open **Info → Configurations**, and confirm that the app target’s **Debug** configuration uses `Development.xcconfig`.
 
-5. Build and run the Debug configuration.
+5. Build and run using the Debug configuration.
 
-The real `Development.xcconfig` file is excluded from Git.
-Commit only the example file with its placeholder. Do not put
-real keys in Swift source files, screenshots, or commits.
+The application reads the configured value through `Env.swift`.
 
-The app reads the key through `Env.swift`. Missing API configuration
-should affect discovery only, not access to locally saved planner data.
+The real `Development.xcconfig` file is excluded from Git. Commit only the example file containing the placeholder. Never include real keys in source files, screenshots, or commits.
 
-## API and saved internship support
-
-- Requests Australian internships from CleanJobData.
-- Supports title search, remote-only filtering, and cursor pagination.
-- Decodes listing details and available application links.
-- Saves selected listings through the existing saved-internship use case
-  and SwiftData repository.
-- Rejects repeated saves of the same provider listing.
-- Preserves manual internship saving.
-
-The Discover screen still needs to be connected to these dependencies.
-Fetching a listing does not automatically save it.
-
-Provider classifications may be inaccurate. A title search such as
-“intern” produced more relevant results during manual testing.
+This direct API configuration is intended for local development. A distributed application should keep the API credential on a server.
 
 ## Testing
 
-Run the normal test suite with ⌘U.
+Run the tests using **⌘U** in Xcode.
 
-API-client tests use simulated responses and do not require a real key
-or internet connection. Save tests use temporary in-memory storage
-or mock repositories.
+API repository tests use simulated responses and do not require a real API key or an internet connection. Persistence tests use in-memory storage or mock repositories.
 
 Coverage includes:
 
-- Search filters, authorization headers, and pagination decoding.
+- Assignment and task validation.
+- Placement and requirement management.
+- Placement deletion and reminder cancellation.
+- PDF document handling.
+- Search filters and pagination decoding.
 - Rate-limit and malformed-response handling.
-- Saving discovered listing details to SwiftData.
-- Duplicate-save prevention.
-- Missing company validation and repository save failures.
+- Exclusion of company-name-only Australian location matches.
+- Saving discovered internship details.
+- Duplicate-save prevention and missing-company fallback.
+- Repository failure handling.
 
-### Optional live API test
+### Optional Live API Test
 
-`InternshipAPILiveTests` is disabled by default because it requires
-a personal API key, internet access, and available API request allowance.
+`InternshipAPILiveTests` is disabled by default because it requires a personal API key, internet access, and available request allowance.
 
 To run it manually:
 
-1. Complete the local API configuration.
-2. Temporarily replace its disabled annotation with `@Test`.
-3. Run only `fetchAustralianInternships`.
+1. Complete the API configuration.
+2. Temporarily replace the test’s disabled annotation with `@Test`.
+3. Run only `fetchAustralianInternships()`.
 4. Restore the disabled annotation before committing.
 
-An empty result page can be valid. The test does not guarantee that
-every listing is correctly classified or that the Discover UI is connected.
+An empty result page can be valid. Passing this test confirms that returned data can be fetched and decoded; it does not verify every listing’s accuracy or external website availability.
