@@ -13,6 +13,8 @@ struct AssignmentView: View {
     @EnvironmentObject var taskViewModel: TaskViewModel
     @EnvironmentObject var requirementViewModel: RequirementViewModel
     @EnvironmentObject var placementViewModel: PlacementViewModel
+    @EnvironmentObject var savedInternshipViewModel: SavedInternshipViewModel
+    @EnvironmentObject var internshipRequirementViewModel: InternshipRequirementViewModel
     @State private var showAddAssignment = false
 
     var body: some View {
@@ -79,6 +81,15 @@ struct AssignmentView: View {
                             completedCount: requirementViewModel.completedCount(for: next.placement.id),
                             totalCount: requirementViewModel.requirements(for: next.placement.id).count,
                             requirements: requirementViewModel.requirements(for: next.placement.id)
+                        )
+                    }
+                    
+                    if let internship = nextInternship {
+                        InternshipPrepCard(
+                            internship: internship,
+                            completedCount: internshipRequirementViewModel.completedCount(for: internship.id),
+                            totalCount: internshipRequirementViewModel.requirements(for: internship.id).count,
+                            requirements: internshipRequirementViewModel.requirements(for: internship.id)
                         )
                     }
 
@@ -169,6 +180,16 @@ struct AssignmentView: View {
     private var nextPlacement: ManagePlacementsUseCase.PlacementSummary? {
         placementViewModel.placements.first { $0.status != .completed }
     }
+    
+    /// Internship with the earliest application deadline that isn't rejected
+    private var nextInternship: SavedInternship? {
+        var active: [SavedInternship] = []
+        for internship in savedInternshipViewModel.internships where internship.applicationStatus != .rejected {
+            active.append(internship)
+        }
+        active.sort { ($0.applicationDeadline ?? .distantFuture) < ($1.applicationDeadline ?? .distantFuture) }
+        return active.first
+    }
 
     private func formattedDuration(
         _ minutes: Int
@@ -193,7 +214,9 @@ struct AssignmentView: View {
         StoredAssignment.self,
         StoredAcademicTask.self,
         StoredPlacementRequirement.self,
-        StoredPlacement.self
+        StoredPlacement.self,
+        StoredSavedInternship.self,
+        StoredInternshipRequirement.self
     ])
 
     let configuration = ModelConfiguration(
@@ -209,6 +232,8 @@ struct AssignmentView: View {
     let assignmentRepository = SwiftDataAssignmentRepository(container: container)
     let requirementRepository = SwiftDataRequirementRepository(container: container)
     let placementRepository = SwiftDataPlacementRepository(container: container)
+    let savedInternshipRepository = SwiftDataSavedInternshipRepository(container: container)
+    let internshipRequirementRepository = SwiftDataInternshipRequirementRepository(container: container)
     
         let days: (Int) -> Date = { n in
             Calendar.current.date(byAdding: .day, value: n, to: .now)!
@@ -239,6 +264,16 @@ struct AssignmentView: View {
                 ]
             )
         )
+    
+    let _ = try? savedInternshipRepository.add(
+        SavedInternship(
+            jobID: "preview-1",
+            title: "iOS Developer Intern",
+            company: "Atlassian",
+            applicationDeadline: days(10),
+            applicationStatus: .applied
+        )
+    )
 
         // Sample placement requirements
     let placement = Placement(
@@ -276,4 +311,6 @@ struct AssignmentView: View {
             .environmentObject(TaskViewModel(assignmentViewModel: assignmentViewModel))
             .environmentObject(RequirementViewModel(repository: requirementRepository))
             .environmentObject(PlacementViewModel(repository: placementRepository))
+            .environmentObject(SavedInternshipViewModel(repository: savedInternshipRepository))
+            .environmentObject(InternshipRequirementViewModel(repository: internshipRequirementRepository))
 }
