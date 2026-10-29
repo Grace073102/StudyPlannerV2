@@ -183,12 +183,41 @@ struct AssignmentView: View {
     
     /// Internship with the earliest application deadline that isn't rejected
     private var nextInternship: SavedInternship? {
+        let startOfToday = Calendar.current.startOfDay(for: .now)
         var active: [SavedInternship] = []
-        for internship in savedInternshipViewModel.internships where internship.applicationStatus != .rejected {
+        for internship in savedInternshipViewModel.internships {
+            if internship.applicationStatus == .rejected { continue }
+            if let deadline = internship.applicationDeadline, deadline < startOfToday { continue }
             active.append(internship)
         }
-        active.sort { ($0.applicationDeadline ?? .distantFuture) < ($1.applicationDeadline ?? .distantFuture) }
+        
+        active.sort { first, second in
+            // 1. Soonest deadline first (no deadline goes last)
+            let firstDeadline = first.applicationDeadline ?? .distantFuture
+            let secondDeadline = second.applicationDeadline ?? .distantFuture
+            if firstDeadline != secondDeadline {
+                return firstDeadline < secondDeadline
+            }
+
+            // 2. Further along in the application first
+            if statusRank(first) != statusRank(second) {
+                return statusRank(first) < statusRank(second)
+            }
+
+            // 3. Most recently saved first
+            return first.savedDate > second.savedDate
+        }
         return active.first
+    }
+    
+    /// Lower number = more urgent to prepare for.
+    private func statusRank(_ internship: SavedInternship) -> Int {
+        switch internship.applicationStatus {
+        case .interviewing: return 0
+        case .applied: return 1
+        case .saved: return 2
+        default: return 3
+        }
     }
 
     private func formattedDuration(
