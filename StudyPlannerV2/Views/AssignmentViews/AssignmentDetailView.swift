@@ -18,6 +18,8 @@ struct AssignmentDetailView: View {
     @State private var showDeleteConfirmation = false
     @State private var deleteErrorMessage = ""
     @State private var showDeleteError = false
+    @State private var showDoneError = false
+    @State private var doneErrorMessage = ""
 
     var body: some View {
         ScrollView {
@@ -44,6 +46,31 @@ struct AssignmentDetailView: View {
                         RoundedRectangle(cornerRadius: 16)
                             .fill(Color(Theme.card))
                     )
+                }
+                if currentAssignment.isCompleted && !currentAssignment.isMarkedDone {
+                    Label("All tasks completed", systemImage: "checkmark.circle.fill")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.green)
+                        .frame(maxWidth: .infinity)
+                } else {
+                    Button {
+                        do {
+                            try assignmentViewModel.toggleDone(id: currentAssignment.id)
+                        } catch {
+                            doneErrorMessage = error.localizedDescription
+                            showDoneError = true
+                        }
+                    } label: {
+                        Label(
+                            currentAssignment.isMarkedDone ? "Mark as Not Done" : "Mark as Done",
+                            systemImage: currentAssignment.isMarkedDone ? "arrow.uturn.backward" : "checkmark.circle"
+                        )
+                        .fontWeight(.semibold)
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(currentAssignment.isMarkedDone ? .gray : .accentColor)
                 }
             }
             .padding(20)
@@ -104,6 +131,11 @@ struct AssignmentDetailView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text(deleteErrorMessage)
+        }
+        .alert("Unable to Update Assignment", isPresented: $showDoneError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(doneErrorMessage)
         }
     }
 
