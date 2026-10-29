@@ -34,112 +34,35 @@ struct AssignmentListView: View {
                         Text("No assignments yet")
                             .font(.headline)
 
-                        Text(
-                            "Add an assignment to start organising your deadlines."
-                        )
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
+                        Text("Add an assignment to start organising your deadlines.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.top, 60)
                 } else {
-                    ForEach(sortedAssignments) { assignment in
-                        NavigationLink {
-                            AssignmentDetailView(
-                                assignment: assignment
-                            )
-                        } label: {
-                            HStack(spacing: 14) {
-                                VStack(spacing: 2) {
-                                    Text(
-                                        assignment.dueDate,
-                                        format: .dateTime.day()
-                                    )
-                                    .font(.title3)
-                                    .fontWeight(.bold)
+                    if !dueAssignments.isEmpty {
+                        sectionHeader("Due")
 
-                                    Text(
-                                        assignment.dueDate,
-                                        format: .dateTime
-                                            .month(.abbreviated)
-                                    )
-                                    .font(.caption2)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(.primary.opacity(0.75))
-                                    .textCase(.uppercase)
-                                }
-                                .frame(width: 52, height: 56)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(
-                                            Color(.tertiarySystemGroupedBackground)
-                                        )
-                                )
-
-                                VStack(alignment: .leading, spacing: 5) {
-                                    Text(assignment.title)
-                                        .font(.headline)
-                                        .fontWeight(.semibold)
-                                        .foregroundStyle(.primary)
-                                        .lineLimit(1)
-
-                                    HStack(spacing: 5) {
-                                        Image(systemName: "book.closed")
-                                            .font(.caption2)
-
-                                        Text(assignment.course)
-                                            .font(.caption)
-                                            .lineLimit(1)
-                                    }
-                                    .foregroundStyle(.secondary)
-
-                                    if !assignment.tasks.isEmpty {
-                                        Text(
-                                            "\(completedTaskCount(for: assignment))/\(assignment.tasks.count) tasks completed"
-                                        )
-                                        .font(.caption2)
-                                        .foregroundStyle(.secondary)
-                                    }
-                                }
-
-                                Spacer()
-
-                                VStack(alignment: .trailing, spacing: 10) {
-                                    Text(
-                                        assignment.priority.rawValue
-                                    )
-                                    .font(.caption2)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(.primary)
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 4)
-                                    .background(
-                                        assignment.priority.color
-                                            .opacity(0.25)
-                                    )
-                                    .clipShape(Capsule())
-
-                                    Image(systemName: "chevron.right")
-                                        .font(.caption)
-                                        .foregroundStyle(.tertiary)
-                                }
-                            }
-                            .padding(14)
-                            .background(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .fill(Color(Theme.card))
-                            )
+                        ForEach(dueAssignments) { assignment in
+                            assignmentRow(assignment)
                         }
-                        .buttonStyle(.plain)
+                    }
+
+                    if !completedAssignments.isEmpty {
+                        sectionHeader("Completed")
+
+                        ForEach(completedAssignments) { assignment in
+                            assignmentRow(assignment)
+                                .opacity(0.6)
+                        }
                     }
                 }
             }
             .padding(20)
         }
-        .background(
-            Color(.systemGroupedBackground)
-        )
+        .background(Color(.systemGroupedBackground))
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 NavigationLink {
@@ -158,11 +81,104 @@ struct AssignmentListView: View {
         }
     }
 
-    private func completedTaskCount(
-        for assignment: Assignment
-    ) -> Int {
-        assignment.tasks.filter {
-            $0.isCompleted
-        }.count
+    private var dueAssignments: [Assignment] {
+        var result: [Assignment] = []
+        for assignment in sortedAssignments where !assignment.isCompleted {
+            result.append(assignment)
+        }
+        return result
+    }
+
+    private var completedAssignments: [Assignment] {
+        var result: [Assignment] = []
+        for assignment in sortedAssignments where assignment.isCompleted {
+            result.append(assignment)
+        }
+        return result
+    }
+
+    private func sectionHeader(_ title: String) -> some View {
+        Text(title)
+            .font(.subheadline)
+            .fontWeight(.semibold)
+            .foregroundStyle(.secondary)
+            .padding(.top, 4)
+            .accessibilityAddTraits(.isHeader)
+    }
+
+    private func assignmentRow(_ assignment: Assignment) -> some View {
+        NavigationLink {
+            AssignmentDetailView(assignment: assignment)
+        } label: {
+            HStack(spacing: 14) {
+                VStack(spacing: 2) {
+                    Text(assignment.dueDate, format: .dateTime.day())
+                        .font(.title3)
+                        .fontWeight(.bold)
+
+                    Text(assignment.dueDate, format: .dateTime.month(.abbreviated))
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.primary.opacity(0.75))
+                        .textCase(.uppercase)
+                }
+                .frame(width: 52, height: 56)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color(.tertiarySystemGroupedBackground))
+                )
+
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(assignment.title)
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+
+                    HStack(spacing: 5) {
+                        Image(systemName: "book.closed")
+                            .font(.caption2)
+
+                        Text(assignment.course)
+                            .font(.caption)
+                            .lineLimit(1)
+                    }
+                    .foregroundStyle(.secondary)
+
+                    if !assignment.tasks.isEmpty {
+                        Text("\(completedTaskCount(for: assignment))/\(assignment.tasks.count) tasks completed")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                Spacer()
+
+                VStack(alignment: .trailing, spacing: 10) {
+                    Text(assignment.priority.rawValue)
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.primary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(assignment.priority.color.opacity(0.25))
+                        .clipShape(Capsule())
+
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                }
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color(Theme.card))
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func completedTaskCount(for assignment: Assignment) -> Int {
+        assignment.tasks.filter { $0.isCompleted }.count
     }
 }

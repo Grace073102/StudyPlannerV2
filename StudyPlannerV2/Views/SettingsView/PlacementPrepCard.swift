@@ -12,6 +12,7 @@ struct PlacementPrepCard: View {
     let summary: ManagePlacementsUseCase.PlacementSummary
     let completedCount: Int
     let totalCount: Int
+    var requirements: [PlacementRequirement] = []
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -51,6 +52,29 @@ struct PlacementPrepCard: View {
             )
             .font(.caption)
             .foregroundStyle(.secondary)
+            
+            if !nextRequirements.isEmpty {
+                VStack(alignment: .leading, spacing: 4) {
+                    ForEach(nextRequirements, id: \.id) { requirement in
+                        HStack(spacing: 6) {
+                            Image(systemName: "circle")
+                                .font(.caption2)
+                                .accessibilityHidden(true)
+
+                            Text(requirement.name)
+                                .lineLimit(1)
+
+                            Spacer()
+
+                            if let dueDate = requirement.dueDate {
+                                Text(dueDate, format: .dateTime.day().month(.abbreviated))
+                            }
+                        }
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    }
+                }
+            }
         }
         .padding(Theme.padding)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -59,6 +83,16 @@ struct PlacementPrepCard: View {
     
     private var progress: Double {
         totalCount == 0 ? 0 : Double(completedCount) / Double(totalCount)
+    }
+    
+    /// Next 3 unfinished requirements with a due date, earliest first
+    private var nextRequirements: [PlacementRequirement] {
+        var result: [PlacementRequirement] = []
+        for requirement in requirements where !requirement.isCompleted && requirement.dueDate != nil {
+            result.append(requirement)
+        }
+        result.sort { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
+        return Array(result.prefix(3))
     }
     
     private var dateText: String {

@@ -63,6 +63,7 @@ final class SwiftDataAssignmentRepository: AssignmentRepository {
             record.dueDate = assignment.dueDate
             record.priorityRawValue = assignment.priority.rawValue
             record.assignmentDescription = assignment.description
+            record.isMarkedDone = assignment.isMarkedDone
 
             replaceTasks(on: record, with: assignment.tasks)
         }

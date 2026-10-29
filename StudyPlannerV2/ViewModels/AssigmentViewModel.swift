@@ -17,11 +17,13 @@ final class AssignmentViewModel: ObservableObject {
     let repository: AssignmentRepository
     private let addAssignmentUseCase: AddAssignmentUseCase
     private let updateAssignmentUseCase: UpdateAssignmentUseCase
+    private let toggleAssignmentDoneUseCase: ToggleAssignmentDoneUseCase
 
     init(repository: AssignmentRepository) {
         self.repository = repository
         self.addAssignmentUseCase = AddAssignmentUseCase(repository: repository)
         self.updateAssignmentUseCase = UpdateAssignmentUseCase(repository: repository)
+        self.toggleAssignmentDoneUseCase = ToggleAssignmentDoneUseCase(repository: repository)
 
         load()
     }
@@ -72,6 +74,12 @@ final class AssignmentViewModel: ObservableObject {
         assignments = repository.assignments
         repositoryErrorMessage = repository.errorMessage
         syncAssignmentsToShareExtension()
+    }
+    
+    func toggleDone(id: String) throws {
+        try toggleAssignmentDoneUseCase.execute(assignmentID: id)
+        assignments = repository.assignments
+        repositoryErrorMessage = repository.errorMessage
     }
 
     func delete(_ assignment: Assignment) throws {

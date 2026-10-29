@@ -18,6 +18,7 @@ final class StoredAssignment {
     var dueDate: Date
     var priorityRawValue: String
     var assignmentDescription: String?
+    var isMarkedDone: Bool = false
 
     @Relationship(deleteRule: .cascade, inverse: \StoredAcademicTask.assignment)
     var tasks: [StoredAcademicTask] = []
@@ -33,7 +34,7 @@ final class StoredAssignment {
     }
 
     var isCompleted: Bool {
-        !tasks.isEmpty && tasks.allSatisfy { $0.isCompleted }
+        isMarkedDone || (!tasks.isEmpty && tasks.allSatisfy { $0.isCompleted })
     }
 
     enum Priority: String, CaseIterable, Codable {
@@ -75,6 +76,7 @@ final class StoredAssignment {
             tasks: tasks.sorted { $0.position < $1.position }.map { $0.copy() }
         )
         result.priorityRawValue = priorityRawValue
+        result.isMarkedDone = isMarkedDone
         return result
     }
 
@@ -92,6 +94,7 @@ final class StoredAssignment {
         dueDate = assignment.dueDate
         priorityRawValue = assignment.priority.rawValue
         assignmentDescription = assignment.description
+        isMarkedDone = assignment.isMarkedDone
     }
 }
 
