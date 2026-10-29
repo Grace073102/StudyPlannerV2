@@ -70,14 +70,15 @@ struct AssignmentView: View {
                     }
                     .fixedSize(horizontal: false, vertical: true)
                     UpcomingDeadlinesView(
-                        items: UpcomingItem.make(assignments: assignmentViewModel.assignments, requirements: requirementViewModel.requirements)
+                        items: UpcomingItem.make(assignments: assignmentViewModel.assignments, requirements: [])
                     )
                     
                     if let next = nextPlacement {
                         PlacementPrepCard(
                             summary: next,
                             completedCount: requirementViewModel.completedCount(for: next.placement.id),
-                            totalCount: requirementViewModel.requirements(for: next.placement.id).count
+                            totalCount: requirementViewModel.requirements(for: next.placement.id).count,
+                            requirements: requirementViewModel.requirements(for: next.placement.id)
                         )
                     }
 
