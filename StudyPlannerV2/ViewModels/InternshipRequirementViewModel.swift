@@ -15,6 +15,7 @@ final class InternshipRequirementViewModel: ObservableObject {
 
     @Published private(set) var repositoryErrorMessage: String?
     @Published private(set) var notificationErrorMessage: String?
+    @Published private(set) var attachmentCleanupWarning: String?
 
     private let repository: InternshipRequirementRepository
     private let addRequirementUseCase: AddInternshipRequirementUseCase
@@ -111,7 +112,9 @@ final class InternshipRequirementViewModel: ObservableObject {
     func deleteRequirement(id: UUID) throws {
         let useCase = DeleteInternshipRequirementUseCase(repository: repository)
 
-        try useCase.execute(id: id)
+        attachmentCleanupWarning = nil
+
+        let cleanupWarning = try useCase.execute(id: id)
 
         reminderTasks[id]?.cancel()
         reminderTasks[id] = nil
@@ -119,7 +122,10 @@ final class InternshipRequirementViewModel: ObservableObject {
         InternshipRequirementNotificationManager.shared
             .cancelNotifications(for: id)
 
-        try reloadRequirements()
+        requirements.removeAll { $0.id == id }
+
+        loadRequirements()
+        attachmentCleanupWarning = cleanupWarning
     }
 
     // Count completed requirements
@@ -233,5 +239,9 @@ final class InternshipRequirementViewModel: ObservableObject {
 
     func clearNotificationError() {
         notificationErrorMessage = nil
+    }
+    
+    func clearAttachmentCleanupWarning() {
+        attachmentCleanupWarning = nil
     }
 }

@@ -204,4 +204,16 @@ final class DocumentUseCase {
 
         try fileManager.removeItem(at: url)
     }
+    
+    /// Deletes all PDF attachments belonging to the specified item.
+    /// If no attachment folder exists, no action is needed.
+    func deleteAllPDFs(assignmentID: String) throws {
+        let folder = attachmentFolder(for: assignmentID)
+
+        guard fileManager.fileExists(atPath: folder.path) else {
+            return
+        }
+
+        try fileManager.removeItem(at: folder)
+    }
 }

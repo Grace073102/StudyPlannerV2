@@ -5,7 +5,6 @@
 //  Created by Djy on 15/10/2026.
 //
 
-
 import SwiftUI
 import SwiftData
 
@@ -312,36 +311,43 @@ struct RequirementListView: View {
         .alert(
             viewModel.repositoryErrorMessage != nil
                 ? "Requirement Storage Error"
-                : "Reminder Error",
+                : viewModel.attachmentCleanupWarning != nil
+                    ? "PDF Cleanup Warning"
+                    : "Reminder Error",
             isPresented: Binding(
                 get: {
                     viewModel.repositoryErrorMessage != nil ||
+                    viewModel.attachmentCleanupWarning != nil ||
                     viewModel.notificationErrorMessage != nil
                 },
                 set: { isPresented in
                     if !isPresented {
-                        if viewModel.repositoryErrorMessage != nil {
-                            viewModel.clearRepositoryError()
-                        } else {
-                            viewModel.clearNotificationError()
-                        }
+                        clearDisplayedMessage()
                     }
                 }
             )
         ) {
-            Button("OK") {
-                if viewModel.repositoryErrorMessage != nil {
-                    viewModel.clearRepositoryError()
-                } else {
-                    viewModel.clearNotificationError()
-                }
+            Button("OK", role: .cancel) {
+                // The binding clears the displayed message when dismissed.
             }
         } message: {
             Text(
                 viewModel.repositoryErrorMessage
+                    ?? viewModel.attachmentCleanupWarning
                     ?? viewModel.notificationErrorMessage
                     ?? "An unexpected error occurred."
             )
+        }
+    }
+    
+    /// Clears only the message currently being displayed.
+    private func clearDisplayedMessage() {
+        if viewModel.repositoryErrorMessage != nil {
+            viewModel.clearRepositoryError()
+        } else if viewModel.attachmentCleanupWarning != nil {
+            viewModel.clearAttachmentCleanupWarning()
+        } else {
+            viewModel.clearNotificationError()
         }
     }
 }

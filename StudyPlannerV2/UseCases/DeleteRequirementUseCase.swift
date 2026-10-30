@@ -8,26 +8,38 @@
 
 import Foundation
 
-/// Deletes an existing placement requirement.
-/// The ViewModel calls this use case when a requirement is deleted.
+/// Deletes an existing placement requirement and its PDF attachments.
 ///
 /// Business rules:
 /// 1. Only an existing requirement can be deleted.
-/// 2. The deletion is saved through the repository.
+/// 2. The requirement is deleted through the repository first.
+/// 3. PDF attachments are cleaned up after successful deletion.
+/// 4. A cleanup failure returns a warning because the requirement
+///    has already been deleted.
 struct DeleteRequirementUseCase {
 
     let repository: RequirementRepository
 
-    func execute(id: UUID) throws {
+    var deleteAttachments: (String) throws -> Void = { attachmentID in
+        try DocumentUseCase().deleteAllPDFs(assignmentID: attachmentID)
+    }
 
-        // Find the requirement
-        guard let requirement = try repository.load().first(
-            where: { $0.id == id }
-        ) else {
+    /// Returns a warning if the requirement was deleted
+    /// but its PDF attachments could not be removed.
+    @discardableResult
+    func execute(id: UUID) throws -> String? {
+
+        guard let requirement = try repository.load().first(where: { $0.id == id }) else {
             throw RequirementValidationError.notFound
         }
 
-        // Delete the requirement
         try repository.delete(requirement)
+
+        do {
+            try deleteAttachments("requirement-\(requirement.id.uuidString)")
+            return nil
+        } catch {
+            return "The requirement was deleted, but its PDF attachments could not be removed. \(error.localizedDescription)"
+        }
     }
 }

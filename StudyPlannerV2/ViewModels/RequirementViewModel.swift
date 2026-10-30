@@ -15,6 +15,7 @@ final class RequirementViewModel: ObservableObject {
     
     @Published private(set) var repositoryErrorMessage: String?
     @Published private(set) var notificationErrorMessage: String?
+    @Published private(set) var attachmentCleanupWarning: String?
     
     private let repository: RequirementRepository
     private let addRequirementUseCase: AddRequirementUseCase
@@ -150,10 +151,15 @@ final class RequirementViewModel: ObservableObject {
     func deleteRequirement(id: UUID) throws {
         let useCase = DeleteRequirementUseCase(repository: repository)
 
-        try useCase.execute(id: id)
+        attachmentCleanupWarning = nil
+
+        let cleanupWarning = try useCase.execute(id: id)
 
         RequirementNotificationManager.shared.removeNotifications(for: id)
-        try reloadRequirements()
+        requirements.removeAll { $0.id == id }
+
+        loadRequirements()
+        attachmentCleanupWarning = cleanupWarning
     }
 
     
@@ -221,6 +227,10 @@ final class RequirementViewModel: ObservableObject {
     
     func clearNotificationError() {
         notificationErrorMessage = nil
+    }
+    
+    func clearAttachmentCleanupWarning() {
+        attachmentCleanupWarning = nil
     }
 }
 

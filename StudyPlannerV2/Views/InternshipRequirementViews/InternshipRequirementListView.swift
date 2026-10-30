@@ -151,23 +151,36 @@ struct InternshipRequirementListView: View {
             AddInternshipRequirementView(viewModel: viewModel, internshipID: internshipID)
         }
         .alert(
-            viewModel.repositoryErrorMessage != nil ? "Requirement Storage Error" : "Reminder Error",
+            viewModel.repositoryErrorMessage != nil
+                ? "Requirement Storage Error"
+                : viewModel.attachmentCleanupWarning != nil
+                    ? "PDF Cleanup Warning"
+                    : "Reminder Error",
             isPresented: Binding(
                 get: {
-                    !showingAddRequirement && (viewModel.repositoryErrorMessage != nil || viewModel.notificationErrorMessage != nil)
+                    !showingAddRequirement && (
+                        viewModel.repositoryErrorMessage != nil ||
+                        viewModel.attachmentCleanupWarning != nil ||
+                        viewModel.notificationErrorMessage != nil
+                    )
                 },
                 set: { isPresented in
                     if !isPresented {
-                        clearCurrentError()
+                        clearDisplayedMessage()
                     }
                 }
             )
         ) {
-            Button("OK") {
-                clearCurrentError()
+            Button("OK", role: .cancel) {
+                // The binding clears the displayed message when dismissed.
             }
         } message: {
-            Text(viewModel.repositoryErrorMessage ?? viewModel.notificationErrorMessage ?? "An unexpected error occurred.")
+            Text(
+                viewModel.repositoryErrorMessage
+                    ?? viewModel.attachmentCleanupWarning
+                    ?? viewModel.notificationErrorMessage
+                    ?? "An unexpected error occurred."
+            )
         }
     }
 
@@ -272,9 +285,11 @@ struct InternshipRequirementListView: View {
             .clipShape(Capsule())
     }
 
-    private func clearCurrentError() {
+    private func clearDisplayedMessage() {
         if viewModel.repositoryErrorMessage != nil {
             viewModel.clearRepositoryError()
+        } else if viewModel.attachmentCleanupWarning != nil {
+            viewModel.clearAttachmentCleanupWarning()
         } else {
             viewModel.clearNotificationError()
         }
