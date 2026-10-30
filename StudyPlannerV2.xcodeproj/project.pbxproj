@@ -67,7 +67,6 @@
 		D867A158308C6F6E006C211A /* Exceptions for "StudyPlannerV2" folder in "StudyPlannerV2" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Configuration/Development.xcconfig,
 				Info.plist,
 			);
 			target = 1D5EE27A307E69CE0007DC0D /* StudyPlannerV2 */;
