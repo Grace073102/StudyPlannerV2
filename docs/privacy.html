@@ -4,27 +4,30 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="How the CampusFlow iOS student planner handles your data.">
-<meta name="theme-color" content="#5856D6">
+<meta name="theme-color" content="#4038A0">
 <title>CampusFlow Privacy Policy</title>
 <style>
+:root {
+  color-scheme: light dark;
+  --accent: #4038A0;
+  --accent-text: #4038A0;
+  --bg: #F2F2F7;
+  --card: #FFFFFF;
+  --text: #1C1C1E;
+  --muted: #55555B;
+  --border: #D8D8E0;
+}
+
+@media (prefers-color-scheme: dark) {
   :root {
-    --accent: #5856D6;        /* app accent: system indigo */
-    --accent-text: #5856D6;
-    --bg: #F2F2F7;
-    --card: #FFFFFF;
-    --text: #1C1C1E;
-    --muted: #6C6C70;
+    --accent-text: #AAA8FF;
+    --bg: #000000;
+    --card: #1C1C1E;
+    --text: #FFFFFF;
+    --muted: #B5B5BD;
+    --border: #44444A;
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --accent: #5E5CE6;
-      --accent-text: #9D9BFF;
-      --bg: #000000;
-      --card: #1C1C1E;
-      --text: #FFFFFF;
-      --muted: #98989D;
-    }
-  }
+}
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     margin: 0;
@@ -39,13 +42,21 @@
     text-align: center;
   }
   nav a { color: #fff; margin: 0 12px; }
-  a:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+  a:focus-visible {
+    outline: 3px solid var(--accent-text);
+    outline-offset: 4px;
+  }       
+  header a:focus-visible,
+  footer a:focus-visible {
+    outline-color: #FFFFFF;
+  }
   main { max-width: 850px; margin: auto; padding: 55px 24px; }
   main a { color: var(--accent-text); }
   h1 { font-size: clamp(1.8rem, 5vw, 2.5rem); line-height: 1.2; }
   h2 { color: var(--accent-text); margin-top: 2rem; }
   .card {
     background: var(--card);
+    border: 1px solid var(--border);
     border-radius: 18px;
     padding: 18px 24px;
     margin: 12px 0;
@@ -69,9 +80,11 @@
   <p class="note">Last updated: 30 October 2026</p>
 
   <div class="card">
-    <p><strong>In short:</strong> CampusFlow has no accounts, no advertising, no analytics and no
-       tracking. Your planner information stays on your device. The only information that leaves your
-       device is the search you type into the Discovery screen.</p>
+    <p><strong>In short:</strong> CampusFlow does not require an account and is designed to store your 
+      academic, placement and internship records locally on your device. Internship discovery requires 
+      requests to a third-party job data service, which may receive search terms, search filters and 
+      technical connection information. CampusFlow does not intentionally transmit your personal planner 
+      records as part of these searches.</p>
   </div>
 
   <h2>Information stored on your device</h2>
