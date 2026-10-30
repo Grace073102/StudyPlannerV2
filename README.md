@@ -153,31 +153,19 @@ Each developer supplies their own CleanJobData API key for local development.
 
 1. Create a [CleanJobData account](https://cleanjobdata.com/) and obtain an API key.
 
-2. Copy:
-
-   ```text
-   StudyPlannerV2/Configuration/Development.xcconfig.example
-   ```
-
-   Name the copy:
-
-   ```text
-   StudyPlannerV2/Configuration/Development.xcconfig
-   ```
-
-3. Replace the placeholder in your local copy with your key:
+2. Navigate to `StudyPlannerV2/Configuration/Development.xcconfig` and replace the placeholder with your key:
 
    ```text
    CLEANJOBDATA_API_KEY = YOUR_API_KEY_HERE
    ```
 
-4. In Xcode, select the project, open **Info → Configurations**, and confirm that the app target’s **Debug** configuration uses `Development.xcconfig`.
+3. In Xcode, select the project, open **Info → Configurations**, and confirm that the app target’s **Debug** configuration uses `Development.xcconfig`.
 
-5. Build and run using the Debug configuration.
+4. Build and run using the Debug configuration.
 
 The application reads the configured value through `Env.swift`.
 
-The real `Development.xcconfig` file is excluded from Git. Commit only the example file containing the placeholder. Never include real keys in source files, screenshots, or commits.
+Make sure not to commit your real API key to the GitHub repository.
 
 This direct API configuration is intended for local development. A distributed application should keep the API credential on a server.
 
