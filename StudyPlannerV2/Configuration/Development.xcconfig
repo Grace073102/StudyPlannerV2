@@ -1,0 +1,8 @@
+//
+//  Development.xcconfig
+//  StudyPlannerV2
+//
+//  Created by Eden Fernando on 24/10/2026.
+//
+
+CLEANJOBDATA_API_KEY = YOUR_API_KEY_HERE
