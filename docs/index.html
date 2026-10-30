@@ -1,91 +1,380 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="CampusFlow is an iOS student planner for assignments, placement preparation and internship opportunities.">
-<meta name="theme-color" content="#5856D6">
-<title>CampusFlow | Student Planner</title>
-<style>
-  :root {
-    --accent: #4038A0;   
-    --accent-text: #4038A0;
-    --bg: #F2F2F7;
-    --card: #FFFFFF;
-    --text: #1C1C1E;
-    --muted: #6C6C70;
-  }
-  @media (prefers-color-scheme: dark) {
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CampusFlow brings academic planning, placement preparation and internship opportunities together in one iOS student productivity app.">
+  <meta name="theme-color" content="#4038A0">
+  <title>CampusFlow | Study, Placement & Career Planning</title>
+  <style>
     :root {
+      color-scheme: light dark;
       --accent: #4038A0;
-      --accent-text: #AAA8FF;
-      --bg: #000000;
-      --card: #1C1C1E;
-      --text: #FFFFFF;
-      --muted: #98989D;
+      --accent-text: #4038A0;
+      --bg: #F2F2F7;
+      --card: #FFFFFF;
+      --text: #1C1C1E;
+      --muted: #55555B;
+      --border: #D8D8E0;
     }
-  }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.6;
-  }
-  header, footer {
-    background: var(--accent);
-    color: #fff;
-    padding: 22px;
-    text-align: center;
-  }
-  nav a { color: #fff; margin: 0 12px; }
-  a:focus-visible { outline: 3px solid var(--accent-text); outline-offset: 3px; }
-  header a:focus-visible,
-  footer a:focus-visible {
-    outline-color:#fff:
-  }
-  main { max-width: 850px; margin: auto; padding: 55px 24px; }
-  h1 { font-size: clamp(1.8rem, 5vw, 2.5rem); line-height: 1.2; }
-  h2 { color: var(--accent-text); }
-  .features { list-style: none; padding: 0; }
-  .features li {
-    background: var(--card);
-    border-radius: 18px;
-    padding: 18px 24px;
-    margin: 12px 0;
-  }
-  .note { color: var(--muted); font-size: 0.95rem; }
-</style>
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --accent-text: #AAA8FF;
+        --bg: #000000;
+        --card: #1C1C1E;
+        --text: #FFFFFF;
+        --muted: #B5B5BD;
+        --border: #44444A;
+      }
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont,
+                   "Segoe UI", sans-serif;
+      line-height: 1.6;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      background: var(--accent);
+      color: #FFFFFF;
+      padding: 20px 24px;
+    }
+
+    .header-content {
+      max-width: 1000px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand {
+      font-size: 1.35rem;
+      font-weight: 700;
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    nav a, footer a {
+      color: #FFFFFF;
+    }
+
+    a:focus-visible {
+      outline: 3px solid var(--accent-text);
+      outline-offset: 4px;
+    }
+
+    header a:focus-visible,
+    footer a:focus-visible {
+      outline-color: #FFFFFF;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: auto;
+      padding: 32px 24px 64px;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 55px 0 45px;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      color: var(--accent-text);
+      font-size: 1.7rem;
+      margin-bottom: 12px;
+    }
+
+    h3 {
+      margin-top: 0;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--accent-text);
+    }
+
+    .intro {
+      max-width: 740px;
+      margin: 20px auto;
+      color: var(--muted);
+    }
+
+    section {
+      margin-bottom: 56px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+    }
+
+    .feature-card p {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .closing {
+      text-align: center;
+      padding: 35px 20px;
+    }
+
+    .closing p {
+      max-width: 680px;
+      margin: 12px auto;
+    }
+
+    .note {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    footer {
+      background: var(--accent);
+      color: #FFFFFF;
+      padding: 24px;
+      text-align: center;
+    }
+
+    footer p {
+      margin: 6px 0;
+    }
+
+    @media (max-width: 600px) {
+      .header-content {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .hero {
+        padding: 32px 0;
+      }
+    }
+  </style>
 </head>
+
 <body>
-<header>
-  <strong>CampusFlow</strong>
-  <nav aria-label="Main">
-    <a href="index.html">Home</a>
-    <a href="support.html">Support</a>
-    <a href="privacy.html">Privacy</a>
-  </nav>
-</header>
+  <header>
+    <div class="header-content">
+      <div class="brand">CampusFlow</div>
+      <nav aria-label="Main navigation">
+        <a href="index.html" aria-current="page">Home</a>
+        <a href="support.html">Support</a>
+        <a href="privacy.html">Privacy Policy</a>
+      </nav>
+    </div>
+  </header>
 
-<main>
-  <h1>Stay organised with CampusFlow</h1>
-  <p>CampusFlow is an iOS student planner that brings academic tasks,
-     placement preparation and internship opportunities together in one app.</p>
+  <main>
+    <section class="hero">
+      <h1>Your studies, placements and career opportunities — all in one place.</h1>
+      <p class="subtitle">Study smarter. Stay prepared. Move forward.</p>
 
-  <h2>Features</h2>
-  <ul class="features">
-    <li>Manage assignments and deadlines</li>
-    <li>Track tasks and academic progress</li>
-    <li>Organise placements and requirements</li>
-    <li>Discover and save internship opportunities</li>
-    <li>Manage supporting PDF documents</li>
-  </ul>
+      <p class="intro">
+        University life is more than attending classes and completing
+        assignments. Managing overlapping deadlines, preparing for
+        professional placements and searching for internships can
+        quickly become overwhelming.
+      </p>
 
-  <p class="note">CampusFlow is a student project and is not affiliated with any
-     university or career website. Internship listings are provided by a third-party      
-     service and may change or be removed.</p>
-</main>
+      <p class="intro">
+        CampusFlow brings academic planning, placement management
+        and career opportunity discovery together in one
+        student-focused iOS productivity app.
+      </p>
+    </section>
 
-<footer>CampusFlow — Student Project</footer>
+    <section>
+      <h2>Plan Your Studies</h2>
+      <p>
+        Stay on top of your academic workload with practical
+        planning tools.
+      </p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Academic Dashboard</h3>
+          <p>View upcoming assignments, deadlines, study tasks
+             and placement requirements in one place.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>Assignment Management</h3>
+          <p>Create, organise and manage assignments across
+             different subjects.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>Task Prioritisation</h3>
+          <p>Identify important tasks and focus on what
+             needs attention.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>Progress Tracking</h3>
+          <p>Monitor completed and outstanding tasks to
+             stay aware of your academic progress.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Prepare for Placements and Internships</h2>
+      <p>
+        Keep your professional preparation organised and accessible.
+      </p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Placement Management</h3>
+          <p>Create and manage placements, including dates,
+             associated subjects and relevant details.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>Customisable Checklists</h3>
+          <p>Track preparation requirements, completion status,
+             deadlines and expiry dates.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>PDF Document Management</h3>
+          <p>Import, preview and attach supporting PDFs to
+             assignments and preparation requirements.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>Deadline Reminders</h3>
+          <p>Receive notifications for approaching requirement
+             deadlines and expiry dates.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>Easy PDF Sharing</h3>
+          <p>Share PDFs from compatible iOS apps into existing
+             CampusFlow assignments using the Share Extension.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Discover Internships and Jobs</h2>
+      <p>
+        Explore opportunities and organise your next steps
+        towards professional experience and employment.
+      </p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Opportunity Search</h3>
+          <p>Search for opportunities by title, with an option
+             to filter remote opportunities.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>Job Details</h3>
+          <p>Review available position, employer, location
+             and application information.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>Saved Opportunities</h3>
+          <p>Save opportunities of interest for future reference.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>Application Tracking</h3>
+          <p>Keep track of saved opportunities and
+             application progress.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>One App, Multiple Responsibilities</h2>
+      <p>
+        CampusFlow connects academic planning, placement and
+        internship preparation, and career opportunities in one
+        centralised experience.
+      </p>
+      <p>
+        Designed for university students across different
+        disciplines, CampusFlow supports academic and professional
+        preparation independently of university-specific systems.
+      </p>
+    </section>
+
+    <section>
+      <h2>Designed for Student Productivity</h2>
+      <p>
+        CampusFlow supports offline access to locally stored
+        academic, placement and internship records. Personal
+        records and supporting PDF documents remain stored
+        on device, while internship discovery requires an
+        internet connection.
+      </p>
+      <p>
+        The app also supports iOS accessibility features,
+        including VoiceOver, alongside Light and Dark Mode.
+      </p>
+    </section>
+
+    <section class="closing">
+      <h2>Study Smarter. Stay Prepared. Move Forward.</h2>
+      <p>
+        From your next assignment to your next career opportunity,
+        CampusFlow helps you stay organised throughout your
+        university journey.
+      </p>
+      <p><strong>CampusFlow — Make your university journey well organised.</strong></p>
+    </section>
+
+    <p class="note">
+      CampusFlow is a student project and is not affiliated
+      with universities, placement portals or career websites.
+      Internship listings are provided through a third-party
+      service and may change or be removed.
+    </p>
+  </main>
+
+  <footer>
+    <p><strong>CampusFlow</strong> — Student Project</p>
+    <p>
+      <a href="index.html">Home</a> |
+      <a href="support.html">Support</a> |
+      <a href="privacy.html">Privacy Policy</a>
+    </p>
+  </footer>
 </body>
 </html>
