@@ -118,8 +118,7 @@ StudyPlannerV2/
 │   └── Extension/
 ├── CampusFlowShareExtension/
 ├── StudyPlannerV2Tests/
-│   └── MockRepositories/
-└── StudyPlannerV2UITests/
+    └── MockRepositories/
 ```
 
 ## Requirements
