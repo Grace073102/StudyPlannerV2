@@ -8,8 +8,8 @@
 <title>CampusFlow | Student Planner</title>
 <style>
   :root {
-    --accent: #5856D6;        /* app accent: system indigo */
-    --accent-text: #5856D6;
+    --accent: #4038A0;   
+    --accent-text: #4038A0;
     --bg: #F2F2F7;
     --card: #FFFFFF;
     --text: #1C1C1E;
@@ -17,8 +17,8 @@
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --accent: #5E5CE6;
-      --accent-text: #9D9BFF;
+      --accent: #4038A0;
+      --accent-text: #AAA8FF;
       --bg: #000000;
       --card: #1C1C1E;
       --text: #FFFFFF;
@@ -39,7 +39,11 @@
     text-align: center;
   }
   nav a { color: #fff; margin: 0 12px; }
-  a:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+  a:focus-visible { outline: 3px solid var(--accent-text); outline-offset: 3px; }
+  header a:focus-visible,
+  footer a:focus-visible {
+    outline-color:#fff:
+  }
   main { max-width: 850px; margin: auto; padding: 55px 24px; }
   h1 { font-size: clamp(1.8rem, 5vw, 2.5rem); line-height: 1.2; }
   h2 { color: var(--accent-text); }
@@ -78,4 +82,10 @@
   </ul>
 
   <p class="note">CampusFlow is a student project and is not affiliated with any
-     university or career website. Internship listings are provided by a third-party
+     university or career website. Internship listings are provided by a third-party      
+     service and may change or be removed.</p>
+</main>
+
+<footer>CampusFlow — Student Project</footer>
+</body>
+</html>
